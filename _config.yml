@@ -1,0 +1,21 @@
+title: Jackknifer 的个人博客
+description: 记录技术、阅读、想法和日常折腾。
+url: "https://Jackknifer.github.io"
+baseurl: ""
+lang: zh-CN
+timezone: Asia/Shanghai
+
+author:
+  name: Jackknifer
+  github: https://github.com/Jackknifer
+  avatar: https://avatars.githubusercontent.com/u/130291261?v=4
+
+permalink: /:year/:month/:day/:title/
+markdown: kramdown
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor

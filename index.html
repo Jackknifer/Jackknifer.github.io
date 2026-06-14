@@ -1,0 +1,41 @@
+---
+layout: default
+title: 首页
+---
+
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">Personal Blog</p>
+    <h1>Jackknifer 的个人博客</h1>
+    <p class="hero-text">
+      这里用来记录技术学习、阅读笔记、项目实践和一些阶段性的想法。
+      先把博客跑起来，再慢慢把它打磨成自己的长期空间。
+    </p>
+    <div class="hero-actions">
+      <a class="button button-primary" href="#posts">阅读文章</a>
+      <a class="button button-secondary" href="{{ site.author.github }}">GitHub 主页</a>
+    </div>
+  </div>
+  <img class="hero-avatar" src="{{ site.author.avatar }}" alt="{{ site.author.name }} 的 GitHub 头像">
+</section>
+
+<section id="posts" class="content-section">
+  <div class="section-heading">
+    <p class="eyebrow">Posts</p>
+    <h2>最新文章</h2>
+  </div>
+
+  <div class="post-list">
+    {% for post in site.posts %}
+      <article class="post-card">
+        <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%Y-%m-%d' }}</time>
+        <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
+        {% if post.description %}
+          <p>{{ post.description }}</p>
+        {% else %}
+          <p>{{ post.excerpt | strip_html | truncate: 110 }}</p>
+        {% endif %}
+      </article>
+    {% endfor %}
+  </div>
+</section>
