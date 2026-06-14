@@ -1,7 +1,15 @@
 ---
-layout: post
-title: "第一篇博客：先把站点搭起来"
-description: "从今天开始，这里会成为一个记录技术、阅读和想法的地方。"
+title: 第一篇博客：先把站点搭起来
+date: 2026-06-14 16:00:00
+updated: 2026-06-14 16:00:00
+tags:
+  - 博客
+  - GitHub Pages
+  - Hexo
+categories:
+  - 日志
+description: 从今天开始，这里会成为一个记录技术、阅读和想法的地方。
+cover: /images/hero-city.jpeg
 ---
 
 这是博客上线后的第一篇文章。
@@ -15,3 +23,5 @@ description: "从今天开始，这里会成为一个记录技术、阅读和想
 3. 挑一个喜欢的视觉方向，慢慢调整排版和配色。
 
 博客已经有了，剩下的就是让它长出自己的内容。
+
+![海面上的飞鸟](/images/hero-sea-level.jpg)

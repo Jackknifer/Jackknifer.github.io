@@ -1,23 +1,18 @@
 # Jackknifer.github.io
 
-这是 Jackknifer 的 GitHub Pages 个人博客。
+Jackknifer 的 GitHub Pages 个人博客，基于 Hexo 和 Theme Redefine。
+
+## 本地预览
+
+```bash
+npm install
+npm run server
+```
 
 ## 写新文章
 
-在 `_posts` 目录中新建 Markdown 文件，文件名格式：
-
-```text
-YYYY-MM-DD-title.md
+```bash
+npm run new "文章标题"
 ```
 
-文件开头保留 Front Matter：
-
-```yaml
----
-layout: post
-title: "文章标题"
-description: "文章摘要"
----
-```
-
-提交并推送到 `main` 分支后，GitHub Pages 会自动重新发布。
+文章会生成在 `source/_posts` 目录。提交并推送到 `main` 后，GitHub Actions 会自动构建并发布到 GitHub Pages。
