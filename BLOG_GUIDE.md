@@ -54,6 +54,8 @@ npm run publish -- "草稿文件名"
 
 `source/_posts` 存放正式文章。每一篇 Markdown 文件都会生成一个公开页面。
 
+这个目录是已发布文章的正式管理区，会同步到 GitHub。文章发布后，后续更新可以直接修改这里的 Markdown 和对应图片，再提交推送。
+
 `source/_drafts` 存放草稿。草稿默认不会发布，只有 `npm run server:drafts` 本地预览时能看到。
 
 `source/images` 存放图片。文章里引用图片时使用 `/images/文件名`，例如 `![海面](/images/hero-sea-level.jpg)`。
@@ -85,8 +87,7 @@ npm run new:post -- "我的文章标题"
 ```yaml
 ---
 title: 我的文章标题
-date: 2020-05-03 21:30:00
-updated: 2026-06-14 17:00:00
+date: 2020-05-03
 tags:
   - 标签一
   - 标签二
@@ -99,9 +100,7 @@ sticky:
 ---
 ```
 
-`date` 可以手动改成旧文章的真实写作时间，所以你可以补发以前的文章。格式建议统一使用 `YYYY-MM-DD HH:mm:ss`。
-
-`updated` 可以写最后整理或迁移的时间。如果不想区分，可以和 `date` 一样。
+`date` 可以手动改成旧文章的真实写作时间，所以你可以补发以前的文章。格式建议统一使用 `YYYY-MM-DD`。博客页面只显示年月日，不显示具体时间，也不显示文件上传或更新时间。
 
 `tags` 是标签，可以有多个。
 
@@ -159,6 +158,8 @@ npm run publish -- "未完成文章"
 
 如果你已经有一批 Markdown 文章，推荐先放到 `pending-posts`，之后我可以直接读取这个文件夹并帮你导入博客。
 
+`pending-posts` 是本地待发布收件箱，里面的实际文章默认不会同步到 GitHub。导入后的正式文章会复制到 `source/_posts`，图片会复制到 `source/images/posts`；这两个正式目录才会跟随提交发布。
+
 推荐结构：
 
 ```text
@@ -196,11 +197,20 @@ npm run import:pending:dry
 npm run import:pending
 ```
 
+如果你在 `pending-posts` 里修改了已经导入过的文章，并希望覆盖 `source/_posts` 里的正式版本：
+
+```bash
+npm run import:pending:force
+```
+
 导入脚本会做三件事：
 
 - 把 Markdown 复制到 `source/_posts/<article-slug>.md`。
 - 把图片复制到 `source/images/posts/<article-slug>/`。
 - 把正文和 `cover` 里的相对图片路径改成博客可访问的 `/images/posts/...` 路径。
+- 如果文件名末尾带日期，例如 `我的文章 3.6.md`，脚本会自动写成 `date: 2026-03-06`，并把标题整理成 `我的文章`。
+- 如果正式文章已经存在，普通导入会跳过；需要覆盖时使用 `npm run import:pending:force`。
+- 如果文章引用的图片缺失，脚本会跳过这篇文章，避免发布破图。
 
 为了避免未发布草稿误传到公开仓库，`pending-posts` 里的实际文章默认被 `.gitignore` 忽略。导入后的正式文章在 `source/_posts`，才需要提交。
 

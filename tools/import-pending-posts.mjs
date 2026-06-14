@@ -27,6 +27,15 @@ function formatDate(date = new Date()) {
   ].join(":");
 }
 
+function formatDateOnly(date = new Date()) {
+  const pad = (value) => String(value).padStart(2, "0");
+  return [
+    date.getFullYear(),
+    pad(date.getMonth() + 1),
+    pad(date.getDate()),
+  ].join("-");
+}
+
 function isIgnoredInboxEntry(name) {
   return name === "README.md" || name === ".DS_Store" || name.startsWith("_");
 }
@@ -102,6 +111,41 @@ function slugify(value) {
   return slug || `post-${Date.now()}`;
 }
 
+function validDateParts(year, month, day) {
+  const date = new Date(year, month - 1, day);
+  return date.getFullYear() === year
+    && date.getMonth() === month - 1
+    && date.getDate() === day;
+}
+
+function parseDatedName(value, fallbackYear = new Date().getFullYear()) {
+  const text = String(value || "").trim();
+  const patterns = [
+    /^(?<title>.+?)[\s_-]+(?<year>\d{4})[./_-](?<month>\d{1,2})[./_-](?<day>\d{1,2})$/,
+    /^(?<year>\d{4})[./_-](?<month>\d{1,2})[./_-](?<day>\d{1,2})[\s_-]+(?<title>.+)$/,
+    /^(?<title>.+?)[\s_-]+(?<month>\d{1,2})[.月/_-](?<day>\d{1,2})日?$/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (!match?.groups) continue;
+
+    const year = Number(match.groups.year || fallbackYear);
+    const month = Number(match.groups.month);
+    const day = Number(match.groups.day);
+    const title = String(match.groups.title || "").trim();
+
+    if (title && validDateParts(year, month, day)) {
+      return {
+        title,
+        date: formatDateOnly(new Date(year, month - 1, day)),
+      };
+    }
+  }
+
+  return { title: text, date: "" };
+}
+
 function escapeYamlScalar(value) {
   const text = String(value || "").trim();
   if (!text) return "";
@@ -155,7 +199,37 @@ function appendBlockIfMissing(frontMatter, key, block) {
 
 function inferTitle(body, fallback) {
   const heading = body.match(/^#\s+(.+)$/m);
-  return heading ? heading[1].trim() : fallback;
+  const fallbackInfo = parseDatedName(fallback);
+  const fallbackTitle = fallbackInfo.title || fallback;
+
+  if (heading) {
+    return parseDatedName(heading[1]).title || heading[1].trim();
+  }
+
+  const firstTextLine = body
+    .split("\n")
+    .map((line) => line.trim())
+    .find((line) => line && !line.startsWith("!["));
+
+  if (firstTextLine) {
+    const firstTitle = parseDatedName(firstTextLine.replace(/^#{1,6}\s+/, "")).title;
+    if (firstTitle === fallbackTitle) return firstTitle;
+  }
+
+  return fallbackTitle;
+}
+
+function removeLeadingTitleLine(body, title) {
+  const lines = body.replace(/\r\n/g, "\n").split("\n");
+  const index = lines.findIndex((line) => line.trim());
+  if (index === -1) return body;
+
+  const firstLine = lines[index].trim().replace(/^#{1,6}\s+/, "");
+  const firstTitle = parseDatedName(firstLine).title;
+  if (firstTitle !== title) return body;
+
+  lines.splice(index, 1);
+  return lines.join("\n").replace(/^\n+/, "");
 }
 
 async function fileExists(filePath) {
@@ -196,6 +270,7 @@ async function discoverCandidates() {
         label: `pending-posts/${entry.name}`,
         mdPath: entryPath,
         baseName: path.basename(entry.name, ".md"),
+        category: "",
       });
       continue;
     }
@@ -208,6 +283,7 @@ async function discoverCandidates() {
         label: `pending-posts/${entry.name}/index.md`,
         mdPath: indexPath,
         baseName: entry.name,
+        category: entry.name,
       });
       continue;
     }
@@ -221,17 +297,57 @@ async function discoverCandidates() {
       candidates.push({
         label: `pending-posts/${entry.name}/${markdownFiles[0]}`,
         mdPath: path.join(entryPath, markdownFiles[0]),
-        baseName: entry.name,
+        baseName: path.basename(markdownFiles[0], ".md"),
+        category: entry.name,
       });
     } else if (markdownFiles.length > 1) {
-      console.warn(`[skip] pending-posts/${entry.name}: found multiple markdown files; use index.md to choose the article.`);
+      for (const markdownFile of markdownFiles) {
+        candidates.push({
+          label: `pending-posts/${entry.name}/${markdownFile}`,
+          mdPath: path.join(entryPath, markdownFile),
+          baseName: path.basename(markdownFile, ".md"),
+          category: entry.name,
+        });
+      }
     }
   }
 
   return candidates;
 }
 
-async function copyAsset(rawTarget, markdownDir, slug, copiedAssets) {
+function isLikelyLocalFilesystemPath(value) {
+  return path.isAbsolute(value) && /^\/(?:Users|Volumes|private|tmp|var)\//.test(value);
+}
+
+async function resolveAssetPath(target, markdownDir) {
+  const withoutAnchor = target.split("#")[0];
+  const withoutQuery = withoutAnchor.split("?")[0];
+  const decodedTarget = decodePathPart(withoutQuery);
+
+  if (isLikelyLocalFilesystemPath(decodedTarget)) {
+    const sameNameInMarkdownDir = path.join(markdownDir, path.basename(decodedTarget));
+    if (await fileExists(sameNameInMarkdownDir)) return sameNameInMarkdownDir;
+
+    const sourcePath = path.resolve(decodedTarget);
+    if (ensureInsidePending(sourcePath) && await fileExists(sourcePath)) {
+      return sourcePath;
+    }
+
+    return "";
+  }
+
+  if (!isLocalUrl(decodedTarget)) return "";
+
+  const sourcePath = path.resolve(markdownDir, decodedTarget);
+  if (!ensureInsidePending(sourcePath)) {
+    console.warn(`[warn] skipped image outside pending-posts: ${target}`);
+    return "";
+  }
+
+  return await fileExists(sourcePath) ? sourcePath : "";
+}
+
+async function copyAsset(rawTarget, markdownDir, slug, copiedAssets, missingAssets) {
   const candidates = parseMarkdownTargets(rawTarget);
   if (!candidates.length) return null;
 
@@ -239,18 +355,7 @@ async function copyAsset(rawTarget, markdownDir, slug, copiedAssets) {
   let selectedSourcePath = "";
 
   for (const parsed of candidates) {
-    if (!isLocalUrl(parsed.target)) continue;
-
-    const withoutAnchor = parsed.target.split("#")[0];
-    const withoutQuery = withoutAnchor.split("?")[0];
-    const decodedTarget = decodePathPart(withoutQuery);
-    const sourcePath = path.resolve(markdownDir, decodedTarget);
-
-    if (!ensureInsidePending(sourcePath)) {
-      console.warn(`[warn] skipped image outside pending-posts: ${parsed.target}`);
-      return null;
-    }
-
+    const sourcePath = await resolveAssetPath(parsed.target, markdownDir);
     if (await fileExists(sourcePath)) {
       selected = parsed;
       selectedSourcePath = sourcePath;
@@ -260,6 +365,7 @@ async function copyAsset(rawTarget, markdownDir, slug, copiedAssets) {
 
   if (!selected) {
     console.warn(`[warn] missing image: ${rawTarget.trim()}`);
+    missingAssets.push(rawTarget.trim());
     return null;
   }
 
@@ -288,14 +394,14 @@ async function copyAsset(rawTarget, markdownDir, slug, copiedAssets) {
   return publicUrl + (selected.target.includes("#") ? `#${selected.target.split("#").slice(1).join("#")}` : "");
 }
 
-async function rewriteMarkdownImages(body, markdownDir, slug, copiedAssets) {
+async function rewriteMarkdownImages(body, markdownDir, slug, copiedAssets, missingAssets) {
   const imagePattern = /!\[([^\]]*)\]\(([^)]+)\)/g;
   let result = "";
   let lastIndex = 0;
 
   for (const match of body.matchAll(imagePattern)) {
     const [whole, alt, rawTarget] = match;
-    const replacementUrl = await copyAsset(rawTarget, markdownDir, slug, copiedAssets);
+    const replacementUrl = await copyAsset(rawTarget, markdownDir, slug, copiedAssets, missingAssets);
     result += body.slice(lastIndex, match.index);
     if (replacementUrl) {
       result += `![${alt}](${replacementUrl})`;
@@ -318,30 +424,37 @@ async function findCover(markdownDir) {
 async function importCandidate(candidate) {
   const markdownDir = path.dirname(candidate.mdPath);
   const rawMarkdown = await readFile(candidate.mdPath, "utf8");
-  let { frontMatter, body } = parseFrontMatter(rawMarkdown);
+  let { frontMatter, body, hasFrontMatter } = parseFrontMatter(rawMarkdown);
 
   const initialTitle = getFrontMatterValue(frontMatter, "title") || inferTitle(body, candidate.baseName);
+  const inferredDate = parseDatedName(candidate.baseName).date;
   const frontMatterSlug = getFrontMatterValue(frontMatter, "slug");
-  const slug = slugify(frontMatterSlug || candidate.baseName);
+  const slug = slugify(frontMatterSlug || initialTitle);
   const destPost = path.join(postsDir, `${slug}.md`);
 
   if (existsSync(destPost) && !force) {
-    throw new Error(`${candidate.label}: source/_posts/${slug}.md already exists. Use --force to overwrite.`);
+    console.log(`[skip] ${candidate.label}: source/_posts/${slug}.md already exists. Use --force to overwrite.`);
+    return;
   }
 
   const copiedAssets = new Map();
-  body = await rewriteMarkdownImages(body, markdownDir, slug, copiedAssets);
+  const missingAssets = [];
+  if (!hasFrontMatter) {
+    body = removeLeadingTitleLine(body, initialTitle);
+  }
+  body = await rewriteMarkdownImages(body, markdownDir, slug, copiedAssets, missingAssets);
+  if (missingAssets.length) {
+    console.error(`[skip] ${candidate.label}: missing ${missingAssets.length} image(s): ${missingAssets.join(", ")}`);
+    return;
+  }
 
   frontMatter = frontMatter.trim();
   if (!frontMatter) {
     frontMatter = [
       `title: ${escapeYamlScalar(initialTitle)}`,
-      `date: ${formatDate()}`,
-      `updated: ${formatDate()}`,
-      "tags:",
-      "  -",
-      "categories:",
-      "  -",
+      `date: ${inferredDate || formatDateOnly()}`,
+      "tags: []",
+      candidate.category ? `categories:\n  - ${escapeYamlScalar(candidate.category)}` : "categories: []",
       "description:",
       "cover:",
       "thumbnail:",
@@ -351,15 +464,17 @@ async function importCandidate(candidate) {
     if (!getFrontMatterValue(frontMatter, "title")) {
       frontMatter = upsertScalar(frontMatter, "title", initialTitle);
     }
-    const date = getFrontMatterValue(frontMatter, "date") || formatDate();
+    const date = getFrontMatterValue(frontMatter, "date") || inferredDate || formatDateOnly();
     if (!getFrontMatterValue(frontMatter, "date")) {
       frontMatter = upsertScalar(frontMatter, "date", date);
     }
-    if (!getFrontMatterValue(frontMatter, "updated")) {
-      frontMatter = upsertScalar(frontMatter, "updated", date);
-    }
-    frontMatter = appendBlockIfMissing(frontMatter, "tags", "tags:\n  -");
-    frontMatter = appendBlockIfMissing(frontMatter, "categories", "categories:\n  -");
+    frontMatter = frontMatter.replace(/^updated:.*(?:\n|$)/m, "");
+    frontMatter = appendBlockIfMissing(frontMatter, "tags", "tags: []");
+    frontMatter = appendBlockIfMissing(
+      frontMatter,
+      "categories",
+      candidate.category ? `categories:\n  - ${escapeYamlScalar(candidate.category)}` : "categories: []",
+    );
     if (!hasFrontMatterKey(frontMatter, "description")) {
       frontMatter = upsertScalar(frontMatter, "description", "");
     }
@@ -376,14 +491,14 @@ async function importCandidate(candidate) {
 
   const coverValue = getFrontMatterValue(frontMatter, "cover");
   if (coverValue && isLocalUrl(coverValue)) {
-    const rewrittenCover = await copyAsset(coverValue, markdownDir, slug, copiedAssets);
+    const rewrittenCover = await copyAsset(coverValue, markdownDir, slug, copiedAssets, missingAssets);
     if (rewrittenCover) {
       frontMatter = upsertScalar(frontMatter, "cover", rewrittenCover);
     }
   } else if (!coverValue) {
     const coverFile = await findCover(markdownDir);
     if (coverFile) {
-      const rewrittenCover = await copyAsset(coverFile, markdownDir, slug, copiedAssets);
+      const rewrittenCover = await copyAsset(coverFile, markdownDir, slug, copiedAssets, missingAssets);
       if (rewrittenCover) {
         frontMatter = upsertScalar(frontMatter, "cover", rewrittenCover);
       }

@@ -11,6 +11,7 @@
     "publish": "hexo publish post",
     "import:pending": "node tools/import-pending-posts.mjs",
     "import:pending:dry": "node tools/import-pending-posts.mjs --dry-run",
+    "import:pending:force": "node tools/import-pending-posts.mjs --force",
     "server": "hexo server",
     "server:drafts": "hexo server --draft",
     "doctor": "hexo doctor"
