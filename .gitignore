@@ -6,3 +6,10 @@ db.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Local inbox for unpublished article drafts.
+# Keep the folder design and template in git, but do not commit actual pending posts by default.
+pending-posts/*
+!pending-posts/README.md
+!pending-posts/_template/
+!pending-posts/_template/**

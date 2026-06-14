@@ -9,6 +9,8 @@
     "new:post": "hexo new post",
     "new:draft": "hexo new draft",
     "publish": "hexo publish post",
+    "import:pending": "node tools/import-pending-posts.mjs",
+    "import:pending:dry": "node tools/import-pending-posts.mjs --dry-run",
     "server": "hexo server",
     "server:drafts": "hexo server --draft",
     "doctor": "hexo doctor"

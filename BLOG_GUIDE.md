@@ -155,7 +155,65 @@ npm run publish -- "未完成文章"
 
 发布后文件会进入 `source/_posts`。发布前仍然可以手动修改 `date`，适合迁移旧文。
 
-## 5. 图片使用建议
+## 5. 待上传文章收件箱
+
+如果你已经有一批 Markdown 文章，推荐先放到 `pending-posts`，之后我可以直接读取这个文件夹并帮你导入博客。
+
+推荐结构：
+
+```text
+pending-posts/
+  article-slug/
+    index.md
+    cover.jpg
+    images/
+      photo-1.jpg
+```
+
+`article-slug` 会作为导入后的文章文件名，也会影响文章 URL，建议使用简短英文、拼音或日期前缀，例如 `2020-reading-note`。
+
+文章里的图片使用相对路径：
+
+```markdown
+![图片说明](./images/photo-1.jpg)
+```
+
+文章封面也可以写相对路径：
+
+```yaml
+cover: ./cover.jpg
+```
+
+导入前可以先预览：
+
+```bash
+npm run import:pending:dry
+```
+
+正式导入：
+
+```bash
+npm run import:pending
+```
+
+导入脚本会做三件事：
+
+- 把 Markdown 复制到 `source/_posts/<article-slug>.md`。
+- 把图片复制到 `source/images/posts/<article-slug>/`。
+- 把正文和 `cover` 里的相对图片路径改成博客可访问的 `/images/posts/...` 路径。
+
+为了避免未发布草稿误传到公开仓库，`pending-posts` 里的实际文章默认被 `.gitignore` 忽略。导入后的正式文章在 `source/_posts`，才需要提交。
+
+导入并检查后发布：
+
+```bash
+npm run build
+git add source/_posts source/images/posts
+git commit -m "Add post: 文章标题"
+git push origin main
+```
+
+## 6. 图片使用建议
 
 把图片放到 `source/images`，文章中这样引用：
 
@@ -171,7 +229,7 @@ cover: /images/example.jpg
 
 Redefine 文档也建议把常用图片放在 Hexo 根目录下的 `source/images`，再用 `/images/...` 引用。
 
-## 6. 怎么使用 Redefine 文档改这个博客
+## 7. 怎么使用 Redefine 文档改这个博客
 
 可以。这个博客已经使用 Theme Redefine，官方文档里的大部分配置都可以用在这里。
 
@@ -197,7 +255,7 @@ Redefine 官方文档：https://redefine-docs.ohevan.com/zh/docs
 
 目前标签页、分类页、归档页、普通页面标题和文章封面标题的字号收敛都放在 `_config.redefine.yml` 的 `inject.footer`。如果以后觉得某个页面字号仍然偏大，优先改这一段，而不是去改主题源码。
 
-## 7. GitHub 仓库能否设置成私密
+## 8. GitHub 仓库能否设置成私密
 
 可以把仓库设置成私密，但 GitHub Pages 对私有仓库有计划限制。GitHub 官方说明是：GitHub Free 支持公开仓库的 GitHub Pages；GitHub Pro、Team、Enterprise 支持公开和私有仓库的 GitHub Pages。
 
@@ -211,7 +269,7 @@ Redefine 官方文档：https://redefine-docs.ohevan.com/zh/docs
 
 注意：即使仓库是私有的，已经发布出来的网站页面本身通常仍是面向访问者的公开网页。不要把密码、身份证、密钥、未公开资料写进博客文章或构建产物。
 
-## 8. 推荐后续优化
+## 9. 推荐后续优化
 
 短期可以继续做：
 
