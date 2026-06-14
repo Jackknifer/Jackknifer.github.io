@@ -6,7 +6,11 @@
     "build": "hexo generate",
     "clean": "hexo clean",
     "new": "hexo new post",
+    "new:post": "hexo new post",
+    "new:draft": "hexo new draft",
+    "publish": "hexo publish post",
     "server": "hexo server",
+    "server:drafts": "hexo server --draft",
     "doctor": "hexo doctor"
   },
   "hexo": {

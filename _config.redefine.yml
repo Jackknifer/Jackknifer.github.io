@@ -75,7 +75,7 @@ global:
     scale: false # scale effect
   # Scroll progress
   scroll_progress:
-    bar: false # progress bar
+    bar: true # progress bar
     percentage: true # percentage
   # Website counter
   website_counter:
@@ -202,7 +202,7 @@ home_banner:
 # Docs: https://redefine-docs.ohevan.com/home/navbar
 navbar:
   # Auto hide navbar
-  auto_hide: false
+  auto_hide: true
   # Navbar background color
   color:
     left: "#A31F34" #left side
@@ -220,6 +220,9 @@ navbar:
     首页:
       path: /
       icon: fa-regular fa-house # can be empty
+    近况:
+      path: /now
+      icon: fa-regular fa-pen-to-square
     归档:
       path: /archives
       icon: fa-regular fa-archive
@@ -257,8 +260,8 @@ home:
   sidebar:
     enable: true # Whether to enable sidebar
     position: left # Sidebar position. left, right
-    first_item: menu # First item in sidebar. menu, info
-    announcement: 博客刚刚搭好，正在慢慢长出内容。
+    first_item: info # First item in sidebar. menu, info
+    announcement: 持续记录技术、阅读、项目和那些值得回头看的想法。
     show_on_mobile: true # Whether to show sidebar navigation on mobile sheet menu
     links:
       归档:
@@ -315,14 +318,14 @@ articles:
   author_label: 
     enable: true # Whether to enable
     auto: false # Whether to automatically add author label, e.g. Lv1, Lv2, Lv3...
-    list: []
+    list: ["博主"]
   # Code block settings
   code_block:
     copy: true # Whether to enable code block copy button
     style: mac # mac | simple
     highlight_theme: # Color scheme for highlightjs code highlighting. For preview, see https://highlightjs.org/examples
       light: github # light mode theme, support: github, atom-one-light, default
-      dark: vs2015 # dark mode theme, support: github-dark, monokai-sublime, vs2015, night-owl, atom-one-dark, nord, tokyo-night-dark, a11y-dark, agate
+      dark: github-dark # dark mode theme, support: github-dark, monokai-sublime, vs2015, night-owl, atom-one-dark, nord, tokyo-night-dark, a11y-dark, agate
     font: # Custom font
       enable: false # Whether to enable
       family: # Font family
@@ -341,7 +344,7 @@ articles:
   # Whether to enable lazyload for images
   lazyload: true
   # Pangu.js (automatically add space between Chinese and English). See https://github.com/vinta/pangu.js
-  pangu_js: false
+  pangu_js: true
   # Article recommendation. Requires nodejieba (npm install nodejieba). Transplanted from hexo-theme-volantis.
   recommendation:
     # Whether to enable article recommendation
