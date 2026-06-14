@@ -1,44 +1,144 @@
 ---
 layout: default
-title: 首页
+title: 主题介绍
 ---
 
-<section class="hero">
-  <div class="hero-copy">
-    <p class="eyebrow">Personal Blog</p>
-    <h1>
-      <span>Jackknifer 的</span>
-      <span>个人博客</span>
-    </h1>
-    <p class="hero-text">
-      这里用来记录技术学习、阅读笔记、项目实践和一些阶段性的想法。
-      先把博客跑起来，再慢慢把它打磨成自己的长期空间。
-    </p>
-    <div class="hero-actions">
-      <a class="button button-primary" href="#posts">阅读文章</a>
-      <a class="button button-secondary" href="{{ site.author.github }}">GitHub 主页</a>
+<div class="docs-home">
+  <aside class="docs-sidebar" aria-label="文档导航">
+    <div class="sidebar-brand">
+      <a href="{{ '/' | relative_url }}">
+        <span class="docs-logo" aria-hidden="true">J</span>
+        <strong>Jackknifer Docs</strong>
+      </a>
+      <button class="icon-button" type="button" aria-label="收起侧边栏">◐</button>
     </div>
-  </div>
-  <img class="hero-avatar" src="{{ site.author.avatar }}" alt="{{ site.author.name }} 的 GitHub 头像">
-</section>
 
-<section id="posts" class="content-section">
-  <div class="section-heading">
-    <p class="eyebrow">Posts</p>
-    <h2>最新文章</h2>
-  </div>
+    <button class="search-box" type="button">
+      <span>搜索文档</span>
+      <kbd>⌘</kbd>
+      <kbd>K</kbd>
+    </button>
 
-  <div class="post-list">
-    {% for post in site.posts %}
-      <article class="post-card">
-        <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%Y-%m-%d' }}</time>
-        <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
-        {% if post.description %}
-          <p>{{ post.description }}</p>
-        {% else %}
-          <p>{{ post.excerpt | strip_html | truncate: 110 }}</p>
-        {% endif %}
-      </article>
-    {% endfor %}
-  </div>
-</section>
+    <nav class="docs-nav">
+      <a class="active" href="#intro">主题介绍</a>
+      <a href="#quick-start">快速开始</a>
+
+      <p>配置</p>
+      <a href="#basic">基本</a>
+      <a href="#home">首页</a>
+      <a href="#posts">文章</a>
+      <a href="#article-style">文章样式</a>
+      <a href="#comments">评论系统</a>
+      <a href="#footer">页脚</a>
+
+      <p>使用</p>
+      <a href="#templates">页面模板</a>
+      <a href="#modules">写作模块</a>
+      <a href="#plugins">插件</a>
+      <a href="#notes">说说</a>
+
+      <p>更多</p>
+      <a href="{{ '/about/' | relative_url }}">关于作者</a>
+      <a href="{{ site.author.github }}">GitHub</a>
+    </nav>
+
+    <div class="sidebar-tools" aria-label="页面工具">
+      <button type="button" aria-label="语言">文</button>
+      <a href="{{ site.author.github }}" aria-label="GitHub">GH</a>
+      <button class="theme-toggle" type="button" aria-label="切换主题">☾</button>
+    </div>
+  </aside>
+
+  <main class="docs-article" id="intro">
+    <header class="article-header">
+      <h1>主题介绍</h1>
+      <div class="article-actions">
+        <button class="utility-button copy-markdown" type="button" data-copy-target="intro-copy">Copy Markdown</button>
+        <button class="utility-button" type="button">Open⌄</button>
+      </div>
+    </header>
+
+    <section class="slogan-panel" aria-label="博客标识">
+      <div class="slogan-mark" aria-hidden="true">
+        <span></span>
+      </div>
+      <p>REDEFINE YOUR WRITING.</p>
+    </section>
+
+    <section class="article-body" id="intro-copy">
+      <p>
+        <strong>"Jackknifer 的个人博客"</strong> 是一个基于 GitHub Pages 的轻量写作空间。它借鉴 Redefine 的文档气质：简洁、快速、纯粹，把注意力放回文章本身。
+      </p>
+      <p>
+        这个首页先复刻 Redefine Docs 的当前页面状态：左侧文档导航，中间正文内容，右侧页面目录，浅灰背景，红色选中态，以及紧凑但清楚的阅读节奏。后续可以继续扩展搜索、归档、标签、评论和深色模式。
+      </p>
+
+      <div class="preview-strip" aria-label="页面预览">
+        <div class="preview-card">
+          <span>Cover</span>
+          <strong>克制的首页</strong>
+          <p>用文档式结构承载博客介绍和最新文章。</p>
+        </div>
+        <div class="preview-card">
+          <span>Pages</span>
+          <strong>长期写作</strong>
+          <p>Markdown 文章通过 GitHub Pages 自动发布。</p>
+        </div>
+      </div>
+
+      <h2 id="quick-start">在线演示站</h2>
+      <ul>
+        <li><a href="https://jackknifer.github.io/">Jackknifer 的个人博客</a></li>
+        <li><a href="https://github.com/Jackknifer/Jackknifer.github.io">GitHub 仓库</a></li>
+      </ul>
+
+      <h2 id="posts">⛰ 部分功能</h2>
+      <ul class="feature-list">
+        <li>Markdown 写作和 Jekyll 自动构建</li>
+        <li>文档式侧边导航和页面目录</li>
+        <li>文章列表、关于页和 404 页面</li>
+        <li>浅色/深色模式的基础切换</li>
+        <li>适配 GitHub Pages 的轻量发布流程</li>
+      </ul>
+
+      <h2 id="basic">☕ 支持</h2>
+      <p>
+        以后写文章时，只需要在 <code>_posts</code> 目录里新增 Markdown 文件，然后提交并推送到 <code>main</code> 分支。
+      </p>
+
+      <section class="latest-posts" id="home" aria-label="最新文章">
+        <h2>最新文章</h2>
+        <div class="post-list">
+          {% for post in site.posts %}
+            <article class="post-card">
+              <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%Y-%m-%d' }}</time>
+              <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
+              {% if post.description %}
+                <p>{{ post.description }}</p>
+              {% else %}
+                <p>{{ post.excerpt | strip_html | truncate: 110 }}</p>
+              {% endif %}
+              <a class="read-link" href="{{ post.url | relative_url }}">Read more</a>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <a class="next-card" href="{{ '/about/' | relative_url }}">
+        <span>快速开始</span>
+        <strong>继续完善博客作者信息。</strong>
+      </a>
+    </section>
+  </main>
+
+  <aside class="docs-toc" aria-label="页面目录">
+    <p>On this page</p>
+    <a class="active" href="#quick-start">在线演示站</a>
+    <a href="#posts">⛰ 部分功能</a>
+    <a href="#basic">☕ 支持</a>
+    <div class="toc-card">
+      <strong>GitHub Pages</strong>
+      <span>静态托管 · 自动发布 · 免费 HTTPS</span>
+    </div>
+  </aside>
+</div>
