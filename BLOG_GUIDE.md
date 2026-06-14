@@ -191,8 +191,11 @@ Redefine 官方文档：https://redefine-docs.ohevan.com/zh/docs
 | 评论系统 | `_config.redefine.yml` | `comment` |
 | 页脚运行时间和文案 | `_config.redefine.yml` | `footer` |
 | 自定义 CSS 或脚本 | `_config.redefine.yml` | `inject` |
+| 全站字号微调 | `_config.redefine.yml` | `inject.footer` 里的 Typography polish |
 
 一个重要原则：尽量不要直接改 `node_modules/hexo-theme-redefine` 里的主题源码。主题升级后这些改动容易丢。日常改动优先放在 `_config.redefine.yml`，少量样式可以放在 `inject.head` 的 `<style>` 里。
+
+目前标签页、分类页、归档页、普通页面标题和文章封面标题的字号收敛都放在 `_config.redefine.yml` 的 `inject.footer`。如果以后觉得某个页面字号仍然偏大，优先改这一段，而不是去改主题源码。
 
 ## 7. GitHub 仓库能否设置成私密
 

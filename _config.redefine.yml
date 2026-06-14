@@ -471,7 +471,172 @@ inject:
     -
   # Inject custom footer html code
   footer:
-    -
+    - |
+      <style>
+        /* Typography polish: keep template pages readable instead of display-sized. */
+        .page-title-header,
+        .page-template-content.markdown-body > h1:first-child {
+          font-size: 2.25rem;
+          line-height: 1.18;
+          margin-bottom: 1.65rem;
+        }
+
+        .markdown-body {
+          font-size: 1rem;
+          line-height: 1.78;
+        }
+
+        .markdown-body h1 {
+          font-size: 2.15rem;
+          line-height: 1.24;
+        }
+
+        .markdown-body h2 {
+          font-size: 1.65rem;
+          line-height: 1.32;
+        }
+
+        .markdown-body h3 {
+          font-size: 1.38rem;
+          line-height: 1.38;
+        }
+
+        .tagcloud-content .tag-list {
+          justify-content: flex-start;
+          gap: 0.75rem;
+          line-height: 1.5;
+        }
+
+        .tagcloud-content .tag-list li a {
+          font-size: 1rem;
+          line-height: 1.35;
+          padding: 0.58rem 0.86rem;
+          margin: 0;
+          border-radius: 10px;
+          filter: none;
+          box-shadow: var(--redefine-box-shadow-flat);
+        }
+
+        .tagcloud-content .tag-list[data-show-value] a::after {
+          font-size: 0.78rem;
+          line-height: 1.1;
+          min-width: 1.5rem;
+          padding: 0.15rem 0.45rem;
+          margin-left: 0.45rem;
+          border-radius: 999px;
+        }
+
+        .category-list-content .all-category-list {
+          justify-content: flex-start;
+          gap: 1rem;
+          padding-left: 0;
+        }
+
+        .category-list-content .all-category-list > .all-category-list-item {
+          width: min(280px, 100%);
+          font-size: 1.05rem;
+          line-height: 1.5;
+          padding: 1rem 1.1rem;
+          border-radius: 10px;
+        }
+
+        .category-list-content .all-category-list > .all-category-list-item span.all-category-list-count {
+          font-size: 0.82rem;
+          padding: 0.08rem 0.42rem;
+          margin-left: 0.38rem;
+        }
+
+        .archive-list-container .archive-year {
+          font-size: 1.5rem;
+          line-height: 1.35;
+        }
+
+        .archive-list-container .article-list {
+          font-size: 1rem;
+          line-height: 1.65;
+        }
+
+        .archive-list-container .article-list .article-item {
+          padding-top: 1.4rem;
+          padding-left: 1.25rem;
+        }
+
+        .archive-list-container .article-title {
+          font-size: 1.08rem;
+          line-height: 1.55;
+          font-weight: 600;
+        }
+
+        .article-title-cover {
+          font-size: 2.25rem;
+          line-height: 1.2;
+          max-width: min(860px, calc(100% - 2rem));
+        }
+
+        .post-page-container .post-tags-box {
+          font-size: 0.95rem;
+          line-height: 1.45;
+        }
+
+        @media (max-width: 640px) {
+          .page-title-header,
+          .page-template-content.markdown-body > h1:first-child {
+            font-size: 1.9rem;
+            line-height: 1.22;
+            margin-bottom: 1.2rem;
+          }
+
+          .markdown-body h1 {
+            font-size: 1.9rem;
+          }
+
+          .markdown-body h2 {
+            font-size: 1.45rem;
+          }
+
+          .markdown-body h3 {
+            font-size: 1.22rem;
+          }
+
+          .tagcloud-content .tag-list {
+            gap: 0.55rem;
+          }
+
+          .tagcloud-content .tag-list li a {
+            font-size: 0.95rem;
+            padding: 0.5rem 0.72rem;
+          }
+
+          .category-list-content .all-category-list > .all-category-list-item {
+            width: 100%;
+            font-size: 1rem;
+            padding: 0.85rem 0.95rem;
+          }
+
+          .archive-list-container .archive-year {
+            font-size: 1.28rem;
+          }
+
+          .archive-list-container .article-list .article-item {
+            padding-top: 1.1rem;
+            padding-left: 1rem;
+          }
+
+          .archive-list-container .article-title {
+            font-size: 1rem;
+          }
+
+          .article-title-cover {
+            font-size: 1.7rem;
+            line-height: 1.22;
+            padding: 0.7rem 0.9rem;
+          }
+
+          .post-page-container .post-tags-box {
+            font-size: 0.9rem;
+          }
+        }
+      </style>
     -
 # INJECT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 
