@@ -224,6 +224,7 @@ kbd {
 .docs-nav {
   display: grid;
   gap: 2px;
+  padding-bottom: 44px;
 }
 
 .docs-nav p {
