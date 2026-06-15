@@ -3,10 +3,8 @@ title: 第一篇博客：先把站点搭起来
 date: 2026-06-14
 tags:
   - 博客
-  - GitHub Pages
-  - Hexo
 categories:
-  - 日志
+  - 写作
 description: 从今天开始，这里会成为一个记录技术、阅读和想法的地方。
 cover: /images/hero-city.jpeg
 ---

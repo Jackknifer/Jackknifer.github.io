@@ -501,6 +501,25 @@ inject:
           margin-bottom: 0;
         }
 
+        .post-page-container .markdown-body img:not(.not-markdown) {
+          display: block;
+          width: auto;
+          max-width: min(100%, 720px);
+          max-height: 78vh;
+          height: auto;
+          object-fit: contain;
+          margin: 1.25rem auto;
+        }
+
+        .post-page-container .markdown-body figure {
+          margin: 1.35rem auto;
+          text-align: center;
+        }
+
+        .post-page-container .markdown-body figure img:not(.not-markdown) {
+          margin: 0 auto 0.55rem;
+        }
+
         .markdown-body h1 {
           font-size: 2.15rem;
           line-height: 1.24;
@@ -583,9 +602,9 @@ inject:
         }
 
         .article-title-cover {
-          font-size: 2.25rem;
-          line-height: 1.2;
-          max-width: min(860px, calc(100% - 2rem));
+          font-size: 1.95rem;
+          line-height: 1.24;
+          max-width: min(760px, calc(100% - 2rem));
         }
 
         .post-page-container .post-tags-box {
@@ -646,7 +665,7 @@ inject:
           }
 
           .article-title-cover {
-            font-size: 1.7rem;
+            font-size: 1.48rem;
             line-height: 1.22;
             padding: 0.7rem 0.9rem;
           }
