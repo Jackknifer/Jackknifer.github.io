@@ -602,19 +602,21 @@ inject:
         }
 
         .post-page-container .article-title > div {
-          padding-top: 0.75rem !important;
+          justify-content: flex-start !important;
+          padding-top: 1rem !important;
         }
 
         .post-page-container .article-title h1.article-title-regular,
         .post-page-container .article-title h1.article-title-cover,
         .post-page-container .article-title h1[class*="article-title-"] {
-          font-size: 1.25rem !important;
-          line-height: 1.35 !important;
+          font-size: 1.75rem !important;
+          line-height: 1.3 !important;
           letter-spacing: 0 !important;
-          max-width: min(620px, calc(100% - 2rem));
-          margin-left: auto;
+          max-width: min(760px, calc(100% - 2rem));
+          margin-left: 0 !important;
           margin-right: auto;
-          padding: 0.45rem 0.5rem !important;
+          padding: 0.55rem 0.5rem !important;
+          text-align: left !important;
           font-weight: 600 !important;
         }
 
@@ -676,15 +678,16 @@ inject:
           }
 
           .post-page-container .article-title > div {
-            padding-top: 0.5rem !important;
+            justify-content: flex-start !important;
+            padding-top: 0.75rem !important;
           }
 
           .post-page-container .article-title h1.article-title-regular,
           .post-page-container .article-title h1.article-title-cover,
           .post-page-container .article-title h1[class*="article-title-"] {
-            font-size: 1.08rem !important;
-            line-height: 1.32 !important;
-            padding: 0.35rem 0.5rem !important;
+            font-size: 1.35rem !important;
+            line-height: 1.3 !important;
+            padding: 0.45rem 0.5rem !important;
           }
 
           .post-page-container .post-tags-box {
