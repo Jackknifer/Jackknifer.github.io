@@ -261,7 +261,7 @@ home:
     enable: true # Whether to enable sidebar
     position: left # Sidebar position. left, right
     first_item: info # First item in sidebar. menu, info
-    announcement: 持续记录技术、阅读、项目和那些值得回头看的想法。
+    announcement: 弃我去者，昨日之日不可留。
     show_on_mobile: true # Whether to show sidebar navigation on mobile sheet menu
     links:
       归档:
