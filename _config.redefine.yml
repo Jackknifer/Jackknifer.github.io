@@ -486,6 +486,21 @@ inject:
           line-height: 1.78;
         }
 
+        .post-page-container .markdown-body p:not(.not-markdown) {
+          margin-top: 0;
+          margin-bottom: 1.25rem;
+        }
+
+        .post-page-container .markdown-body blockquote:not(.not-markdown) {
+          margin: 1.35rem 0 1.55rem;
+          border-left-color: var(--primary-color);
+          background: var(--third-background-color);
+        }
+
+        .post-page-container .markdown-body blockquote:not(.not-markdown) p:last-child {
+          margin-bottom: 0;
+        }
+
         .markdown-body h1 {
           font-size: 2.15rem;
           line-height: 1.24;
