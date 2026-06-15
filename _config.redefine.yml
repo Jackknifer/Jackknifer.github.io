@@ -504,20 +504,29 @@ inject:
         .post-page-container .markdown-body img:not(.not-markdown) {
           display: block;
           width: auto;
-          max-width: min(100%, 720px);
-          max-height: 78vh;
+          max-width: min(92%, 640px);
+          max-height: 72vh;
           height: auto;
           object-fit: contain;
           margin: 1.25rem auto;
         }
 
         .post-page-container .markdown-body figure {
+          max-width: min(92%, 640px);
           margin: 1.35rem auto;
           text-align: center;
         }
 
         .post-page-container .markdown-body figure img:not(.not-markdown) {
+          max-width: 100%;
           margin: 0 auto 0.55rem;
+        }
+
+        @media (max-width: 768px) {
+          .post-page-container .markdown-body img:not(.not-markdown),
+          .post-page-container .markdown-body figure {
+            max-width: 100%;
+          }
         }
 
         .markdown-body h1 {
