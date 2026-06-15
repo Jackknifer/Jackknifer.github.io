@@ -21,4 +21,4 @@ cover: /images/hero-city.jpeg
 
 博客已经有了，剩下的就是让它长出自己的内容。
 
-![海面上的飞鸟](/images/hero-sea-level.jpg)
+![大连 东港的海鸥](/images/hero-sea-level.jpg)
