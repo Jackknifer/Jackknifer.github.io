@@ -74,7 +74,50 @@ npm run publish -- "草稿文件名"
 
 `public` 是构建产物。本地 `npm run build` 会生成它，但平时主要改 `source`、配置文件和模板。
 
-## 3. 文章写作和上传流程
+## 3. 背景音乐
+
+博客已经预留全站音乐播放器。默认歌单为空，所以页面不会显示播放器；等你加入歌曲后，播放器会自动出现在页面左下角，读者需要手动点击播放。
+
+音频文件放在：
+
+```text
+source/music
+```
+
+封面图片放在：
+
+```text
+source/images/music
+```
+
+歌单文件是：
+
+```text
+source/music/playlist.json
+```
+
+示例：
+
+```json
+[
+  {
+    "name": "歌曲名",
+    "artist": "歌手",
+    "url": "/music/song-name.mp3",
+    "cover": "/images/music/song-cover.jpg"
+  }
+]
+```
+
+如果有 `.lrc` 歌词文件，也放在 `source/music`，然后在歌单里增加：
+
+```json
+"lrc": "/music/song-name.lrc"
+```
+
+注意：不要把没有公开播放授权的商业歌曲文件上传到公开仓库。
+
+## 4. 文章写作和上传流程
 
 推荐流程：
 
@@ -132,7 +175,7 @@ git push origin main
 
 推送后 GitHub Actions 会自动发布。发布进度在仓库的 Actions 页面查看。
 
-## 4. 草稿工作流
+## 5. 草稿工作流
 
 如果一篇文章还没写完，先建草稿：
 
@@ -154,7 +197,7 @@ npm run publish -- "未完成文章"
 
 发布后文件会进入 `source/_posts`。发布前仍然可以手动修改 `date`，适合迁移旧文。
 
-## 5. 待上传文章收件箱
+## 6. 待上传文章收件箱
 
 如果你已经有一批 Markdown 文章，推荐先放到 `pending-posts`，之后我可以直接读取这个文件夹并帮你导入博客。
 
@@ -223,7 +266,7 @@ git commit -m "Add post: 文章标题"
 git push origin main
 ```
 
-## 6. 图片使用建议
+## 7. 图片使用建议
 
 把图片放到 `source/images`，文章中这样引用：
 
@@ -239,7 +282,7 @@ cover: /images/example.jpg
 
 Redefine 文档也建议把常用图片放在 Hexo 根目录下的 `source/images`，再用 `/images/...` 引用。
 
-## 7. 怎么使用 Redefine 文档改这个博客
+## 8. 怎么使用 Redefine 文档改这个博客
 
 可以。这个博客已经使用 Theme Redefine，官方文档里的大部分配置都可以用在这里。
 
@@ -265,7 +308,7 @@ Redefine 官方文档：https://redefine-docs.ohevan.com/zh/docs
 
 目前标签页、分类页、归档页、普通页面标题和文章封面标题的字号收敛都放在 `_config.redefine.yml` 的 `inject.footer`。如果以后觉得某个页面字号仍然偏大，优先改这一段，而不是去改主题源码。
 
-## 8. GitHub 仓库能否设置成私密
+## 9. GitHub 仓库能否设置成私密
 
 可以把仓库设置成私密，但 GitHub Pages 对私有仓库有计划限制。GitHub 官方说明是：GitHub Free 支持公开仓库的 GitHub Pages；GitHub Pro、Team、Enterprise 支持公开和私有仓库的 GitHub Pages。
 
@@ -279,7 +322,7 @@ Redefine 官方文档：https://redefine-docs.ohevan.com/zh/docs
 
 注意：即使仓库是私有的，已经发布出来的网站页面本身通常仍是面向访问者的公开网页。不要把密码、身份证、密钥、未公开资料写进博客文章或构建产物。
 
-## 9. 推荐后续优化
+## 10. 推荐后续优化
 
 短期可以继续做：
 

@@ -696,6 +696,9 @@ inject:
         }
       </style>
     -
+    - |
+      <script src="/js/blog-music-player.js" defer></script>
+    -
 # INJECT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 
 
