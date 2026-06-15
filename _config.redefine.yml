@@ -232,6 +232,9 @@ navbar:
     分类:
       path: /categories
       icon: fa-regular fa-folder
+    订阅:
+      path: /atom.xml
+      icon: fa-regular fa-rss
     关于:
       icon: fa-regular fa-user
       submenus:
