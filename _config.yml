@@ -85,14 +85,9 @@ include:
 exclude:
 ignore:
 
-# Sitemap & RSS feed
+# Sitemap
 sitemap:
   path: sitemap.xml
-feed:
-  type: atom
-  path: atom.xml
-  limit: 20
-  content: true
 
 # Extensions
 theme: redefine
