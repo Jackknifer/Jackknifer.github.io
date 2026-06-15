@@ -109,6 +109,12 @@ source/music/playlist.json
 ]
 ```
 
+播放器会把封面显示成圆形唱片效果，并在播放时旋转、暂停时停止。当前《雨夜》的封面路径是：
+
+```text
+source/images/music/liu-sen-yu-ye.jpg
+```
+
 如果有 `.lrc` 歌词文件，也放在 `source/music`，然后在歌单里增加：
 
 ```json

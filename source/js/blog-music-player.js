@@ -53,6 +53,20 @@
     }
   }
 
+  function bindPlayerState(player) {
+    const syncPlayingState = () => {
+      const isPlaying = player.audio && !player.audio.paused && !player.audio.ended;
+      player.container.classList.toggle("is-playing", isPlaying);
+    };
+
+    player.on("play", syncPlayingState);
+    player.on("playing", syncPlayingState);
+    player.on("pause", syncPlayingState);
+    player.on("ended", syncPlayingState);
+    player.on("error", syncPlayingState);
+    syncPlayingState();
+  }
+
   async function initMusicPlayer() {
     const tracks = await loadPlaylist();
     if (!tracks.length || document.getElementById("blog-music-player")) return;
@@ -67,7 +81,7 @@
 
     if (!window.APlayer) return;
 
-    new APlayer({
+    const player = new APlayer({
       container,
       fixed: true,
       mini: true,
@@ -80,6 +94,7 @@
       lrcType: 3,
       audio: tracks,
     });
+    bindPlayerState(player);
   }
 
   if (document.readyState === "loading") {
