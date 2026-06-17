@@ -658,7 +658,22 @@ inject:
         }
 
         .home-sidebar-container .sidebar-content {
-          padding-bottom: 1.15rem;
+          padding-top: 1.45rem;
+          padding-bottom: 1.55rem;
+        }
+
+        .home-sidebar-container .sidebar-content .avatar {
+          margin-bottom: 0.52rem;
+        }
+
+        .home-sidebar-container .sidebar-content .author {
+          margin-top: 0.85rem !important;
+          margin-bottom: 1.05rem !important;
+        }
+
+        .home-sidebar-container .sidebar-content .statistics {
+          margin-top: 1rem !important;
+          margin-bottom: 0.95rem !important;
         }
 
         .home-sidebar-container .blog-sidebar-socials {
@@ -666,7 +681,7 @@ inject:
           align-items: center;
           justify-content: center;
           gap: 0.58rem;
-          margin: 0.18rem 0 0.12rem;
+          margin: 0.78rem 0 0.18rem;
         }
 
         .home-sidebar-container .blog-social-link {
@@ -691,6 +706,12 @@ inject:
         .home-sidebar-container .blog-social-link.github img {
           width: 1.18rem;
           height: 1.18rem;
+        }
+
+        .home-sidebar-container .blog-social-link.xiaohongshu img {
+          width: 1.42rem;
+          height: 1.42rem;
+          border-radius: 0.42rem;
         }
 
         .home-sidebar-container .blog-social-link:hover {
