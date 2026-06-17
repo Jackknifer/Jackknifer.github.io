@@ -685,21 +685,21 @@ inject:
         }
 
         .home-sidebar-container .blog-social-link {
-          width: 1.98rem;
-          height: 1.98rem;
+          width: 1.9rem;
+          height: 1.9rem;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           border-radius: 999px;
           border: 0;
           overflow: hidden;
-          box-shadow: 0 5px 11px rgba(30, 38, 50, 0.1);
+          box-shadow: 0 4px 9px rgba(30, 38, 50, 0.1);
           transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
         }
 
         .home-sidebar-container .blog-social-link img {
-          width: 1.12rem;
-          height: 1.12rem;
+          width: 1.16rem;
+          height: 1.16rem;
           object-fit: contain;
         }
 
@@ -708,43 +708,43 @@ inject:
         }
 
         .home-sidebar-container .blog-social-link.github img {
-          width: 1.16rem;
-          height: 1.16rem;
+          width: 1.2rem;
+          height: 1.2rem;
         }
 
         .home-sidebar-container .blog-social-link.xiaohongshu {
           background: #ff2442;
-          box-shadow: 0 4px 10px rgba(255, 36, 66, 0.16);
+          box-shadow: 0 4px 9px rgba(255, 36, 66, 0.16);
         }
 
         .home-sidebar-container .blog-social-link.xiaohongshu img {
-          width: 1.25rem;
-          height: 1.25rem;
+          width: 1.3rem;
+          height: 1.3rem;
         }
 
         .home-sidebar-container .blog-social-link.netease {
           background: #d43c33;
-          box-shadow: 0 4px 10px rgba(212, 60, 51, 0.16);
+          box-shadow: 0 4px 9px rgba(212, 60, 51, 0.16);
         }
 
         .home-sidebar-container .blog-social-link.netease img {
-          width: 1.21rem;
-          height: 1.21rem;
+          width: 1.25rem;
+          height: 1.25rem;
         }
 
         .home-sidebar-container .blog-social-link:hover {
           transform: translateY(-1px);
-          box-shadow: 0 8px 16px rgba(30, 38, 50, 0.14);
+          box-shadow: 0 7px 14px rgba(30, 38, 50, 0.14);
         }
 
         .home-sidebar-container .blog-social-link.xiaohongshu:hover {
           background: #ff2442;
-          box-shadow: 0 7px 15px rgba(255, 36, 66, 0.21);
+          box-shadow: 0 7px 14px rgba(255, 36, 66, 0.21);
         }
 
         .home-sidebar-container .blog-social-link.netease:hover {
           background: #d43c33;
-          box-shadow: 0 7px 15px rgba(212, 60, 51, 0.21);
+          box-shadow: 0 7px 14px rgba(212, 60, 51, 0.21);
         }
 
         .home-sidebar-container .sidebar-links {
