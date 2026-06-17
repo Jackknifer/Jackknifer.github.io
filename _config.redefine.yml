@@ -708,10 +708,18 @@ inject:
           height: 1.18rem;
         }
 
+        .home-sidebar-container .blog-social-link.xiaohongshu {
+          overflow: hidden;
+          border-radius: 0.72rem;
+          background: #ff2442;
+          border-color: rgba(255, 36, 66, 0.48);
+          box-shadow: 0 6px 14px rgba(255, 36, 66, 0.18);
+        }
+
         .home-sidebar-container .blog-social-link.xiaohongshu img {
-          width: 1.42rem;
-          height: 1.42rem;
-          border-radius: 0.42rem;
+          width: 100%;
+          height: 100%;
+          border-radius: inherit;
         }
 
         .home-sidebar-container .blog-social-link:hover {
@@ -719,6 +727,12 @@ inject:
           background: #fff;
           border-color: rgba(163, 31, 52, 0.32);
           box-shadow: 0 10px 20px rgba(30, 38, 50, 0.13);
+        }
+
+        .home-sidebar-container .blog-social-link.xiaohongshu:hover {
+          background: #ff2442;
+          border-color: rgba(255, 36, 66, 0.64);
+          box-shadow: 0 10px 20px rgba(255, 36, 66, 0.24);
         }
 
         .home-sidebar-container .sidebar-links {
