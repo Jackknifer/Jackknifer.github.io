@@ -658,35 +658,35 @@ inject:
         }
 
         .home-sidebar-container .sidebar-content {
-          padding-top: 1.85rem;
-          padding-bottom: 2.05rem;
+          padding-top: 1.98rem;
+          padding-bottom: 2.22rem;
         }
 
         .home-sidebar-container .sidebar-content .avatar {
-          margin-bottom: 0.78rem;
+          margin-bottom: 0.86rem;
         }
 
         .home-sidebar-container .sidebar-content .author {
-          margin-top: 1.05rem !important;
-          margin-bottom: 1.28rem !important;
+          margin-top: 1.12rem !important;
+          margin-bottom: 1.38rem !important;
         }
 
         .home-sidebar-container .sidebar-content .statistics {
-          margin-top: 1.2rem !important;
-          margin-bottom: 1.16rem !important;
+          margin-top: 1.28rem !important;
+          margin-bottom: 1.26rem !important;
         }
 
         .home-sidebar-container .blog-sidebar-socials {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.68rem;
-          margin: 1.04rem 0 0.22rem;
+          gap: 0.84rem;
+          margin: 1.14rem 0 0.26rem;
         }
 
         .home-sidebar-container .blog-social-link {
-          width: 2.26rem;
-          height: 2.26rem;
+          width: 2.18rem;
+          height: 2.18rem;
           display: inline-flex;
           align-items: center;
           justify-content: center;
@@ -698,8 +698,8 @@ inject:
         }
 
         .home-sidebar-container .blog-social-link img {
-          width: 1.18rem;
-          height: 1.18rem;
+          width: 1.14rem;
+          height: 1.14rem;
           object-fit: contain;
         }
 
@@ -708,8 +708,8 @@ inject:
         }
 
         .home-sidebar-container .blog-social-link.github img {
-          width: 1.22rem;
-          height: 1.22rem;
+          width: 1.18rem;
+          height: 1.18rem;
         }
 
         .home-sidebar-container .blog-social-link.xiaohongshu {
@@ -718,8 +718,8 @@ inject:
         }
 
         .home-sidebar-container .blog-social-link.xiaohongshu img {
-          width: 1.34rem;
-          height: 1.34rem;
+          width: 1.28rem;
+          height: 1.28rem;
         }
 
         .home-sidebar-container .blog-social-link.netease {
@@ -728,8 +728,8 @@ inject:
         }
 
         .home-sidebar-container .blog-social-link.netease img {
-          width: 1.29rem;
-          height: 1.29rem;
+          width: 1.24rem;
+          height: 1.24rem;
         }
 
         .home-sidebar-container .blog-social-link:hover {
