@@ -41,12 +41,49 @@
     }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", renderSocialLinks, { once: true });
-  } else {
-    renderSocialLinks();
+  function scrollToMainFallback() {
+    if (typeof window.scrollToMain === "function") {
+      window.scrollToMain();
+      return;
+    }
+
+    const target = document.querySelector(".home-content-container, main, .main-content-container");
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
-  document.addEventListener("swup:contentReplaced", renderSocialLinks);
-  document.addEventListener("pjax:complete", renderSocialLinks);
+  function enhanceHomeBannerScrollCue() {
+    const cue = document.querySelector('.home-banner-container .content > div.absolute > div[onclick="scrollToMain()"]');
+    if (!cue) return;
+
+    cue.classList.add("home-banner-scroll-cue");
+    cue.setAttribute("role", "button");
+    cue.setAttribute("tabindex", "0");
+    cue.setAttribute("aria-label", "继续阅读");
+    cue.setAttribute("title", "继续阅读");
+
+    if (cue.dataset.keyboardReady === "true") return;
+
+    cue.dataset.keyboardReady = "true";
+    cue.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      scrollToMainFallback();
+    });
+  }
+
+  function refreshBlogChrome() {
+    renderSocialLinks();
+    enhanceHomeBannerScrollCue();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", refreshBlogChrome, { once: true });
+  } else {
+    refreshBlogChrome();
+  }
+
+  document.addEventListener("swup:contentReplaced", refreshBlogChrome);
+  document.addEventListener("pjax:complete", refreshBlogChrome);
 })();

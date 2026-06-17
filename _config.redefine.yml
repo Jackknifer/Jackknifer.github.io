@@ -173,14 +173,15 @@ home_banner:
     url:
   # Home banner social links
   social_links:
-    # Whether to enable
+    # Keep enabled so Theme Redefine renders the native scroll cue.
+    # External accounts are shown in the sidebar instead of the banner.
     enable: true
     # Social links style
     style: default # default, reverse, center
     # Social links
     links:
       - icon: github # can also be "fa-brands fa-github"
-        url: https://github.com/Jackknifer
+        url:
       - icon: twitter
         url:
       - icon: email
@@ -465,6 +466,59 @@ inject:
           .home-banner-container .content .description {
             font-size: 1.65rem;
             line-height: 1.15;
+          }
+        }
+
+        .home-banner-container .content > div.absolute {
+          justify-content: flex-end !important;
+          bottom: clamp(1.35rem, 5vh, 3rem) !important;
+          padding-left: clamp(1.25rem, 6vw, 4.5rem) !important;
+          padding-right: clamp(1.25rem, 6vw, 4.5rem) !important;
+          pointer-events: none;
+        }
+
+        .home-banner-container .content > div.absolute .social-contacts {
+          display: none !important;
+        }
+
+        .home-banner-container .content > div.absolute > div[onclick="scrollToMain()"] {
+          width: 3rem;
+          min-width: 3rem;
+          height: 3rem;
+          padding: 0 !important;
+          border-radius: 999px;
+          pointer-events: auto;
+          color: rgba(28, 40, 48, 0.78);
+          background: rgba(236, 244, 248, 0.46) !important;
+          border-color: rgba(255, 255, 255, 0.44) !important;
+          box-shadow: 0 8px 24px rgba(17, 30, 43, 0.13);
+          transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+        }
+
+        .home-banner-container .content > div.absolute > div[onclick="scrollToMain()"]:hover,
+        .home-banner-container .content > div.absolute > div[onclick="scrollToMain()"]:focus-visible {
+          color: rgba(20, 30, 38, 0.9);
+          background: rgba(255, 255, 255, 0.62) !important;
+          box-shadow: 0 10px 28px rgba(17, 30, 43, 0.18);
+          transform: translateY(-2px);
+          outline: none;
+        }
+
+        .home-banner-container .content > div.absolute > div[onclick="scrollToMain()"] i {
+          font-size: 0.98rem;
+          line-height: 1;
+        }
+
+        @media (max-width: 640px) {
+          .home-banner-container .content > div.absolute {
+            bottom: 1.2rem !important;
+            padding-right: 1.15rem !important;
+          }
+
+          .home-banner-container .content > div.absolute > div[onclick="scrollToMain()"] {
+            width: 2.75rem;
+            min-width: 2.75rem;
+            height: 2.75rem;
           }
         }
       </style>
