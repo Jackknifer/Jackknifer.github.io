@@ -7,7 +7,6 @@ tags:
 categories:
   - 分类名
 description: 一句话摘要。
-share_description: 转发卡片使用的短摘要，可留空。
 cover: ./cover.jpg
 thumbnail:
 sticky:

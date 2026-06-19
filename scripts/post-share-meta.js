@@ -3,26 +3,18 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-const MARKDOWN_IMAGE_PATTERN = /!\[[^\]]*]\(\s*(?:<([^>]+)>|([^\s)]+))(?:\s+["'][^"']*["'])?\s*\)/;
-const DEFAULT_SHARE_IMAGE = "/images/hero-city.jpeg";
+const DEFAULT_SHARE_IMAGE = "/images/hero-sea-level.jpg";
+const SHARE_DESCRIPTION = "弃我去者，昨日之日不可留。";
 
 hexo.extend.filter.register("before_post_render", (data) => {
   if (data.layout !== "post") {
     return data;
   }
 
-  data.og_description = cleanText(
-    data.share_description || data.description || "",
-  );
+  data.og_description = SHARE_DESCRIPTION;
 
   if (!data.og_image) {
-    const firstImage = String(data.content || "").match(MARKDOWN_IMAGE_PATTERN);
-    const firstImagePath = firstImage?.[1] || firstImage?.[2];
-
-    data.og_image = data.cover
-      || (firstImagePath && !firstImagePath.startsWith("data:")
-        ? firstImagePath
-        : DEFAULT_SHARE_IMAGE);
+    data.og_image = cleanText(data.cover) || DEFAULT_SHARE_IMAGE;
   }
 
   return data;
@@ -66,7 +58,7 @@ hexo.extend.filter.register("after_render:html", (html) => {
 });
 
 function cleanText(value) {
-  return String(value).replace(/\s+/g, " ").trim();
+  return String(value ?? "").replace(/\s+/g, " ").trim();
 }
 
 function escapeAttribute(value) {

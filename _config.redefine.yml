@@ -99,8 +99,8 @@ global:
   # Whether to enable open graph
   open_graph:
     enable: true
-    image: /images/hero-city.jpeg  # default og:image；文章无图时使用博客自己的方形图片
-    description: # 留空：文章页用各自的 description，其余页面回退到站点 description
+    image: /images/hero-sea-level.jpg  # default og:image；与博客首页浅色背景图一致
+    description: 弃我去者，昨日之日不可留。
   # Google Analytics
   google_analytics:
     enable: false # Whether to enable Google Analytics

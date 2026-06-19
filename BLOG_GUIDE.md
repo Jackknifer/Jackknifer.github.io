@@ -94,7 +94,6 @@ tags:
 categories:
   - 分类名
 description: 这是一句话摘要，会出现在首页列表和搜索结果里。
-share_description: 可选。转发到聊天软件时使用的短摘要，建议一句话、约 25 到 35 个汉字。
 cover: /images/my-cover.jpg
 thumbnail:
 sticky:
@@ -108,8 +107,6 @@ sticky:
 `categories` 是分类，建议一篇文章只放一个主分类，后期更好整理。
 
 `description` 是摘要，建议控制在一两句话。
-
-`share_description` 是可选的转发卡片短摘要。建议比 `description` 更精炼，优先保留文章主题和最有辨识度的信息；留空时会继续使用 `description`。
 
 `cover` 是文章头图或列表图，Theme Redefine 会读取它。
 
@@ -299,8 +296,8 @@ Redefine 官方文档：https://redefine-docs.ohevan.com/zh/docs
 
 博客已启用以下功能：
 
-- 分享到支持 Open Graph 的平台时，图片按 `cover`、正文第一张图片、博客默认方形图的顺序选择；同时输出图片尺寸、类型和替代文字，减少聊天软件抓取失败。
-- 分享卡片文字优先使用 `share_description`，留空时使用 `description`。建议短摘要控制在 25 到 35 个汉字，避免在手机端被截断得太生硬。
+- 分享到支持 Open Graph 的平台时，有 `cover` 的文章使用文章封面；没有 `cover` 时统一使用博客首页的海鸥背景图。
+- 分享卡片的简短文字统一为“弃我去者，昨日之日不可留。”，同时输出图片尺寸、类型和替代文字，减少聊天软件抓取失败。
 - 文章标题信息区显示单篇浏览量，页脚显示全站访问人数和总访问量。统计由 Theme Redefine 集成的 Vercount 提供，从启用后开始累计。
 - 首次打开站点时显示 Jackknifer 加载页；站内页面切换继续使用轻量顶部进度条。
 
