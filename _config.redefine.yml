@@ -80,7 +80,7 @@ global:
   # Website counter
   website_counter:
     url: https://cn.vercount.one/js # counter API URL (no need to change)
-    enable: false # enable website counter or not
+    enable: true # enable website counter or not
     site_pv: true # site page view
     site_uv: true # site unique visitor
     post_pv: true # post page view
@@ -88,8 +88,8 @@ global:
   single_page: true
   # Whether to enable Preloader.
   preloader:
-    enable: false
-    custom_message: # Custom message. If empty, the site title will be displayed
+    enable: true
+    custom_message: Jackknifer # Custom message. If empty, the site title will be displayed
   # Side tools settings
   side_tools:
     # Whether to enable gear rotation animation for settings button
@@ -449,6 +449,7 @@ inject:
   # Inject custom head html code
   head: 
     - |
+      <link rel="stylesheet" href="/css/blog-enhancements.css">
       <style>
         @media (max-width: 768px) {
           .home-banner-container .content .description {
@@ -855,6 +856,8 @@ inject:
       </style>
     - |
       <script defer src="/js/blog-sidebar-socials.js"></script>
+    - |
+      <script defer src="/js/blog-share.js"></script>
     -
 # INJECT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 

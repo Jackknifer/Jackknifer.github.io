@@ -291,3 +291,19 @@ Redefine 官方文档：https://redefine-docs.ohevan.com/zh/docs
 - 定期更新依赖并本地运行 `npm run build` 检查。
 
 这个站点现在已经可以进入正常写作状态。后续美化时，优先围绕内容可读性、首页第一眼、文章页面阅读体验来改，不要一次加太多装饰功能。
+
+## 10. 分享、访问统计和加载页
+
+博客已启用以下功能：
+
+- 文章末尾显示当前文章链接，并提供“复制链接”和系统“转发”按钮。支持系统分享的浏览器会显示“转发”，其他浏览器仍可复制链接。
+- 分享到支持 Open Graph 的平台时，优先使用文章的 `cover`；如果没有 `cover`，会尝试使用正文第一张图片；都没有时使用主题默认分享图。
+- 文章标题信息区显示单篇浏览量，页脚显示全站访问人数和总访问量。统计由 Theme Redefine 集成的 Vercount 提供，从启用后开始累计。
+- 首次打开站点时显示 Jackknifer 加载页；站内页面切换继续使用轻量顶部进度条。
+
+相关文件：
+
+- `_config.redefine.yml`：功能开关和资源注入。
+- `source/css/blog-enhancements.css`：分享、统计和加载状态样式。
+- `source/js/blog-share.js`：文章分享交互。
+- `scripts/post-share-meta.js`：自动选择文章分享图片。
