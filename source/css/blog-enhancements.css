@@ -57,106 +57,6 @@ html .preloader .ml13::after {
   content: " 次浏览";
 }
 
-.blog-share-panel {
-  margin: 0 2rem 1.65rem;
-  padding: 1rem 1.05rem;
-  border: 1px solid var(--border-color);
-  border-radius: 14px;
-  background: var(--second-background-color);
-  box-shadow: var(--redefine-box-shadow-flat);
-}
-
-.blog-share-heading {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.72rem;
-  color: var(--default-text-color);
-  font-size: 0.98rem;
-  font-weight: 600;
-}
-
-.blog-share-heading i {
-  color: var(--primary-color);
-  font-size: 0.9rem;
-}
-
-.blog-share-row {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.blog-share-link {
-  min-width: 0;
-  flex: 1;
-  overflow: hidden;
-  padding: 0.68rem 0.78rem;
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  background: var(--background-color);
-  color: var(--third-text-color);
-  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
-  font-size: 0.78rem;
-  line-height: 1.35;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  user-select: all;
-}
-
-.blog-share-actions {
-  display: flex;
-  flex: 0 0 auto;
-  gap: 0.48rem;
-}
-
-.blog-share-button {
-  min-height: 2.45rem;
-  padding: 0.58rem 0.82rem;
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  background: var(--background-color);
-  color: var(--default-text-color);
-  font: inherit;
-  font-size: 0.84rem;
-  line-height: 1;
-  cursor: pointer;
-  transition:
-    transform 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease,
-    background-color 0.18s ease;
-}
-
-.blog-share-button:hover {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-  transform: translateY(-1px);
-}
-
-.blog-share-button:focus-visible {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
-}
-
-.blog-share-button.primary {
-  border-color: var(--primary-color);
-  background: var(--primary-color);
-  color: #ffffff;
-}
-
-.blog-share-button.primary:hover {
-  color: #ffffff;
-  filter: brightness(1.06);
-}
-
-.blog-share-status {
-  min-height: 1.1rem;
-  margin-top: 0.55rem;
-  color: var(--third-text-color);
-  font-size: 0.76rem;
-}
-
 @keyframes blog-loader-pulse {
   from {
     opacity: 0.38;
@@ -169,39 +69,8 @@ html .preloader .ml13::after {
   }
 }
 
-@media (max-width: 640px) {
-  .blog-share-panel {
-    margin-right: 0.5rem;
-    margin-left: 0.5rem;
-    padding: 0.88rem;
-  }
-
-  .blog-share-row {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .blog-share-actions {
-    width: 100%;
-  }
-
-  .blog-share-button {
-    flex: 1;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   html .preloader .ml13::after {
     animation: none;
-  }
-
-  .blog-share-button {
-    transition: none;
-  }
-}
-
-@media print {
-  .blog-share-panel {
-    display: none;
   }
 }

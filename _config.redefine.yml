@@ -99,7 +99,7 @@ global:
   # Whether to enable open graph
   open_graph:
     enable: true
-    image: /images/redefine-og.webp  # default og:image
+    image: /images/hero-city.jpeg  # default og:image；文章无图时使用博客自己的方形图片
     description: # 留空：文章页用各自的 description，其余页面回退到站点 description
   # Google Analytics
   google_analytics:
@@ -856,8 +856,6 @@ inject:
       </style>
     - |
       <script defer src="/js/blog-sidebar-socials.js"></script>
-    - |
-      <script defer src="/js/blog-share.js"></script>
     -
 # INJECT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 

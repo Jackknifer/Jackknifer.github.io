@@ -94,6 +94,7 @@ tags:
 categories:
   - 分类名
 description: 这是一句话摘要，会出现在首页列表和搜索结果里。
+share_description: 可选。转发到聊天软件时使用的短摘要，建议一句话、约 25 到 35 个汉字。
 cover: /images/my-cover.jpg
 thumbnail:
 sticky:
@@ -107,6 +108,8 @@ sticky:
 `categories` 是分类，建议一篇文章只放一个主分类，后期更好整理。
 
 `description` 是摘要，建议控制在一两句话。
+
+`share_description` 是可选的转发卡片短摘要。建议比 `description` 更精炼，优先保留文章主题和最有辨识度的信息；留空时会继续使用 `description`。
 
 `cover` 是文章头图或列表图，Theme Redefine 会读取它。
 
@@ -292,18 +295,17 @@ Redefine 官方文档：https://redefine-docs.ohevan.com/zh/docs
 
 这个站点现在已经可以进入正常写作状态。后续美化时，优先围绕内容可读性、首页第一眼、文章页面阅读体验来改，不要一次加太多装饰功能。
 
-## 10. 分享、访问统计和加载页
+## 10. 分享预览、访问统计和加载页
 
 博客已启用以下功能：
 
-- 文章末尾显示当前文章链接，并提供“复制链接”和系统“转发”按钮。支持系统分享的浏览器会显示“转发”，其他浏览器仍可复制链接。
-- 分享到支持 Open Graph 的平台时，优先使用文章的 `cover`；如果没有 `cover`，会尝试使用正文第一张图片；都没有时使用主题默认分享图。
+- 分享到支持 Open Graph 的平台时，图片按 `cover`、正文第一张图片、博客默认方形图的顺序选择；同时输出图片尺寸、类型和替代文字，减少聊天软件抓取失败。
+- 分享卡片文字优先使用 `share_description`，留空时使用 `description`。建议短摘要控制在 25 到 35 个汉字，避免在手机端被截断得太生硬。
 - 文章标题信息区显示单篇浏览量，页脚显示全站访问人数和总访问量。统计由 Theme Redefine 集成的 Vercount 提供，从启用后开始累计。
 - 首次打开站点时显示 Jackknifer 加载页；站内页面切换继续使用轻量顶部进度条。
 
 相关文件：
 
 - `_config.redefine.yml`：功能开关和资源注入。
-- `source/css/blog-enhancements.css`：分享、统计和加载状态样式。
-- `source/js/blog-share.js`：文章分享交互。
+- `source/css/blog-enhancements.css`：统计和加载状态样式。
 - `scripts/post-share-meta.js`：自动选择文章分享图片。
