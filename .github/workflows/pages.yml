@@ -36,6 +36,12 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
+      - name: Upload sitemap for IndexNow
+        uses: actions/upload-artifact@v4
+        with:
+          name: indexnow-sitemap
+          path: ./public/sitemap.xml
+          if-no-files-found: error
 
   deploy:
     environment:
@@ -44,6 +50,16 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Download sitemap for IndexNow
+        uses: actions/download-artifact@v4
+        with:
+          name: indexnow-sitemap
+          path: ./indexnow
+      - name: Notify IndexNow
+        run: node tools/submit-indexnow.mjs ./indexnow/sitemap.xml
+        continue-on-error: true
