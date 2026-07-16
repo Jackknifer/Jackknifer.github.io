@@ -6,6 +6,7 @@ db.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.playwright-cli/
 
 # Local inbox for unpublished article drafts.
 # Keep the folder design and template in git, but do not commit actual pending posts by default.
