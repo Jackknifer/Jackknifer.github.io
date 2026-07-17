@@ -224,7 +224,7 @@ navbar:
     近况:
       path: /now
       icon: fa-regular fa-pen-to-square
-    碎碎念:
+    随想:
       path: /moments
       icon: fa-regular fa-comment-dots
     归档:
@@ -272,7 +272,7 @@ home:
       近况:
         path: /now
         icon: fa-regular fa-pen-to-square
-      碎碎念:
+      随想:
         path: /moments
         icon: fa-regular fa-comment-dots
       归档:

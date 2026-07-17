@@ -84,14 +84,18 @@ html .preloader .ml13::after {
     "SimSun", Georgia, serif;
   --blog-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
     "Microsoft YaHei", sans-serif;
-  --blog-player-accent: #dc8717;
-  --blog-player-accent-strong: #bd6810;
-  --blog-moment-accent: #625cff;
-  --blog-glass-light: rgba(255, 252, 247, 0.82);
-  --blog-glass-dark: rgba(37, 39, 44, 0.82);
-  --blog-glass-border-light: rgba(255, 255, 255, 0.82);
+  /* Align accent colors with the theme primary (#A31F34) so the custom
+     widgets share the blog's crimson identity instead of standing out. */
+  --blog-player-accent: #a31f34;
+  --blog-player-accent-strong: #7f1a2a;
+  --blog-player-accent-soft: rgba(163, 31, 52, 0.12);
+  --blog-moment-accent: #a31f34;
+  --blog-moment-accent-soft: rgba(163, 31, 52, 0.12);
+  --blog-glass-light: rgba(255, 255, 255, 0.86);
+  --blog-glass-dark: rgba(37, 39, 44, 0.86);
+  --blog-glass-border-light: var(--border-color);
   --blog-glass-border-dark: rgba(255, 255, 255, 0.1);
-  --blog-card-shadow: 0 18px 44px rgba(76, 54, 35, 0.12);
+  --blog-card-shadow: 0 18px 44px rgba(0, 0, 0, 0.08);
 }
 
 body,
@@ -176,16 +180,17 @@ html.dark .blog-widget {
 }
 
 .blog-home-widgets {
-  position: sticky;
-  top: 88px;
+  /* Match the left sidebar: same 240px width and 38px side margin, and scroll
+     with the page instead of staying pinned so both rails move together. */
+  position: relative;
   z-index: 4;
   display: flex;
-  flex: 0 0 286px;
+  flex: 0 0 240px;
   flex-direction: column;
   align-self: flex-start;
-  width: 286px;
-  margin: 0 24px 0 0;
-  gap: 24px;
+  width: 240px;
+  margin: 0 38px;
+  gap: 20px;
 }
 
 html[data-blog-page="home"] .main-content-body {
@@ -210,7 +215,7 @@ html[data-blog-page="home"] .main-content-body {
   width: 152px;
   height: 152px;
   border-radius: 50%;
-  background: rgba(220, 135, 23, 0.15);
+  background: rgba(163, 31, 52, 0.12);
   filter: blur(28px);
   content: "";
 }
@@ -251,18 +256,10 @@ html[data-blog-page="home"] .main-content-body {
   content: "";
 }
 
+/* The decorative vinyl-hole dot obscured the album art, so it is hidden on
+   both the home and compact covers. */
 .blog-player-cover-center {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  left: 50%;
-  width: 17px;
-  height: 17px;
-  border: 1px solid rgba(59, 59, 59, 0.18);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.15);
-  transform: translate(-50%, -50%);
+  display: none;
 }
 
 .blog-music-card-copy {
@@ -340,7 +337,7 @@ html[data-blog-page="home"] .main-content-body {
   border: 2px solid rgba(255, 255, 255, 0.9);
   border-radius: 50%;
   background: var(--blog-player-accent-strong);
-  box-shadow: 0 2px 7px rgba(117, 66, 14, 0.24);
+  box-shadow: 0 2px 7px rgba(163, 31, 52, 0.28);
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
@@ -352,7 +349,7 @@ html[data-blog-page="home"] .main-content-body {
   border: 2px solid rgba(255, 255, 255, 0.9);
   border-radius: 50%;
   background: var(--blog-player-accent-strong);
-  box-shadow: 0 2px 7px rgba(117, 66, 14, 0.24);
+  box-shadow: 0 2px 7px rgba(163, 31, 52, 0.28);
   cursor: pointer;
 }
 
@@ -394,7 +391,7 @@ html[data-blog-page="home"] .main-content-body {
 .blog-player-button-quiet:hover,
 .blog-player-button-quiet.is-active {
   color: var(--blog-player-accent-strong);
-  background: rgba(220, 135, 23, 0.12);
+  background: var(--blog-player-accent-soft);
 }
 
 .blog-player-button-primary {
@@ -402,7 +399,7 @@ html[data-blog-page="home"] .main-content-body {
   height: 48px;
   color: #fff;
   background: var(--blog-player-accent);
-  box-shadow: 0 8px 20px rgba(220, 135, 23, 0.34);
+  box-shadow: 0 8px 20px rgba(163, 31, 52, 0.3);
 }
 
 .blog-player-button-primary:hover {
@@ -421,19 +418,19 @@ html[data-blog-page="home"] .main-content-body {
 .blog-floating-player {
   position: fixed;
   z-index: 9999;
-  right: 5.25rem;
+  left: 1.5rem;
   bottom: 1.5rem;
   display: grid;
-  grid-template-columns: 48px minmax(150px, 1fr) 36px 32px;
-  width: min(390px, calc(100vw - 7rem));
+  grid-template-columns: 38px minmax(112px, 1fr) 30px 28px;
+  width: min(310px, calc(100vw - 3rem));
   align-items: center;
-  gap: 11px;
+  gap: 9px;
   box-sizing: border-box;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid var(--blog-glass-border-light);
-  border-radius: 22px;
-  background: rgba(255, 252, 247, 0.88);
-  box-shadow: 0 16px 42px rgba(49, 38, 30, 0.2);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.16);
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
@@ -461,14 +458,9 @@ html[data-blog-page="home"] .blog-floating-player {
 }
 
 .blog-player-cover-compact {
-  width: 48px;
-  height: 48px;
-  flex-basis: 48px;
-}
-
-.blog-player-cover-compact .blog-player-cover-center {
-  width: 10px;
-  height: 10px;
+  width: 38px;
+  height: 38px;
+  flex-basis: 38px;
 }
 
 .blog-floating-player-copy {
@@ -485,25 +477,25 @@ html[data-blog-page="home"] .blog-floating-player {
 
 .blog-floating-player-copy > strong {
   color: var(--second-text-color);
-  font-size: 0.92rem;
+  font-size: 0.82rem;
   line-height: 1.25;
 }
 
 .blog-floating-player-copy > span {
-  margin-top: 2px;
+  margin-top: 1px;
   color: var(--third-text-color);
-  font-size: 0.7rem;
+  font-size: 0.64rem;
   line-height: 1.3;
 }
 
 .blog-floating-player-progress {
   display: grid;
-  grid-template-columns: 30px 1fr 30px;
+  grid-template-columns: 26px 1fr 26px;
   align-items: center;
-  gap: 5px;
-  margin-top: 6px;
+  gap: 4px;
+  margin-top: 4px;
   color: var(--third-text-color);
-  font-size: 0.55rem;
+  font-size: 0.52rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -512,9 +504,14 @@ html[data-blog-page="home"] .blog-floating-player {
 }
 
 .blog-player-button-compact {
-  width: 36px;
-  height: 36px;
-  font-size: 0.78rem;
+  width: 30px;
+  height: 30px;
+  font-size: 0.7rem;
+}
+
+.blog-player-button-compact.blog-player-button-quiet {
+  width: 28px;
+  height: 28px;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -535,7 +532,7 @@ html[data-blog-page="home"] .blog-floating-player {
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  background: rgba(255, 190, 74, 0.14);
+  background: rgba(163, 31, 52, 0.1);
   filter: blur(32px);
   content: "";
 }
@@ -634,7 +631,7 @@ html.dark .blog-weather-mode {
   justify-content: center;
   border-radius: 22px;
   color: var(--blog-player-accent);
-  background: rgba(255, 193, 68, 0.15);
+  background: var(--blog-player-accent-soft);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
   font-size: 2rem;
 }
@@ -817,18 +814,18 @@ html[data-blog-page="moments"] .page-template-content.markdown-body {
 html[data-blog-page="moments"]
   .page-template-content.markdown-body
   > h1:first-child {
-  margin: 16px 0 28px;
-  color: #17233d;
-  font-size: clamp(2.35rem, 5vw, 3.65rem);
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -0.055em;
+  margin: 6px 0 24px;
+  color: var(--second-text-color);
+  font-size: 2.25rem;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
 }
 
 html.dark[data-blog-page="moments"]
   .page-template-content.markdown-body
   > h1:first-child {
-  color: #f0f3fa;
+  color: var(--second-text-color);
 }
 
 .moments-page {
@@ -870,7 +867,7 @@ html.dark .moments-search {
 
 .moments-search i {
   flex: 0 0 auto;
-  color: #70809c;
+  color: var(--third-text-color);
   font-size: 1.1rem;
 }
 
@@ -897,11 +894,11 @@ html.dark .moments-search {
 
 .moments-filter {
   padding: 9px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--border-color);
   border-radius: 999px;
-  color: #4f5f79;
+  color: var(--second-text-color);
   background: rgba(255, 255, 255, 0.62);
-  box-shadow: 0 5px 16px rgba(65, 58, 52, 0.08);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.06);
   font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
@@ -914,7 +911,7 @@ html.dark .moments-search {
 
 html.dark .moments-filter {
   border-color: rgba(255, 255, 255, 0.08);
-  color: #c5ccda;
+  color: var(--second-text-color);
   background: rgba(255, 255, 255, 0.06);
 }
 
@@ -926,7 +923,7 @@ html.dark .moments-filter {
   border-color: transparent;
   color: #fff;
   background: var(--blog-moment-accent);
-  box-shadow: 0 8px 18px rgba(98, 92, 255, 0.3);
+  box-shadow: 0 8px 18px rgba(163, 31, 52, 0.28);
 }
 
 .moments-summary {
@@ -952,7 +949,7 @@ html.dark .moments-filter {
   left: 19px;
   width: 3px;
   border-radius: 999px;
-  background: rgba(98, 92, 255, 0.84);
+  background: rgba(163, 31, 52, 0.78);
   content: "";
 }
 
@@ -993,7 +990,7 @@ html.dark .moment-card {
   border-radius: 50%;
   color: var(--blog-moment-accent);
   background: var(--blog-moment-accent);
-  box-shadow: 0 0 0 2px rgba(98, 92, 255, 0.2);
+  box-shadow: 0 0 0 2px rgba(163, 31, 52, 0.2);
   font-size: 0.5rem;
 }
 
@@ -1010,7 +1007,7 @@ html.dark .moment-marker {
 }
 
 .moment-date {
-  color: #4e48f6;
+  color: var(--blog-moment-accent);
   font-family: var(--blog-sans);
   font-size: 0.92rem;
   font-weight: 800;
@@ -1022,32 +1019,32 @@ html.dark .moment-marker {
   align-items: center;
   padding: 4px 10px;
   border-radius: 999px;
-  color: #be2b72;
-  background: rgba(255, 151, 205, 0.2);
+  color: var(--blog-player-accent-strong);
+  background: var(--blog-moment-accent-soft);
   font-size: 0.76rem;
   font-weight: 700;
 }
 
 .moment-tag.is-blue {
-  color: #1684b8;
-  background: rgba(113, 205, 244, 0.22);
+  color: var(--third-text-color);
+  background: var(--third-background-color);
 }
 
 .moment-card p {
   margin: 0;
-  color: #43526b;
+  color: var(--default-text-color);
   font-size: 1.02rem;
   line-height: 1.88;
 }
 
 html.dark .moment-card p {
-  color: #d7dce6;
+  color: var(--default-text-color);
 }
 
 .moments-empty {
   margin: 30px 0 0;
   padding: 34px 24px;
-  border: 1px dashed rgba(98, 92, 255, 0.34);
+  border: 1px dashed rgba(163, 31, 52, 0.32);
   border-radius: 24px;
   color: var(--third-text-color);
   text-align: center;
@@ -1105,12 +1102,13 @@ html.dark .moment-card p {
   }
 
   .blog-floating-player {
-    right: 1rem;
+    left: 1rem;
+    right: auto;
     bottom: 4.8rem;
-    grid-template-columns: 42px minmax(110px, 1fr) 34px;
+    grid-template-columns: 36px minmax(96px, 1fr) 30px;
     width: calc(100vw - 2rem);
-    gap: 9px;
-    padding: 9px 10px;
+    gap: 8px;
+    padding: 8px 9px;
   }
 
   .blog-floating-player > .blog-player-button-quiet {
@@ -1118,9 +1116,9 @@ html.dark .moment-card p {
   }
 
   .blog-player-cover-compact {
-    width: 42px;
-    height: 42px;
-    flex-basis: 42px;
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
   }
 
   html[data-blog-page="moments"] .main-content {
