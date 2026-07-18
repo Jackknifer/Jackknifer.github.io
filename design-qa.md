@@ -3,138 +3,109 @@
 ## Comparison target
 
 - Source visual truth:
+  - The tall mobile reference supplied in the current task (conversation image;
+    no local attachment path was exposed).
   - `/Users/apple/.codex/attachments/ee281477-66dd-44a4-adbc-b7b54277a9c7/image-1.jpg`
   - `/Users/apple/.codex/attachments/ee281477-66dd-44a4-adbc-b7b54277a9c7/image-2.jpg`
   - `/Users/apple/.codex/attachments/ee281477-66dd-44a4-adbc-b7b54277a9c7/image-3.png`
 - Browser-rendered implementation:
-  - `/tmp/blog-home-desktop.png`
-  - `/tmp/blog-article-player.png`
-  - `/tmp/blog-moments-desktop.png`
-  - `/tmp/blog-home-mobile.png`
-  - `/tmp/blog-moments-mobile.png`
-- Full-view side-by-side comparison: `/tmp/blog-visual-comparison.png`
-- Desktop viewport: `1920 × 1080`
-- Mobile viewport: `390 × 844`
-- State:
-  - Light theme.
-  - Homepage scrolled past the hero to the article, music, and weather grid.
-  - Local song actively playing before navigating to an article.
-  - Article page showing the persistent compact player.
-  - 碎碎念 page showing all entries, plus tested search and month-filter states.
+  - `/private/tmp/output/playwright/blog-mobile-redesign/home-mobile-full.png`
+  - `/private/tmp/output/playwright/blog-mobile-redesign/article-mobile-full.png`
+  - `/private/tmp/output/playwright/blog-mobile-redesign/article-player-mobile.png`
+  - `/private/tmp/output/playwright/blog-mobile-redesign/moments-mobile.png`
+  - `/private/tmp/output/playwright/blog-mobile-redesign/home-desktop-content-final.png`
+  - `/private/tmp/output/playwright/blog-mobile-redesign/home-desktop-hover.png`
+- Full-view comparison input:
+  `/private/tmp/output/playwright/blog-mobile-redesign/design-comparison.png`.
+- Desktop viewport: `1920 × 1080`.
+- Mobile viewport: `390 × 844`.
+- State: light theme; homepage, first article, and `/moments/`; music playing;
+  weather resolved through network/IP approximation; moments search and month
+  filter active states.
+
+## Environment
+
+- Browser MCP was attempted first and returned `No browser is available`.
+- The user-authorized Playwright CLI fallback ran against the local Hexo server
+  at `http://localhost:4000/`.
+- Production generation used Hexo 8.1.2 and completed successfully.
 
 ## Findings
 
 No actionable P0, P1, or P2 differences remain.
 
-- [P3] The reference pages include decorative petals, extra clock/calendar cards,
-  and project-specific content that are absent from this implementation.
-  - Location: full-page background and reference-only cards.
-  - Evidence: the source images contain these additional visual elements, while
-    the implementation keeps the existing blog content and requested widgets.
-  - Classification: intentional scope difference. The user explicitly limited
-    this update to music, weather, 碎碎念, navigation, and typography.
-- [P3] The implementation retains the Redefine theme's header proportions and
-  current blog imagery instead of cloning the reference site's identity.
-  - Location: global header, homepage article cards, and profile card.
-  - Evidence: `/tmp/blog-visual-comparison.png`.
-  - Classification: acceptable adaptation to the existing product design system.
+- [P3] The reference site contains decorative petals, clock/calendar widgets,
+  and its own content and identity.
+  - Classification: intentional scope difference. This implementation keeps
+    the existing Jackknifer/Redefine identity while applying the requested
+    mobile order, glass-card rhythm, and lower-page utility placement.
+- [P3] The current theme's hero and article imagery differ from the reference.
+  - Classification: intentional content preservation; no substitute or
+    generated assets were introduced.
 
 ## Required fidelity surfaces
 
-- Fonts and typography: passed. Display and article text use a Chinese serif
-  stack with adjusted article size and line height; compact controls use the
-  existing sans-serif UI treatment. Hierarchy and wrapping remain legible on
-  desktop and mobile.
-- Spacing and layout rhythm: passed. The desktop homepage uses the intended
-  left profile/navigation, central article list, and right widget rail. At
-  narrower widths the widgets stack without clipping. Card radii, padding,
-  shadows, and vertical rhythm are visually coherent with the references.
-- Colors and visual tokens: passed. Warm translucent music/weather surfaces,
-  orange playback emphasis, violet timeline accents, and pink/blue moment tags
-  preserve the reference hierarchy while fitting the existing theme.
-- Image quality and asset fidelity: passed. The supplied album cover is used
-  directly without placeholder art, stretching, or custom SVG substitution.
-  Existing article imagery remains sharp and correctly cropped.
-- Copy and content: passed. Player metadata, lyrics, weather labels, privacy
-  fallback copy, timeline dates/tags, search placeholder, and record count are
-  coherent in Chinese and reflect real blog content.
-- Icons: passed. Existing Font Awesome icons are used consistently for
-  navigation, playback, weather, search, and metadata.
-- Responsiveness and accessibility: passed. Mobile width reported no horizontal
-  overflow (`390px` viewport, `376px` document width). Controls have semantic
-  buttons, labels, pressed states, and practical touch targets. The visually
-  hidden homepage floating player is also removed from keyboard and
-  accessibility navigation.
-
-## Focused region evidence
-
-Focused regions were inspected at their original screenshot resolution:
-
-- Homepage music and weather cards:
-  `/tmp/blog-home-desktop.png` against source image 1.
-- Article compact player:
-  `/tmp/blog-article-player.png` against source image 2.
-- 碎碎念 search, filters, timeline line/markers, and card typography:
-  `/tmp/blog-moments-desktop.png` against source image 3.
-- Responsive stacking and fixed-player clearance:
-  `/tmp/blog-home-mobile.png` and `/tmp/blog-moments-mobile.png`.
-
-No additional crop files were required because the controls and typography were
-clearly readable in the original-resolution captures.
+- Mobile order: passed. Homepage DOM and rendered order is profile/introduction
+  → navigation → articles/pagination → music → weather.
+- Article player placement: passed. Article pages contain zero floating players
+  and one full player after article navigation and before comments.
+- Desktop rail symmetry: passed. Both rails are `240px` wide, use the same
+  `24px` radius, border, fill, shadow, and vertical gap. Measured height deltas
+  are exactly `0px` for introduction↔music and navigation↔weather.
+- Hover feedback: passed. Homepage cards lift `6px`, scale to `1.01`, and gain a
+  stronger shadow on pointer hover; touch layouts do not receive hover motion.
+- Weather privacy behavior: passed. No geolocation permission API is called.
+  Location comes from network/IP approximation and the card explains that no
+  device location is requested.
+- Moments authoring: passed. `/moments/` is generated from one Markdown file per
+  entry in `source/_moments/`; search and month filters continue to work.
+- Responsiveness: passed. No horizontal overflow at `390px` mobile or `1920px`
+  desktop.
+- Typography, imagery, icons, controls, and card edges: passed after full-view
+  and focused-region inspection.
 
 ## Comparison history
 
 ### Iteration 1
 
-- Earlier finding: [P2] On the homepage, the compact floating player was
-  visually transparent but still present in the accessibility tree, duplicating
-  playback controls.
-- Fix:
-  - Added `inert` and `aria-hidden` page-state synchronization in
-    `source/js/blog-experience.js`.
-  - Added `visibility: hidden` to the homepage-only floating-player state in
-    `source/css/blog-enhancements.css`.
-- Post-fix evidence:
-  - The refreshed homepage accessibility snapshot contained only the home music
-    card controls.
-  - `/tmp/blog-home-desktop.png` shows no duplicate floating player.
+- [P2] A weather-card decorative glow could paint behind the otherwise matched
+  right rail, and rounded runtime heights created a sub-pixel mismatch.
+- Fix: removed the escaping decoration and preserved exact browser sub-pixel
+  measurements when synchronizing paired rail heights.
 
 ### Iteration 2
 
-- Full-view comparison:
-  `/tmp/blog-visual-comparison.png`.
-- Result: no actionable P0, P1, or P2 visual mismatch. Remaining differences
-  are the intentional P3 scope adaptations listed above.
+- Rebuilt, refreshed, remeasured, and regenerated the full-view comparison.
+- Result: `0px` paired-height deltas, identical edge tokens, no overflow, and no
+  remaining actionable P0/P1/P2 issue.
 
 ## Primary interactions tested
 
-- Started 刘森《雨夜》 and observed elapsed time and lyric synchronization.
-- Navigated from homepage to an article while playback continued.
-- Confirmed the homepage player becomes the compact bottom-right article player.
-- Confirmed weather renders after geolocation fallback and exposes a retry
-  control for requesting precise location.
-- Searched 碎碎念 for `旧文章` and confirmed the result count changed to one.
-- Selected `26 年 7 月` and confirmed only the July entry remained.
-- Checked desktop and mobile navigation states and verified the top/left
-  navigation item sets are identical.
-- Confirmed “关于” is a direct link and has no GitHub submenu.
+- Hovered a homepage article card and confirmed transform and shadow changes.
+- Started music on an article page and observed elapsed-time/lyric progress.
+- Confirmed article navigation → full music card → comments ordering.
+- Confirmed the weather card resolves a network-derived location without a
+  browser permission prompt.
+- Searched moments for `旧文章` and received one result.
+- Selected `26年7月` and received the single July entry.
+- Verified all three migrated moment files render on `/moments/`.
 
 ## Console review
 
-- Custom music, weather, navigation, and moments code produced no console errors.
-- The article page emitted the existing Giscus “discussion not found” local
-  preview response; this is unrelated to the implementation and Giscus states
-  that a discussion will be created when a comment or reaction is submitted.
+- Homepage custom behavior produced zero console errors and warnings.
+- The article page emitted only the expected local-preview Giscus
+  `discussion not found` response; Giscus indicates the discussion will be
+  created after the first comment or reaction. This is unrelated to the change.
 
 ## Implementation checklist
 
-- [x] Homepage music widget and article/page floating player.
-- [x] Local MP3, LRC lyrics, and album cover.
-- [x] Visitor-location weather with permission-aware fallback.
-- [x] 碎碎念 route with search and month filters.
-- [x] Unified top and left navigation.
-- [x] Direct 关于 link without GitHub submenu.
-- [x] Serif typography and adjusted article sizing.
+- [x] Mobile profile and navigation before articles.
+- [x] Mobile music and weather below pagination.
+- [x] Full article-page player below previous/next navigation.
+- [x] Homepage pointer hover effect.
+- [x] Network-only approximate weather location.
+- [x] One-file-per-moment Markdown workflow.
+- [x] Exact left/right desktop rail symmetry.
 - [x] Desktop/mobile browser QA and production build.
 
 final result: passed

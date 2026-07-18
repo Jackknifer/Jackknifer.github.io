@@ -73,42 +73,8 @@
   }
 
   function playerSurfaceMarkup(kind) {
-    const isFloating = kind === "floating";
-    const surfaceClass = isFloating
-      ? "blog-player-surface blog-floating-player"
-      : "blog-player-surface blog-music-card blog-widget";
-
-    if (isFloating) {
-      return `
-        <aside class="${surfaceClass}" data-player-surface="floating" aria-label="正在播放">
-          <div class="blog-player-cover blog-player-cover-compact" aria-hidden="true">
-            <img src="${MUSIC.cover}" alt="">
-            <span class="blog-player-cover-center"></span>
-          </div>
-          <div class="blog-floating-player-copy">
-            <strong>${MUSIC.title}</strong>
-            <span data-player-lyric>${state.currentLyric}</span>
-            <div class="blog-floating-player-progress">
-              <span data-player-current>00:00</span>
-              <input data-player-seek type="range" min="0" max="100" value="0" aria-label="播放进度">
-              <span data-player-duration>00:00</span>
-            </div>
-          </div>
-          <button class="blog-player-button blog-player-button-quiet blog-player-button-compact" type="button" data-player-action="back" aria-label="后退 15 秒" title="后退 15 秒">
-            <i class="fa-solid fa-backward-step" aria-hidden="true"></i>
-          </button>
-          <button class="blog-player-button blog-player-button-primary blog-player-button-compact" type="button" data-player-action="toggle" aria-label="播放">
-            <i class="fa-solid fa-play" data-player-toggle-icon aria-hidden="true"></i>
-          </button>
-          <button class="blog-player-button blog-player-button-quiet blog-player-button-compact" type="button" data-player-action="forward" aria-label="快进 15 秒" title="快进 15 秒">
-            <i class="fa-solid fa-forward-step" aria-hidden="true"></i>
-          </button>
-        </aside>
-      `;
-    }
-
     return `
-      <section class="${surfaceClass}" data-player-surface="home" aria-label="音乐播放器">
+      <section class="blog-player-surface blog-music-card blog-widget" data-player-surface="${kind}" aria-label="音乐播放器">
         <div class="blog-music-card-heading">
           <div class="blog-player-cover" aria-hidden="true">
             <img src="${MUSIC.cover}" alt="">
@@ -153,10 +119,10 @@
         <div class="blog-weather-heading">
           <div class="blog-weather-location">
             <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-            <strong data-weather-city>正在获取位置</strong>
+            <strong data-weather-city>正在获取网络位置</strong>
           </div>
-          <button type="button" class="blog-weather-mode" data-weather-action="retry" title="重新定位">
-            <span data-weather-mode>定位中</span>
+          <button type="button" class="blog-weather-mode" data-weather-action="retry" title="重新获取网络位置">
+            <span data-weather-mode>网络定位</span>
             <i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>
           </button>
         </div>
@@ -202,8 +168,8 @@
           </div>
         </div>
         <p class="blog-weather-status" data-weather-status>
-          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-          坐标仅用于本次天气查询，不在本站保存
+          <i class="fa-solid fa-wifi" aria-hidden="true"></i>
+          使用网络大致位置，不调用设备定位
         </p>
       </section>
     `;
@@ -214,7 +180,6 @@
     root.id = "blog-global-player";
     root.innerHTML = `
       <audio preload="metadata" src="${escapeAttribute(MUSIC.audio)}"></audio>
-      ${playerSurfaceMarkup("floating")}
     `;
     document.body.appendChild(root);
 
@@ -456,7 +421,7 @@
     if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
       throw new Error("approximate location unavailable");
     }
-    await loadWeatherForCoordinates(latitude, longitude, "大致位置");
+    await loadWeatherForCoordinates(latitude, longitude, "网络位置");
   }
 
   function requestWeather(force = false) {
@@ -467,44 +432,21 @@
 
     state.weather = {
       status: "loading",
-      mode: "定位中",
-      message: "正在请求访客位置",
+      mode: "网络定位",
+      message: "正在根据网络信息获取大致位置",
       data: null,
     };
     renderWeather();
 
-    const fallback = () => {
-      loadApproximateWeather().catch(() => {
-        state.weather = {
-          status: "error",
-          mode: "定位失败",
-          message: "暂时无法获取你所在位置的天气，点击右上角重试。",
-          data: null,
-        };
-        renderWeather();
-      });
-    };
-
-    if (!navigator.geolocation) {
-      fallback();
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        loadWeatherForCoordinates(
-          position.coords.latitude,
-          position.coords.longitude,
-          "精确定位",
-        ).catch(fallback);
-      },
-      fallback,
-      {
-        enableHighAccuracy: false,
-        timeout: 10000,
-        maximumAge: 30 * 60 * 1000,
-      },
-    );
+    loadApproximateWeather().catch(() => {
+      state.weather = {
+        status: "error",
+        mode: "获取失败",
+        message: "暂时无法通过网络信息获取当地天气，点击右上角重试。",
+        data: null,
+      };
+      renderWeather();
+    });
   }
 
   function renderWeather() {
@@ -520,8 +462,9 @@
     widget.classList.toggle("has-error", weatherState.status === "error");
 
     if (weatherState.status !== "ready" || !weatherState.data) {
-      city.textContent = weatherState.status === "error" ? "天气不可用" : "正在获取位置";
-      mode.textContent = weatherState.mode || "定位中";
+      city.textContent =
+        weatherState.status === "error" ? "天气不可用" : "正在获取网络位置";
+      mode.textContent = weatherState.mode || "网络定位";
       widget.querySelector("[data-weather-text]").textContent =
         weatherState.message || "正在同步当地天气";
       setWeatherIcon(
@@ -531,8 +474,8 @@
       );
       status.innerHTML =
         weatherState.status === "error"
-          ? '<i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> 点击右上角重新请求定位与天气'
-          : '<i class="fa-solid fa-shield-halved" aria-hidden="true"></i> 坐标仅用于本次天气查询，不在本站保存';
+          ? '<i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> 点击右上角重新获取网络位置与天气'
+          : '<i class="fa-solid fa-wifi" aria-hidden="true"></i> 使用网络大致位置，不调用设备定位';
       return;
     }
 
@@ -587,9 +530,7 @@
     });
 
     status.innerHTML =
-      weatherState.mode === "精确定位"
-        ? '<i class="fa-solid fa-shield-halved" aria-hidden="true"></i> 已获授权；坐标仅用于本次查询，不在本站保存'
-        : '<i class="fa-solid fa-circle-info" aria-hidden="true"></i> 未获精确定位授权，当前使用网络大致位置';
+      '<i class="fa-solid fa-wifi" aria-hidden="true"></i> 当前使用网络大致位置，不调用设备定位';
   }
 
   function renderSocialLinks() {
@@ -669,16 +610,41 @@
     requestWeather();
   }
 
+  function mountPostPlayer() {
+    const article = document.querySelector(
+      ".post-page-container .article-content-container",
+    );
+    if (!article || article.querySelector(".blog-post-player-section")) return;
+
+    const playerSection = document.createElement("aside");
+    playerSection.className = "blog-post-player-section";
+    playerSection.setAttribute("aria-label", "文章页音乐播放器");
+    playerSection.innerHTML = playerSurfaceMarkup("post");
+
+    const articleNavigation = article.querySelector(".article-nav");
+    const comments = article.querySelector(".comment-container");
+    if (articleNavigation) {
+      articleNavigation.insertAdjacentElement("afterend", playerSection);
+    } else if (comments) {
+      comments.insertAdjacentElement("beforebegin", playerSection);
+    } else {
+      article.appendChild(playerSection);
+    }
+
+    renderPlayer();
+  }
+
   // Make the right rail mirror the left one exactly: the music card matches the
   // author/intro card, the weather card matches the navigation/links card. We
   // read the left heights at runtime (rather than hard-coding pixels) so the
   // two rails stay symmetric even as fonts, content or the viewport change.
   function syncRailHeights() {
-    if (window.matchMedia("(max-width: 992px)").matches) {
-      // Stacked single-column layout on tablet/mobile: no pairing needed.
+    if (window.matchMedia("(max-width: 1279px)").matches) {
+      // Stacked layout on tablet/mobile: no left/right pairing is visible.
       document
         .querySelectorAll(".blog-music-card, .blog-weather-card")
         .forEach((card) => {
+          card.style.height = "";
           card.style.minHeight = "";
         });
       return;
@@ -694,16 +660,18 @@
     const weather = document.querySelector(".blog-weather-card");
     if (!leftInfo || !leftLinks || !music || !weather) return;
 
-    // Clear any previous override before measuring so the natural height of
-    // the right cards is not inflated by a stale min-height.
-    music.style.minHeight = "";
-    weather.style.minHeight = "";
+    // Clear any previous override before measuring so stale values do not
+    // affect the paired card dimensions.
+    music.style.height = "";
+    weather.style.height = "";
 
-    const infoHeight = Math.round(leftInfo.getBoundingClientRect().height);
-    const linksHeight = Math.round(leftLinks.getBoundingClientRect().height);
+    // Preserve the browser's sub-pixel measurements. Rounding here can leave
+    // the paired card a fraction of a pixel taller on high-DPI screens.
+    const infoHeight = leftInfo.getBoundingClientRect().height;
+    const linksHeight = leftLinks.getBoundingClientRect().height;
 
-    if (infoHeight > 0) music.style.minHeight = `${infoHeight}px`;
-    if (linksHeight > 0) weather.style.minHeight = `${linksHeight}px`;
+    if (infoHeight > 0) music.style.height = `${infoHeight}px`;
+    if (linksHeight > 0) weather.style.height = `${linksHeight}px`;
   }
 
   function initializeMomentsPage() {
@@ -762,18 +730,6 @@
   function syncPage() {
     const pageType = classifyPage();
     document.documentElement.dataset.blogPage = pageType;
-    const floatingPlayer = document.querySelector(
-      '[data-player-surface="floating"]',
-    );
-    const hideFloatingPlayer = pageType === "home";
-
-    if (floatingPlayer) {
-      floatingPlayer.inert = hideFloatingPlayer;
-      floatingPlayer.setAttribute(
-        "aria-hidden",
-        String(hideFloatingPlayer),
-      );
-    }
 
     if (pageType === "home") {
       mountHomeWidgets();
@@ -784,6 +740,10 @@
       // synchronous layout and late image/font reflow.
       requestAnimationFrame(syncRailHeights);
       window.setTimeout(syncRailHeights, 400);
+    }
+
+    if (pageType === "post") {
+      mountPostPlayer();
     }
 
     if (pageType === "moments") {

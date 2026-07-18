@@ -8,6 +8,7 @@
     "new": "hexo new post",
     "new:post": "hexo new post",
     "new:draft": "hexo new draft",
+    "new:moment": "node tools/new-moment.mjs",
     "publish": "hexo publish post",
     "import:pending": "node tools/import-pending-posts.mjs",
     "import:pending:dry": "node tools/import-pending-posts.mjs --dry-run",

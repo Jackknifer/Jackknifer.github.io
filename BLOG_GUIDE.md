@@ -40,6 +40,12 @@ npm run new:post -- "文章标题"
 npm run new:draft -- "文章标题"
 ```
 
+新建随想：
+
+```bash
+npm run new:moment -- "这条随想的简短名称"
+```
+
 发布草稿：
 
 ```bash
@@ -55,6 +61,8 @@ npm run publish -- "草稿文件名"
 `source/_posts` 存放正式文章。每一篇 Markdown 文件都会生成一个公开页面。
 
 这个目录是已发布文章的正式管理区，会同步到 GitHub。文章发布后，后续更新可以直接修改这里的 Markdown 和对应图片，再提交推送。
+
+`source/_moments` 存放随想。每一条随想使用一个独立 Markdown 文件，构建时会按日期自动汇总到 `/moments/` 页面，不会混进正常博文列表。
 
 `source/_drafts` 存放草稿。草稿默认不会发布，只有 `npm run server:drafts` 本地预览时能看到。
 
@@ -132,7 +140,32 @@ git push origin main
 
 推送后 GitHub Actions 会自动发布。发布进度在仓库的 Actions 页面查看。
 
-## 4. 草稿工作流
+## 4. 随想写作和上传流程
+
+随想现在统一放在 `source/_moments`，一条内容对应一个 Markdown 文件。推荐用命令创建：
+
+```bash
+npm run new:moment -- "博客移动端改版"
+```
+
+命令会生成类似 `source/_moments/2026-07-18-博客移动端改版.md` 的文件。打开后按下面的格式写：
+
+```yaml
+---
+date: 2026-07-18 14:30:00
+tags:
+  - 博客更新
+  - 移动端
+---
+
+今天把博客的移动端栏目顺序重新整理了一遍。
+```
+
+`date` 决定随想的显示日期和排序；`tags` 可以写一个或多个。正文直接使用 Markdown，可以分段，也可以使用链接、强调等常用语法。
+
+写完后运行 `npm run server` 或 `npm run build` 检查。新增、删除或修改 `source/_moments` 里的文件后，随想页的数量、月份筛选和内容会自动更新，不需要再手工编辑汇总页面。
+
+## 5. 草稿工作流
 
 如果一篇文章还没写完，先建草稿：
 
@@ -154,7 +187,7 @@ npm run publish -- "未完成文章"
 
 发布后文件会进入 `source/_posts`。发布前仍然可以手动修改 `date`，适合迁移旧文。
 
-## 5. 待上传文章收件箱
+## 6. 待上传文章收件箱
 
 如果你已经有一批 Markdown 文章，推荐先放到 `pending-posts`，之后我可以直接读取这个文件夹并帮你导入博客。
 
@@ -223,7 +256,7 @@ git commit -m "Add post: 文章标题"
 git push origin main
 ```
 
-## 6. 图片使用建议
+## 7. 图片使用建议
 
 把图片放到 `source/images`，文章中这样引用：
 
@@ -239,7 +272,7 @@ cover: /images/example.jpg
 
 Redefine 文档也建议把常用图片放在 Hexo 根目录下的 `source/images`，再用 `/images/...` 引用。
 
-## 7. 怎么使用 Redefine 文档改这个博客
+## 8. 怎么使用 Redefine 文档改这个博客
 
 可以。这个博客已经使用 Theme Redefine，官方文档里的大部分配置都可以用在这里。
 
@@ -265,7 +298,7 @@ Redefine 官方文档：https://redefine-docs.ohevan.com/zh/docs
 
 目前标签页、分类页、归档页、普通页面标题和文章封面标题的字号收敛都放在 `_config.redefine.yml` 的 `inject.footer`。如果以后觉得某个页面字号仍然偏大，优先改这一段，而不是去改主题源码。
 
-## 8. GitHub 仓库能否设置成私密
+## 9. GitHub 仓库能否设置成私密
 
 可以把仓库设置成私密，但 GitHub Pages 对私有仓库有计划限制。GitHub 官方说明是：GitHub Free 支持公开仓库的 GitHub Pages；GitHub Pro、Team、Enterprise 支持公开和私有仓库的 GitHub Pages。
 
@@ -279,7 +312,7 @@ Redefine 官方文档：https://redefine-docs.ohevan.com/zh/docs
 
 注意：即使仓库是私有的，已经发布出来的网站页面本身通常仍是面向访问者的公开网页。不要把密码、身份证、密钥、未公开资料写进博客文章或构建产物。
 
-## 9. 推荐后续优化
+## 10. 推荐后续优化
 
 短期可以继续做：
 
@@ -292,7 +325,7 @@ Redefine 官方文档：https://redefine-docs.ohevan.com/zh/docs
 
 这个站点现在已经可以进入正常写作状态。后续美化时，优先围绕内容可读性、首页第一眼、文章页面阅读体验来改，不要一次加太多装饰功能。
 
-## 10. 分享预览、访问统计和加载页
+## 11. 分享预览、访问统计和加载页
 
 博客已启用以下功能：
 
