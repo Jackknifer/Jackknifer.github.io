@@ -18,6 +18,7 @@
     audio: null,
     root: null,
     sideToolsObserver: null,
+    widgetAvoidanceObserver: null,
     lyricLayoutFrame: null,
     lyrics: [],
     currentLyric: "点击播放，听一场雨夜",
@@ -842,6 +843,41 @@
     });
   }
 
+  function observeDesktopWidgetAvoidance() {
+    state.widgetAvoidanceObserver?.disconnect();
+    state.widgetAvoidanceObserver = null;
+
+    const sideTools = document.querySelector(".right-side-tools-container");
+    sideTools?.classList.remove("blog-widget-avoidance");
+    if (!sideTools || !window.matchMedia("(min-width: 769px)").matches) return;
+
+    const widgets = [
+      ...document.querySelectorAll(
+        ".blog-home-widgets .blog-music-card, .blog-home-widgets .blog-weather-card",
+      ),
+    ];
+    if (!widgets.length) return;
+
+    const visibleWidgets = new Set();
+    state.widgetAvoidanceObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            visibleWidgets.add(entry.target);
+          } else {
+            visibleWidgets.delete(entry.target);
+          }
+        });
+        sideTools.classList.toggle(
+          "blog-widget-avoidance",
+          visibleWidgets.size > 0,
+        );
+      },
+      { threshold: 0 },
+    );
+    widgets.forEach((widget) => state.widgetAvoidanceObserver.observe(widget));
+  }
+
   function syncPlayerPresentation(pageType) {
     const isDesktopPost =
       pageType === "post" && window.matchMedia("(min-width: 769px)").matches;
@@ -895,6 +931,7 @@
     }
 
     observeSideToolsVisibility();
+    observeDesktopWidgetAvoidance();
     syncPlayerPresentation(pageType);
     renderPlayer();
   }
@@ -929,6 +966,7 @@
     window.clearTimeout(railResizeTimer);
     railResizeTimer = window.setTimeout(() => {
       syncRailHeights();
+      observeDesktopWidgetAvoidance();
       syncPlayerPresentation(classifyPage());
       queueFloatingLyricLayout();
     }, 150);
