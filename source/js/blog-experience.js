@@ -7,6 +7,7 @@
     lyrics: "/media/rainy-night.lrc",
     cover: "/media/rainy-night-cover.png",
   };
+  const DEFAULT_VOLUME = 0.35;
 
   if (window[EXPERIENCE_KEY]) {
     window[EXPERIENCE_KEY].syncPage();
@@ -73,6 +74,35 @@
   }
 
   function playerSurfaceMarkup(kind) {
+    if (kind === "floating") {
+      return `
+        <aside class="blog-player-surface blog-floating-player" data-player-surface="floating" aria-label="正在播放">
+          <div class="blog-player-cover blog-player-cover-compact" aria-hidden="true">
+            <img src="${MUSIC.cover}" alt="">
+            <span class="blog-player-cover-center"></span>
+          </div>
+          <div class="blog-floating-player-copy">
+            <strong>${MUSIC.title}</strong>
+            <span data-player-lyric>${state.currentLyric}</span>
+            <div class="blog-floating-player-progress">
+              <span data-player-current>00:00</span>
+              <input data-player-seek type="range" min="0" max="100" value="0" aria-label="播放进度">
+              <span data-player-duration>00:00</span>
+            </div>
+          </div>
+          <button class="blog-player-button blog-player-button-quiet blog-player-button-compact" type="button" data-player-action="back" aria-label="后退 15 秒" title="后退 15 秒">
+            <i class="fa-solid fa-backward-step" aria-hidden="true"></i>
+          </button>
+          <button class="blog-player-button blog-player-button-primary blog-player-button-compact" type="button" data-player-action="toggle" aria-label="播放">
+            <i class="fa-solid fa-play" data-player-toggle-icon aria-hidden="true"></i>
+          </button>
+          <button class="blog-player-button blog-player-button-quiet blog-player-button-compact" type="button" data-player-action="forward" aria-label="快进 15 秒" title="快进 15 秒">
+            <i class="fa-solid fa-forward-step" aria-hidden="true"></i>
+          </button>
+        </aside>
+      `;
+    }
+
     return `
       <section class="blog-player-surface blog-music-card blog-widget" data-player-surface="${kind}" aria-label="音乐播放器">
         <div class="blog-music-card-heading">
@@ -180,12 +210,14 @@
     root.id = "blog-global-player";
     root.innerHTML = `
       <audio preload="metadata" src="${escapeAttribute(MUSIC.audio)}"></audio>
+      ${playerSurfaceMarkup("floating")}
     `;
     document.body.appendChild(root);
 
     state.root = root;
     state.audio = root.querySelector("audio");
     state.audio.loop = true;
+    state.audio.volume = DEFAULT_VOLUME;
 
     state.audio.addEventListener("loadedmetadata", renderPlayer);
     state.audio.addEventListener("durationchange", renderPlayer);
@@ -266,7 +298,12 @@
       button.setAttribute("aria-pressed", String(state.audio.loop));
     });
     document.querySelectorAll("[data-player-volume-icon]").forEach((element) => {
-      element.className = `fa-solid ${state.audio.muted ? "fa-volume-xmark" : "fa-volume-high"}`;
+      const volumeIcon = state.audio.muted
+        ? "fa-volume-xmark"
+        : state.audio.volume < 0.5
+          ? "fa-volume-low"
+          : "fa-volume-high";
+      element.className = `fa-solid ${volumeIcon}`;
     });
   }
 
@@ -727,6 +764,29 @@
     return "page";
   }
 
+  function syncPlayerPresentation(pageType) {
+    const isDesktopPost =
+      pageType === "post" && window.matchMedia("(min-width: 769px)").matches;
+    const isMobilePost =
+      pageType === "post" && window.matchMedia("(max-width: 768px)").matches;
+    const floatingPlayer = document.querySelector(
+      '[data-player-surface="floating"]',
+    );
+    const postPlayer = document.querySelector(
+      '.blog-post-player-section [data-player-surface="post"]',
+    );
+
+    if (floatingPlayer) {
+      floatingPlayer.inert = !isDesktopPost;
+      floatingPlayer.setAttribute("aria-hidden", String(!isDesktopPost));
+    }
+
+    if (postPlayer) {
+      postPlayer.inert = !isMobilePost;
+      postPlayer.setAttribute("aria-hidden", String(!isMobilePost));
+    }
+  }
+
   function syncPage() {
     const pageType = classifyPage();
     document.documentElement.dataset.blogPage = pageType;
@@ -750,6 +810,7 @@
       initializeMomentsPage();
     }
 
+    syncPlayerPresentation(pageType);
     renderPlayer();
   }
 
@@ -781,7 +842,10 @@
   let railResizeTimer = null;
   window.addEventListener("resize", () => {
     window.clearTimeout(railResizeTimer);
-    railResizeTimer = window.setTimeout(syncRailHeights, 150);
+    railResizeTimer = window.setTimeout(() => {
+      syncRailHeights();
+      syncPlayerPresentation(classifyPage());
+    }, 150);
   });
 
   createGlobalPlayer();

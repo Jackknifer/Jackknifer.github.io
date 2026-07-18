@@ -108,6 +108,7 @@ code,
 pre,
 .blog-widget-kicker,
 .blog-player-timeline,
+.blog-floating-player-progress,
 .blog-weather-status {
   font-family: var(--blog-sans);
 }
@@ -477,6 +478,100 @@ html[data-blog-page="home"] .main-content-body {
 
 #blog-global-player audio {
   display: none;
+}
+
+.blog-floating-player {
+  position: fixed;
+  z-index: 9999;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  display: none;
+  grid-template-columns: 44px minmax(90px, 1fr) 28px 30px 28px;
+  width: min(280px, calc(100vw - 3rem));
+  align-items: center;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid var(--blog-glass-border-light);
+  border-radius: 18px;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.16);
+  pointer-events: auto;
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+html.dark .blog-floating-player {
+  border-color: var(--blog-glass-border-dark);
+  background: rgba(37, 39, 44, 0.9);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.34);
+}
+
+.blog-player-cover-compact {
+  width: 44px;
+  height: 44px;
+  flex-basis: 44px;
+}
+
+.blog-floating-player-copy {
+  min-width: 0;
+}
+
+.blog-floating-player-copy > strong,
+.blog-floating-player-copy > span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.blog-floating-player-copy > strong {
+  color: var(--second-text-color);
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+.blog-floating-player-copy > span {
+  margin-top: 1px;
+  color: var(--third-text-color);
+  font-size: 0.64rem;
+  line-height: 1.3;
+}
+
+.blog-floating-player-progress {
+  display: grid;
+  grid-template-columns: 26px 1fr 26px;
+  align-items: center;
+  margin-top: 4px;
+  gap: 4px;
+  color: var(--third-text-color);
+  font-size: 0.52rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.blog-floating-player-progress [data-player-seek] {
+  height: 3px;
+}
+
+.blog-player-button-compact {
+  width: 30px;
+  height: 30px;
+  font-size: 0.7rem;
+}
+
+.blog-player-button-compact.blog-player-button-quiet {
+  width: 28px;
+  height: 28px;
+}
+
+@media (min-width: 769px) {
+  html[data-blog-page="post"] .blog-floating-player {
+    display: grid;
+  }
+
+  html[data-blog-page="post"] .blog-post-player-section {
+    display: none;
+  }
 }
 
 /* -------------------------------------------------------------------------- */

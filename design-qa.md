@@ -3,109 +3,123 @@
 ## Comparison target
 
 - Source visual truth:
-  - The tall mobile reference supplied in the current task (conversation image;
-    no local attachment path was exposed).
-  - `/Users/apple/.codex/attachments/ee281477-66dd-44a4-adbc-b7b54277a9c7/image-1.jpg`
-  - `/Users/apple/.codex/attachments/ee281477-66dd-44a4-adbc-b7b54277a9c7/image-2.jpg`
-  - `/Users/apple/.codex/attachments/ee281477-66dd-44a4-adbc-b7b54277a9c7/image-3.png`
+  - Current oversized desktop regression supplied by the user:
+    `/var/folders/9g/7wbr3g8573n2v6jw1dtx1ks40000gn/T/codex-clipboard-db24f6c1-39de-4401-97ff-ba5c7adf8927.png`.
+  - Previous compact desktop player baseline:
+    `/tmp/blog-article-player.png`.
+  - Existing mobile full-player baseline:
+    `/private/tmp/output/playwright/blog-mobile-redesign/article-player-mobile.png`.
 - Browser-rendered implementation:
-  - `/private/tmp/output/playwright/blog-mobile-redesign/home-mobile-full.png`
-  - `/private/tmp/output/playwright/blog-mobile-redesign/article-mobile-full.png`
-  - `/private/tmp/output/playwright/blog-mobile-redesign/article-player-mobile.png`
-  - `/private/tmp/output/playwright/blog-mobile-redesign/moments-mobile.png`
-  - `/private/tmp/output/playwright/blog-mobile-redesign/home-desktop-content-final.png`
-  - `/private/tmp/output/playwright/blog-mobile-redesign/home-desktop-hover.png`
-- Full-view comparison input:
-  `/private/tmp/output/playwright/blog-mobile-redesign/design-comparison.png`.
-- Desktop viewport: `1920 × 1080`.
-- Mobile viewport: `390 × 844`.
-- State: light theme; homepage, first article, and `/moments/`; music playing;
-  weather resolved through network/IP approximation; moments search and month
-  filter active states.
+  - Desktop article at `1440 × 900`:
+    `/private/tmp/output/blog-player-responsive-qa/article-desktop-compact.png`.
+  - Mobile article at `390 × 844`:
+    `/private/tmp/output/blog-player-responsive-qa/article-mobile-full-player.png`.
+- Focused regions:
+  - `/private/tmp/output/blog-player-responsive-qa/article-desktop-player-crop.png`.
+  - `/private/tmp/output/blog-player-responsive-qa/article-mobile-player-crop.png`.
+- Combined comparison input:
+  `/private/tmp/output/blog-player-responsive-qa/design-comparison.png`.
+- State: article page near its previous/next navigation and comments; desktop
+  compact player fixed at the lower-left; mobile full player between navigation
+  and comments; playback toggled in both responsive states.
 
 ## Environment
 
-- Browser MCP was attempted first and returned `No browser is available`.
-- The user-authorized Playwright CLI fallback ran against the local Hexo server
-  at `http://localhost:4000/`.
-- Production generation used Hexo 8.1.2 and completed successfully.
+- Local Hexo preview: `http://localhost:4000/`.
+- Browser path: Codex in-app Browser; no fallback browser was used.
+- Desktop checks: `1440 × 900` (plus dimension reads at the requested desktop
+  breakpoint).
+- Mobile checks: `390 × 844`.
+- Theme note: the historical source capture is light while the browser session
+  retained the user's dark theme. Geometry, density, controls, and responsive
+  presentation were compared; both variants use the existing theme tokens.
 
 ## Findings
 
 No actionable P0, P1, or P2 differences remain.
 
-- [P3] The reference site contains decorative petals, clock/calendar widgets,
-  and its own content and identity.
-  - Classification: intentional scope difference. This implementation keeps
-    the existing Jackknifer/Redefine identity while applying the requested
-    mobile order, glass-card rhythm, and lower-page utility placement.
-- [P3] The current theme's hero and article imagery differ from the reference.
-  - Classification: intentional content preservation; no substitute or
-    generated assets were introduced.
+- [P3] Compact-player color differs between the historical light reference and
+  the current dark browser state.
+  - Classification: expected theme-state difference. Border, fill, text, and
+    shadow all use the existing light/dark tokens.
+- [P3] Perceived loudness remains partly dependent on the visitor's system and
+  browser volume.
+  - Classification: expected platform variance. The site-side default is now
+    explicitly set to `35%` instead of the browser default `100%`.
 
 ## Required fidelity surfaces
 
-- Mobile order: passed. Homepage DOM and rendered order is profile/introduction
-  → navigation → articles/pagination → music → weather.
-- Article player placement: passed. Article pages contain zero floating players
-  and one full player after article navigation and before comments.
-- Desktop rail symmetry: passed. Both rails are `240px` wide, use the same
-  `24px` radius, border, fill, shadow, and vertical gap. Measured height deltas
-  are exactly `0px` for introduction↔music and navigation↔weather.
-- Hover feedback: passed. Homepage cards lift `6px`, scale to `1.01`, and gain a
-  stronger shadow on pointer hover; touch layouts do not receive hover motion.
-- Weather privacy behavior: passed. No geolocation permission API is called.
-  Location comes from network/IP approximation and the card explains that no
-  device location is requested.
-- Moments authoring: passed. `/moments/` is generated from one Markdown file per
-  entry in `source/_moments/`; search and month filters continue to work.
-- Responsiveness: passed. No horizontal overflow at `390px` mobile or `1920px`
-  desktop.
-- Typography, imagery, icons, controls, and card edges: passed after full-view
-  and focused-region inspection.
+- Fonts and typography: passed. Compact title, lyric, time labels, and mobile
+  full-player hierarchy reuse the prior component styles without wrapping or
+  clipping.
+- Spacing and layout rhythm: passed. Desktop player measures `280px` wide and
+  sits `24px` from the left and bottom viewport edges. Mobile retains the full
+  card after article navigation and before comments.
+- Colors and visual tokens: passed. The compact player uses the same glass,
+  accent, border, and shadow tokens as the existing component, including dark
+  mode.
+- Image quality and asset fidelity: passed. The original album cover is reused
+  directly at both sizes with no placeholder or regenerated asset.
+- Copy and content: passed. Song title, artist, lyric, progress, duration, and
+  control labels remain synchronized between desktop and mobile surfaces.
+
+## Responsive and interaction evidence
+
+- Desktop article:
+  - Compact player display is `grid`; position is `fixed`.
+  - Measured left offset `24px`, bottom offset `24px`, width `280px`.
+  - The old full-width article player is `display: none` and removed from the
+    accessibility interaction path.
+- Mobile article:
+  - Compact player is `display: none` and `aria-hidden=true`.
+  - Full article player is visible, accessible, and ordered after navigation
+    and before comments.
+  - No horizontal overflow at `390px`.
+- Playback:
+  - Desktop play changed the control to pause and advanced elapsed time.
+  - Mobile toggle changed the same shared audio state and brought the full card
+    into view.
+  - Default audio volume is assigned to `0.35` when the global audio element is
+    created.
 
 ## Comparison history
 
 ### Iteration 1
 
-- [P2] A weather-card decorative glow could paint behind the otherwise matched
-  right rail, and rounded runtime heights created a sub-pixel mismatch.
-- Fix: removed the escaping decoration and preserved exact browser sub-pixel
-  measurements when synchronizing paired rail heights.
+- [P1] The desktop article page rendered the mobile-style full-width music card
+  below navigation, materially increasing page length and differing from the
+  user's requested compact desktop behavior.
+- Fix:
+  - Restored the prior compact player markup and desktop glass-card styling.
+  - Scoped it to desktop article pages at `min-width: 769px`.
+  - Kept the full article card only at `max-width: 768px`.
+  - Added breakpoint-aware `inert` and `aria-hidden` synchronization.
+- Post-fix evidence:
+  - Desktop: `article-desktop-compact.png` and
+    `article-desktop-player-crop.png`.
+  - Mobile: `article-mobile-full-player.png` and
+    `article-mobile-player-crop.png`.
+  - Combined: `design-comparison.png`.
 
 ### Iteration 2
 
-- Rebuilt, refreshed, remeasured, and regenerated the full-view comparison.
-- Result: `0px` paired-height deltas, identical edge tokens, no overflow, and no
-  remaining actionable P0/P1/P2 issue.
-
-## Primary interactions tested
-
-- Hovered a homepage article card and confirmed transform and shadow changes.
-- Started music on an article page and observed elapsed-time/lyric progress.
-- Confirmed article navigation → full music card → comments ordering.
-- Confirmed the weather card resolves a network-derived location without a
-  browser permission prompt.
-- Searched moments for `旧文章` and received one result.
-- Selected `26年7月` and received the single July entry.
-- Verified all three migrated moment files render on `/moments/`.
+- Full-view and focused comparison found no remaining actionable P0/P1/P2
+  issue. Desktop and mobile each expose exactly one usable player surface.
 
 ## Console review
 
-- Homepage custom behavior produced zero console errors and warnings.
-- The article page emitted only the expected local-preview Giscus
-  `discussion not found` response; Giscus indicates the discussion will be
-  created after the first comment or reaction. This is unrelated to the change.
+- No custom player errors or warnings were emitted.
+- The only warning was the expected local-preview Giscus `Discussion not
+  found` message; it is unrelated to the player change.
 
 ## Implementation checklist
 
-- [x] Mobile profile and navigation before articles.
-- [x] Mobile music and weather below pagination.
-- [x] Full article-page player below previous/next navigation.
-- [x] Homepage pointer hover effect.
-- [x] Network-only approximate weather location.
-- [x] One-file-per-moment Markdown workflow.
-- [x] Exact left/right desktop rail symmetry.
-- [x] Desktop/mobile browser QA and production build.
+- [x] Desktop article compact player restored at lower-left.
+- [x] Desktop full-width article player hidden.
+- [x] Mobile full-width article player preserved.
+- [x] Hidden responsive surface removed from accessibility interaction.
+- [x] Default music volume reduced to 35%.
+- [x] Desktop/mobile playback interactions verified.
+- [x] Production build and visual comparison passed.
 
 final result: passed
