@@ -94,10 +94,13 @@
               <span data-player-duration>00:00</span>
             </div>
           </div>
+          <button class="blog-player-button blog-player-button-quiet blog-player-button-compact" type="button" data-player-action="back" aria-label="后退 15 秒" title="后退 15 秒">
+            <i class="fa-solid fa-backward-step" aria-hidden="true"></i>
+          </button>
           <button class="blog-player-button blog-player-button-primary blog-player-button-compact" type="button" data-player-action="toggle" aria-label="播放">
             <i class="fa-solid fa-play" data-player-toggle-icon aria-hidden="true"></i>
           </button>
-          <button class="blog-player-button blog-player-button-quiet" type="button" data-player-action="forward" aria-label="快进 15 秒" title="快进 15 秒">
+          <button class="blog-player-button blog-player-button-quiet blog-player-button-compact" type="button" data-player-action="forward" aria-label="快进 15 秒" title="快进 15 秒">
             <i class="fa-solid fa-forward-step" aria-hidden="true"></i>
           </button>
         </aside>
@@ -666,6 +669,43 @@
     requestWeather();
   }
 
+  // Make the right rail mirror the left one exactly: the music card matches the
+  // author/intro card, the weather card matches the navigation/links card. We
+  // read the left heights at runtime (rather than hard-coding pixels) so the
+  // two rails stay symmetric even as fonts, content or the viewport change.
+  function syncRailHeights() {
+    if (window.matchMedia("(max-width: 992px)").matches) {
+      // Stacked single-column layout on tablet/mobile: no pairing needed.
+      document
+        .querySelectorAll(".blog-music-card, .blog-weather-card")
+        .forEach((card) => {
+          card.style.minHeight = "";
+        });
+      return;
+    }
+
+    const leftInfo = document.querySelector(
+      ".home-sidebar-container .sidebar-content",
+    );
+    const leftLinks = document.querySelector(
+      ".home-sidebar-container .sidebar-links",
+    );
+    const music = document.querySelector(".blog-music-card");
+    const weather = document.querySelector(".blog-weather-card");
+    if (!leftInfo || !leftLinks || !music || !weather) return;
+
+    // Clear any previous override before measuring so the natural height of
+    // the right cards is not inflated by a stale min-height.
+    music.style.minHeight = "";
+    weather.style.minHeight = "";
+
+    const infoHeight = Math.round(leftInfo.getBoundingClientRect().height);
+    const linksHeight = Math.round(leftLinks.getBoundingClientRect().height);
+
+    if (infoHeight > 0) music.style.minHeight = `${infoHeight}px`;
+    if (linksHeight > 0) weather.style.minHeight = `${linksHeight}px`;
+  }
+
   function initializeMomentsPage() {
     const page = document.querySelector("[data-moments-page]");
     if (!page || page.dataset.momentsReady === "true") return;
@@ -739,6 +779,11 @@
       mountHomeWidgets();
       renderSocialLinks();
       enhanceHomeBannerScrollCue();
+      // Sync after the left card's async pieces (avatar, socials) settle so we
+      // measure its final height. A rAF pass plus a short fallback covers both
+      // synchronous layout and late image/font reflow.
+      requestAnimationFrame(syncRailHeights);
+      window.setTimeout(syncRailHeights, 400);
     }
 
     if (pageType === "moments") {
@@ -772,6 +817,12 @@
   document.addEventListener("swup:contentReplaced", syncPage);
   document.addEventListener("pjax:complete", syncPage);
   window.addEventListener("popstate", () => window.setTimeout(syncPage, 0));
+
+  let railResizeTimer = null;
+  window.addEventListener("resize", () => {
+    window.clearTimeout(railResizeTimer);
+    railResizeTimer = window.setTimeout(syncRailHeights, 150);
+  });
 
   createGlobalPlayer();
   syncPage();
