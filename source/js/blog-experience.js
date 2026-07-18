@@ -18,6 +18,7 @@
     audio: null,
     root: null,
     sideToolsObserver: null,
+    lyricLayoutFrame: null,
     lyrics: [],
     currentLyric: "点击播放，听一场雨夜",
     weather: {
@@ -84,7 +85,9 @@
           </div>
           <div class="blog-floating-player-copy">
             <strong>${MUSIC.title}</strong>
-            <span data-player-lyric>${state.currentLyric}</span>
+            <div class="blog-floating-player-lyric" data-player-lyric-viewport>
+              <span data-player-lyric data-player-lyric-track>${state.currentLyric}</span>
+            </div>
             <div class="blog-floating-player-progress">
               <span data-player-current>00:00</span>
               <input data-player-seek type="range" min="0" max="100" value="0" aria-label="播放进度">
@@ -210,7 +213,9 @@
     const root = document.createElement("div");
     root.id = "blog-global-player";
     root.innerHTML = `
-      <audio preload="metadata" src="${escapeAttribute(MUSIC.audio)}"></audio>
+      <audio preload="auto" playsinline>
+        <source src="${escapeAttribute(MUSIC.audio)}" type="audio/mpeg">
+      </audio>
       ${playerSurfaceMarkup("floating")}
     `;
     document.body.appendChild(root);
@@ -230,7 +235,7 @@
     state.audio.addEventListener("pause", renderPlayer);
     state.audio.addEventListener("ended", renderPlayer);
     state.audio.addEventListener("error", () => {
-      state.currentLyric = "音乐文件暂时无法播放";
+      state.currentLyric = "播放加载失败，请点击重试";
       renderPlayer();
     });
 
@@ -263,6 +268,41 @@
     state.currentLyric = activeLyric;
   }
 
+  function syncFloatingLyricLayout() {
+    document.querySelectorAll("[data-player-lyric-viewport]").forEach((viewport) => {
+      const track = viewport.querySelector("[data-player-lyric-track]");
+      if (!track || viewport.clientWidth === 0) return;
+
+      const layoutKey = `${track.textContent}\u0000${viewport.clientWidth}`;
+      if (viewport.dataset.lyricLayout === layoutKey) return;
+      viewport.dataset.lyricLayout = layoutKey;
+
+      viewport.classList.remove("is-scrolling");
+      track.style.removeProperty("--lyric-scroll-distance");
+      track.style.removeProperty("--lyric-scroll-duration");
+
+      const overflow = Math.ceil(track.scrollWidth - viewport.clientWidth);
+      const isOverflowing = overflow > 2;
+      viewport.toggleAttribute("title", isOverflowing);
+      if (isOverflowing) {
+        viewport.title = track.textContent;
+        track.style.setProperty("--lyric-scroll-distance", `-${overflow}px`);
+        track.style.setProperty(
+          "--lyric-scroll-duration",
+          `${Math.max(7, Math.min(14, overflow / 12 + 6))}s`,
+        );
+        viewport.classList.add("is-scrolling");
+      }
+    });
+  }
+
+  function queueFloatingLyricLayout() {
+    window.cancelAnimationFrame(state.lyricLayoutFrame);
+    state.lyricLayoutFrame = window.requestAnimationFrame(
+      syncFloatingLyricLayout,
+    );
+  }
+
   function renderPlayer() {
     if (!state.audio) return;
 
@@ -282,8 +322,11 @@
       element.textContent = formatTime(duration);
     });
     document.querySelectorAll("[data-player-lyric]").forEach((element) => {
-      element.textContent = state.currentLyric;
+      if (element.textContent !== state.currentLyric) {
+        element.textContent = state.currentLyric;
+      }
     });
+    queueFloatingLyricLayout();
     document.querySelectorAll("[data-player-seek]").forEach((element) => {
       element.value = String(progress);
       element.style.setProperty("--player-progress", `${progress}%`);
@@ -313,8 +356,11 @@
 
     if (action === "toggle") {
       if (state.audio.paused) {
+        if (state.audio.error || state.audio.networkState === 3) {
+          state.audio.load();
+        }
         state.audio.play().catch(() => {
-          state.currentLyric = "请再次点击播放";
+          state.currentLyric = "播放失败，请检查网络后重试";
           renderPlayer();
         });
       } else {
@@ -884,6 +930,7 @@
     railResizeTimer = window.setTimeout(() => {
       syncRailHeights();
       syncPlayerPresentation(classifyPage());
+      queueFloatingLyricLayout();
     }, 150);
   });
 
