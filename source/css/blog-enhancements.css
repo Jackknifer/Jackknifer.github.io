@@ -483,7 +483,7 @@ html[data-blog-page="home"] .main-content-body {
 .blog-floating-player {
   position: fixed;
   z-index: 9999;
-  bottom: 1.5rem;
+  bottom: 5%;
   left: 1.5rem;
   display: none;
   grid-template-columns: 44px minmax(90px, 1fr) 28px 30px 28px;
@@ -496,9 +496,29 @@ html[data-blog-page="home"] .main-content-body {
   gap: 8px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.16);
+  opacity: 1;
   pointer-events: auto;
+  transition:
+    opacity 0.2s ease,
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
+}
+
+.blog-floating-player.hide {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .blog-floating-player:not(.hide):hover,
+  .blog-floating-player:not(.hide):focus-within {
+    border-color: rgba(163, 31, 52, 0.22);
+    box-shadow: 0 24px 54px rgba(45, 35, 30, 0.22);
+    transform: translateY(-6px) scale(1.01);
+  }
 }
 
 html.dark .blog-floating-player {
@@ -1275,6 +1295,7 @@ html.dark .moment-card p {
 @media (prefers-reduced-motion: reduce) {
   .blog-player-cover,
   .blog-player-button,
+  .blog-floating-player,
   .moments-filter {
     animation: none;
     transition: none;

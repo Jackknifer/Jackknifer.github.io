@@ -3,123 +3,128 @@
 ## Comparison target
 
 - Source visual truth:
-  - Current oversized desktop regression supplied by the user:
-    `/var/folders/9g/7wbr3g8573n2v6jw1dtx1ks40000gn/T/codex-clipboard-db24f6c1-39de-4401-97ff-ba5c7adf8927.png`.
-  - Previous compact desktop player baseline:
-    `/tmp/blog-article-player.png`.
-  - Existing mobile full-player baseline:
-    `/private/tmp/output/playwright/blog-mobile-redesign/article-player-mobile.png`.
+  `/var/folders/9g/7wbr3g8573n2v6jw1dtx1ks40000gn/T/codex-clipboard-b9eef88c-a50b-433d-a687-f9f719618c68.png`.
+- Existing component being matched: Theme Redefine's right-side gear and scroll
+  percentage tools (`.right-side-tools-container`).
 - Browser-rendered implementation:
-  - Desktop article at `1440 × 900`:
-    `/private/tmp/output/blog-player-responsive-qa/article-desktop-compact.png`.
-  - Mobile article at `390 × 844`:
-    `/private/tmp/output/blog-player-responsive-qa/article-mobile-full-player.png`.
-- Focused regions:
-  - `/private/tmp/output/blog-player-responsive-qa/article-desktop-player-crop.png`.
-  - `/private/tmp/output/blog-player-responsive-qa/article-mobile-player-crop.png`.
-- Combined comparison input:
-  `/private/tmp/output/blog-player-responsive-qa/design-comparison.png`.
-- State: article page near its previous/next navigation and comments; desktop
-  compact player fixed at the lower-left; mobile full player between navigation
-  and comments; playback toggled in both responsive states.
+  - Normal desktop state:
+    `/private/tmp/output/blog-player-scroll-qa/desktop-aligned-visible.png`.
+  - Hover/focus elevation state:
+    `/private/tmp/output/blog-player-scroll-qa/desktop-hover.png`.
+  - Page-bottom hidden state:
+    `/private/tmp/output/blog-player-scroll-qa/desktop-footer-hidden.png`.
+  - Mobile article player:
+    `/private/tmp/output/blog-player-scroll-qa/mobile-player-unchanged.png`.
+- Full comparison input:
+  `/private/tmp/output/blog-player-scroll-qa/design-comparison.png`.
+- Focused evidence: the lower viewport region in the normal and hover desktop
+  captures clearly shows both fixed components and their shared bottom edge, so
+  no separate enlarged crop was required.
 
 ## Environment
 
 - Local Hexo preview: `http://localhost:4000/`.
-- Browser path: Codex in-app Browser; no fallback browser was used.
-- Desktop checks: `1440 × 900` (plus dimension reads at the requested desktop
-  breakpoint).
-- Mobile checks: `390 × 844`.
-- Theme note: the historical source capture is light while the browser session
-  retained the user's dark theme. Geometry, density, controls, and responsive
-  presentation were compared; both variants use the existing theme tokens.
+- Browser: Codex in-app Browser; no fallback browser was used.
+- Desktop viewport: `1440 × 900`.
+- Mobile viewport: `390 × 844`.
+- Route: `/2026/06/28/别了，前进大街2699号/`.
+- States: article middle, elevated player, page bottom, return from page bottom,
+  and mobile article player.
 
 ## Findings
 
 No actionable P0, P1, or P2 differences remain.
 
-- [P3] Compact-player color differs between the historical light reference and
-  the current dark browser state.
-  - Classification: expected theme-state difference. Border, fill, text, and
-    shadow all use the existing light/dark tokens.
-- [P3] Perceived loudness remains partly dependent on the visitor's system and
-  browser volume.
-  - Classification: expected platform variance. The site-side default is now
-    explicitly set to `35%` instead of the browser default `100%`.
+- [P3] The in-app Browser does not retain a queryable `:hover` pseudo-state
+  after its pointer-move call.
+  - Classification: browser-test limitation. The identical hover/focus selector
+    was activated through `:focus-within`; computed styles and the rendered
+    capture confirm `translateY(-6px) scale(1.01)`, the accent border, and the
+    stronger shadow. The production CSS applies the same declaration to
+    `:hover` for fine pointers.
 
 ## Required fidelity surfaces
 
-- Fonts and typography: passed. Compact title, lyric, time labels, and mobile
-  full-player hierarchy reuse the prior component styles without wrapping or
-  clipping.
-- Spacing and layout rhythm: passed. Desktop player measures `280px` wide and
-  sits `24px` from the left and bottom viewport edges. Mobile retains the full
-  card after article navigation and before comments.
-- Colors and visual tokens: passed. The compact player uses the same glass,
-  accent, border, and shadow tokens as the existing component, including dark
-  mode.
-- Image quality and asset fidelity: passed. The original album cover is reused
-  directly at both sizes with no placeholder or regenerated asset.
-- Copy and content: passed. Song title, artist, lyric, progress, duration, and
-  control labels remain synchronized between desktop and mobile surfaces.
+- Fonts and typography: passed. Player copy, time labels, and controls are
+  unchanged; the new behavior does not alter type size, weight, wrapping, or
+  truncation.
+- Spacing and layout rhythm: passed. At `1440 × 900`, the player and right-side
+  tools both use `bottom: 45px` (`5%`) and their measured bottom edges are both
+  `855px`.
+- Colors and visual tokens: passed. The hover/focus state reuses the site's
+  burgundy accent, glass border, and shadow language.
+- Image quality and asset fidelity: passed. The original album cover and the
+  theme's Font Awesome icons are unchanged; no replacement assets were added.
+- Copy and content: passed. Song title, lyric, progress, duration, and button
+  labels are unchanged.
 
 ## Responsive and interaction evidence
 
-- Desktop article:
-  - Compact player display is `grid`; position is `fixed`.
-  - Measured left offset `24px`, bottom offset `24px`, width `280px`.
-  - The old full-width article player is `display: none` and removed from the
-    accessibility interaction path.
-- Mobile article:
-  - Compact player is `display: none` and `aria-hidden=true`.
-  - Full article player is visible, accessible, and ordered after navigation
-    and before comments.
+- Normal desktop state:
+  - Player bottom edge: `855px`; right-side tools bottom edge: `855px`.
+  - Both are visible with `opacity: 1` and accept pointer input.
+  - No horizontal overflow.
+- Hover/focus elevation:
+  - Transform: `translateY(-6px) scale(1.01)`.
+  - Shadow: `0 24px 54px rgba(45, 35, 30, 0.22)`.
+  - Border: `rgba(163, 31, 52, 0.22)`.
+  - Playback toggled from play to pause while the state was active.
+- Page bottom:
+  - Theme side tools gained `hide`; the player mirrored the same class through
+    a class observer.
+  - Both reached `opacity: 0` and `pointer-events: none` with the same `0.2s`
+    fade timing.
+  - The hidden player also became `aria-hidden=true` and inert.
+- Returning upward:
+  - Both components removed `hide`, returned to `opacity: 1`, and the player
+    returned to the accessible interaction path.
+- Mobile:
+  - Compact player remains `display: none`, `aria-hidden=true`, and inert.
+  - Full article player remains visible after article navigation and before
+    comments.
   - No horizontal overflow at `390px`.
-- Playback:
-  - Desktop play changed the control to pause and advanced elapsed time.
-  - Mobile toggle changed the same shared audio state and brought the full card
-    into view.
-  - Default audio volume is assigned to `0.35` when the global audio element is
-    created.
 
 ## Comparison history
 
 ### Iteration 1
 
-- [P1] The desktop article page rendered the mobile-style full-width music card
-  below navigation, materially increasing page length and differing from the
-  user's requested compact desktop behavior.
+- [P2] The compact player used a fixed `24px` bottom offset while the right-side
+  tools used `5%`; at `1440 × 900` their bottom edges differed by `21px`.
+- [P1] At the page bottom, the right-side tools faded out but the compact player
+  remained visible and interactive.
 - Fix:
-  - Restored the prior compact player markup and desktop glass-card styling.
-  - Scoped it to desktop article pages at `min-width: 769px`.
-  - Kept the full article card only at `max-width: 768px`.
-  - Added breakpoint-aware `inert` and `aria-hidden` synchronization.
-- Post-fix evidence:
-  - Desktop: `article-desktop-compact.png` and
-    `article-desktop-player-crop.png`.
-  - Mobile: `article-mobile-full-player.png` and
-    `article-mobile-player-crop.png`.
-  - Combined: `design-comparison.png`.
+  - Changed the compact player's bottom offset to `5%`.
+  - Mirrored the existing tools container's `hide` class with a
+    `MutationObserver`, including accessibility state.
+  - Added the requested hover/focus elevation state.
 
 ### Iteration 2
 
-- Full-view and focused comparison found no remaining actionable P0/P1/P2
-  issue. Desktop and mobile each expose exactly one usable player surface.
+- Post-fix browser evidence shows identical bottom edges, synchronized hide and
+  restore states, the intended elevated visual state, and unchanged mobile
+  behavior. No actionable P0/P1/P2 issue remains.
 
-## Console review
+## Browser checks
 
-- No custom player errors or warnings were emitted.
-- The only warning was the expected local-preview Giscus `Discussion not
-  found` message; it is unrelated to the player change.
+- Page identity: passed; expected article URL and title loaded.
+- Blank-page check: passed; article, music player, and comments are present in
+  the DOM snapshot.
+- Framework overlay: passed; none present.
+- Console health: passed for the custom player. The only warnings are the
+  expected Giscus `Discussion not found` messages in local preview.
+- Screenshot evidence: passed; normal, elevated, bottom-hidden, mobile, and
+  combined comparison captures are recorded above.
+- Interaction proof: passed; playback, page-bottom fade, upward restore, and
+  responsive presentation were exercised.
 
 ## Implementation checklist
 
-- [x] Desktop article compact player restored at lower-left.
-- [x] Desktop full-width article player hidden.
-- [x] Mobile full-width article player preserved.
-- [x] Hidden responsive surface removed from accessibility interaction.
-- [x] Default music volume reduced to 35%.
-- [x] Desktop/mobile playback interactions verified.
-- [x] Production build and visual comparison passed.
+- [x] Player and right-side tools share the same bottom edge.
+- [x] Player mirrors the right-side tools' page-bottom hide state.
+- [x] Hidden player is non-interactive and inaccessible to assistive controls.
+- [x] Fine-pointer hover elevates, scales, and strengthens the shadow.
+- [x] Reduced-motion users do not receive the transition.
+- [x] Mobile full-player behavior remains unchanged.
+- [x] Production build and browser QA passed.
 
 final result: passed

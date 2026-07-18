@@ -17,6 +17,7 @@
   const state = {
     audio: null,
     root: null,
+    sideToolsObserver: null,
     lyrics: [],
     currentLyric: "点击播放，听一场雨夜",
     weather: {
@@ -764,6 +765,37 @@
     return "page";
   }
 
+  function syncFloatingPlayerVisibility() {
+    const floatingPlayer = document.querySelector(
+      '[data-player-surface="floating"]',
+    );
+    const sideTools = document.querySelector(".right-side-tools-container");
+    if (!floatingPlayer) return;
+
+    floatingPlayer.classList.toggle(
+      "hide",
+      Boolean(sideTools?.classList.contains("hide")),
+    );
+    syncPlayerPresentation(classifyPage());
+  }
+
+  function observeSideToolsVisibility() {
+    state.sideToolsObserver?.disconnect();
+    state.sideToolsObserver = null;
+
+    const sideTools = document.querySelector(".right-side-tools-container");
+    syncFloatingPlayerVisibility();
+    if (!sideTools) return;
+
+    state.sideToolsObserver = new MutationObserver(
+      syncFloatingPlayerVisibility,
+    );
+    state.sideToolsObserver.observe(sideTools, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  }
+
   function syncPlayerPresentation(pageType) {
     const isDesktopPost =
       pageType === "post" && window.matchMedia("(min-width: 769px)").matches;
@@ -777,8 +809,14 @@
     );
 
     if (floatingPlayer) {
-      floatingPlayer.inert = !isDesktopPost;
-      floatingPlayer.setAttribute("aria-hidden", String(!isDesktopPost));
+      const isHiddenWithSideTools = floatingPlayer.classList.contains("hide");
+      const isFloatingPlayerUsable =
+        isDesktopPost && !isHiddenWithSideTools;
+      floatingPlayer.inert = !isFloatingPlayerUsable;
+      floatingPlayer.setAttribute(
+        "aria-hidden",
+        String(!isFloatingPlayerUsable),
+      );
     }
 
     if (postPlayer) {
@@ -810,6 +848,7 @@
       initializeMomentsPage();
     }
 
+    observeSideToolsVisibility();
     syncPlayerPresentation(pageType);
     renderPlayer();
   }
