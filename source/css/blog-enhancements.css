@@ -89,6 +89,8 @@ html .preloader .ml13::after {
   --blog-player-accent: #a31f34;
   --blog-player-accent-strong: #7f1a2a;
   --blog-player-accent-soft: rgba(163, 31, 52, 0.12);
+  --blog-secondary-accent: #4d6b8a;
+  --blog-secondary-accent-soft: rgba(77, 107, 138, 0.13);
   --blog-moment-accent: #a31f34;
   --blog-moment-accent-soft: rgba(163, 31, 52, 0.12);
   --blog-glass-light: rgba(255, 255, 255, 0.86);
@@ -152,6 +154,136 @@ html .home-article-meta-info-container,
 html .article-meta-info,
 html .post-tags-box {
   font-family: var(--blog-sans);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Archive, tags and categories                                               */
+/* -------------------------------------------------------------------------- */
+
+.archive-container .archive-year {
+  color: var(--blog-player-accent);
+}
+
+.archive-container .archive-year-post-count {
+  border-color: rgba(77, 107, 138, 0.24);
+  color: var(--blog-secondary-accent);
+  background: var(--blog-secondary-accent-soft);
+}
+
+.archive-list-container .article-item {
+  border-left-color: rgba(77, 107, 138, 0.28);
+}
+
+.archive-container .archive-list-container .article-item::before {
+  color: var(--blog-secondary-accent);
+}
+
+.archive-container .archive-list-container .article-item::after {
+  border-color: var(--blog-player-accent);
+  box-shadow: 0 0 0 4px var(--blog-player-accent-soft);
+}
+
+.archive-container
+  .archive-list-container
+  .article-item
+  span.article-title::after {
+  border-color: rgba(77, 107, 138, 0.28);
+  background: var(--blog-secondary-accent);
+}
+
+.archive-container
+  .archive-list-container
+  .article-item:nth-child(even)
+  span.article-title::after {
+  border-color: rgba(163, 31, 52, 0.28);
+  background: var(--blog-player-accent);
+}
+
+.archive-container .archive-list-container .article-item a:hover .article-title {
+  color: var(--blog-player-accent);
+}
+
+html .tagcloud-content .tag-list li:nth-child(odd),
+.category-list-content
+  .all-category-list
+  > .all-category-list-item:nth-child(odd) {
+  --taxonomy-accent: var(--blog-player-accent);
+  --taxonomy-soft: var(--blog-player-accent-soft);
+  --taxonomy-border: rgba(163, 31, 52, 0.18);
+}
+
+html .tagcloud-content .tag-list li:nth-child(even),
+.category-list-content
+  .all-category-list
+  > .all-category-list-item:nth-child(even) {
+  --taxonomy-accent: var(--blog-secondary-accent);
+  --taxonomy-soft: var(--blog-secondary-accent-soft);
+  --taxonomy-border: rgba(77, 107, 138, 0.2);
+}
+
+html .tagcloud-content .tag-list li a {
+  border: 1px solid var(--taxonomy-border);
+  background-color: var(--default-background-color);
+  background-image: linear-gradient(
+    135deg,
+    var(--taxonomy-soft),
+    transparent 66%
+  );
+}
+
+html .tagcloud-content .tag-list li a .fa-hashtag {
+  color: var(--taxonomy-accent);
+  opacity: 0.72;
+}
+
+html .tagcloud-content .tag-list[data-show-value] li a::after {
+  color: var(--taxonomy-accent);
+  background: var(--taxonomy-soft);
+}
+
+html .tagcloud-content .tag-list li a:hover {
+  border-color: transparent;
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    var(--blog-player-accent),
+    var(--blog-secondary-accent)
+  );
+}
+
+html .tagcloud-content .tag-list li a:hover .fa-hashtag {
+  color: #fff;
+  opacity: 0.82;
+}
+
+.category-list-content
+  .all-category-list
+  > .all-category-list-item {
+  border: 1px solid var(--taxonomy-border);
+  background-color: var(--second-background-color);
+  background-image: linear-gradient(
+    135deg,
+    var(--taxonomy-soft),
+    transparent 72%
+  );
+}
+
+html
+  .category-list-content
+  .all-category-list
+  > .all-category-list-item
+  > a.all-category-list-link {
+  border-color: var(--taxonomy-border);
+  color: var(--taxonomy-accent);
+}
+
+html
+  .category-list-content
+  .all-category-list
+  > .all-category-list-item
+  > span.all-category-list-count {
+  color: var(--taxonomy-accent);
+  background: var(--taxonomy-soft);
 }
 
 /* -------------------------------------------------------------------------- */
