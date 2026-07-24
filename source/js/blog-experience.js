@@ -129,9 +129,6 @@
           <span data-player-duration>00:00</span>
         </div>
         <div class="blog-player-controls">
-          <button class="blog-player-button blog-player-button-quiet is-active" type="button" data-player-action="loop" data-player-loop aria-label="切换单曲循环" aria-pressed="true" title="单曲循环">
-            <i class="fa-solid fa-repeat" aria-hidden="true"></i>
-          </button>
           <button class="blog-player-button blog-player-button-quiet" type="button" data-player-action="back" aria-label="后退 15 秒" title="后退 15 秒">
             <i class="fa-solid fa-backward-step" aria-hidden="true"></i>
           </button>
@@ -339,10 +336,6 @@
     document.querySelectorAll('[data-player-action="toggle"]').forEach((button) => {
       button.setAttribute("aria-label", isPlaying ? "暂停" : "播放");
     });
-    document.querySelectorAll("[data-player-loop]").forEach((button) => {
-      button.classList.toggle("is-active", state.audio.loop);
-      button.setAttribute("aria-pressed", String(state.audio.loop));
-    });
     document.querySelectorAll("[data-player-volume-icon]").forEach((element) => {
       const volumeIcon = state.audio.muted
         ? "fa-volume-xmark"
@@ -379,10 +372,6 @@
         ? state.audio.duration
         : state.audio.currentTime + 15;
       state.audio.currentTime = Math.min(duration, state.audio.currentTime + 15);
-    }
-
-    if (action === "loop") {
-      state.audio.loop = !state.audio.loop;
     }
 
     if (action === "mute") {

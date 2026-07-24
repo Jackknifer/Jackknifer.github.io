@@ -411,22 +411,13 @@ html[data-blog-section="archive"] .archive-page-title::after {
   box-shadow: var(--blog-index-focus-ring);
 }
 
-html .tagcloud-content .tag-list li:nth-child(odd),
+html .tagcloud-content .tag-list li,
 .category-list-content
   .all-category-list
-  > .all-category-list-item:nth-child(odd) {
+  > .all-category-list-item {
   --taxonomy-accent: var(--blog-index-primary);
   --taxonomy-soft: var(--blog-index-primary-soft);
   --taxonomy-border: var(--blog-index-primary-border);
-}
-
-html .tagcloud-content .tag-list li:nth-child(even),
-.category-list-content
-  .all-category-list
-  > .all-category-list-item:nth-child(even) {
-  --taxonomy-accent: var(--blog-index-secondary);
-  --taxonomy-soft: var(--blog-index-secondary-soft);
-  --taxonomy-border: var(--blog-index-secondary-border);
 }
 
 html .tagcloud-content .tag-list li a {
@@ -1625,10 +1616,14 @@ html[data-blog-page="moments"] .main-content {
 }
 
 .moment-body p {
-  margin: 0.35em 0 0.75em;
+  margin: 0.35em 0 0.55em;
   color: var(--default-text-color);
   font-size: inherit;
   line-height: inherit;
+}
+
+.moment-body p:last-child {
+  margin-bottom: 0;
 }
 
 .moment-body a {
@@ -1680,7 +1675,7 @@ html[data-blog-page="moments"] .main-content {
   grid-column: 1 / -1;
   box-sizing: border-box;
   width: 100%;
-  margin-top: 14px;
+  margin-top: 6px;
   border: 1px solid var(--blog-index-border);
   border-radius: 14px;
   background: var(--third-background-color);
@@ -1694,7 +1689,7 @@ html[data-blog-page="moments"] .main-content {
 
 .moment-share-card {
   display: grid;
-  grid-template-columns: 58px minmax(0, 1fr) auto;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
   align-items: center;
   padding: 10px;
   gap: 12px;
@@ -1703,12 +1698,16 @@ html[data-blog-page="moments"] .main-content {
 }
 
 .moment-share-card > img,
+.moment-share-cover,
 .moment-attachment-icon {
-  width: 58px;
-  height: 58px;
+  width: 64px;
+  height: 64px;
   overflow: hidden;
   border-radius: 10px;
-  background: var(--second-background-color);
+  background-color: var(--second-background-color);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   object-fit: cover;
 }
 
@@ -1768,7 +1767,7 @@ html[data-blog-page="moments"] .main-content {
 
 .moment-music-main {
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) auto;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
   align-items: center;
   gap: 14px;
 }
@@ -1776,36 +1775,22 @@ html[data-blog-page="moments"] .main-content {
 .moment-music-cover {
   position: relative;
   display: block;
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   overflow: hidden;
   border-radius: 10px;
-  background: var(--third-background-color);
+  background-color: var(--third-background-color);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   line-height: 0;
-}
-
-.moment-music-cover > img,
-.moment-music-cover > figure,
-.moment-music-cover > figure img,
-.moment-music-cover > .moment-attachment-icon {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  object-fit: cover;
-}
-
-.moment-music-cover > figure {
-  margin: 0 !important;
-  line-height: 0;
-}
-
-.moment-music-cover > figure figcaption {
-  display: none;
 }
 
 .moment-music-cover > .moment-attachment-icon {
   display: inline-flex;
+  width: 100%;
+  height: 100%;
+  background: transparent;
 }
 
 .moment-music-toggle {
@@ -2099,19 +2084,20 @@ html[data-blog-page="moments"] .main-content {
 
   .moment-share-card,
   .moment-music-main {
-    grid-template-columns: 52px minmax(0, 1fr) auto;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
     gap: 10px;
   }
 
   .moment-share-card > img,
+  .moment-share-cover,
   .moment-attachment-icon {
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
   }
 
   .moment-music-cover {
-    width: 50px;
-    height: 50px;
+    width: 56px;
+    height: 56px;
   }
 }
 
@@ -2172,19 +2158,20 @@ html[data-blog-page="moments"] .main-content {
 
   .moment-share-card,
   .moment-music-main {
-    grid-template-columns: 46px minmax(0, 1fr) auto;
+    grid-template-columns: 50px minmax(0, 1fr) auto;
     gap: 9px;
   }
 
   .moment-share-card > img,
+  .moment-share-cover,
   .moment-attachment-icon {
-    width: 46px;
-    height: 46px;
+    width: 50px;
+    height: 50px;
   }
 
   .moment-music-cover {
-    width: 46px;
-    height: 46px;
+    width: 50px;
+    height: 50px;
   }
 
   .archive-container .archive-list-container .article-list {

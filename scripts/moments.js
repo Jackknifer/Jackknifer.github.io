@@ -344,7 +344,7 @@ function renderShareCard(share) {
     <a class="moment-share-card" href="${escapeHtml(share.url)}"${linkAttributes(share.url)}>
       ${
         share.image
-          ? `<img src="${escapeHtml(share.image)}" alt="" loading="lazy" decoding="async">`
+          ? `<span class="moment-share-cover" aria-hidden="true" style="background-image:url('${escapeHtml(share.image)}')"></span>`
           : '<span class="moment-attachment-icon" aria-hidden="true"><i class="fa-regular fa-link"></i></span>'
       }
       <span class="moment-attachment-copy">
@@ -362,10 +362,10 @@ function renderMusicCard(music) {
   return `
     <div class="moment-music-card" data-moment-music data-provider="${escapeHtml(music.provider)}">
       <div class="moment-music-main">
-        <span class="moment-music-cover">
+        <span class="moment-music-cover"${music.cover ? ` style="background-image:url('${escapeHtml(music.cover)}')"` : ""}>
           ${
             music.cover
-              ? `<img src="${escapeHtml(music.cover)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">`
+              ? ""
               : '<span class="moment-attachment-icon" aria-hidden="true"><i class="fa-regular fa-music"></i></span>'
           }
           ${
