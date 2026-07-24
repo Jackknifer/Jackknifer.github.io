@@ -19,6 +19,7 @@
     root: null,
     sideToolsObserver: null,
     widgetAvoidanceObserver: null,
+    momentRevealObserver: null,
     lyricLayoutFrame: null,
     lyrics: [],
     currentLyric: "点击播放，听一场雨夜",
@@ -767,9 +768,42 @@
     const input = page.querySelector("[data-moments-search]");
     const filters = [...page.querySelectorAll("[data-moments-filter]")];
     const cards = [...page.querySelectorAll("[data-moment-card]")];
+    const days = [...page.querySelectorAll("[data-moment-day]")];
     const resultCount = page.querySelector("[data-moments-count]");
     const emptyState = page.querySelector("[data-moments-empty]");
     let activeMonth = "all";
+
+    state.momentRevealObserver?.disconnect();
+    state.momentRevealObserver = null;
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (!reduceMotion && "IntersectionObserver" in window) {
+      state.momentRevealObserver = new IntersectionObserver(
+        (entries, observer) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          });
+        },
+        { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
+      );
+
+      cards.forEach((card) => {
+        card.classList.add("is-reveal-pending");
+        state.momentRevealObserver.observe(card);
+      });
+    } else {
+      cards.forEach((card) => card.classList.add("is-visible"));
+    }
+
+    page.querySelectorAll(".moment-audio").forEach((audio) => {
+      audio.addEventListener("play", () => {
+        if (state.audio && !state.audio.paused) state.audio.pause();
+      });
+    });
 
     const applyFilter = () => {
       const query = input.value.trim().toLocaleLowerCase("zh-CN");
@@ -783,6 +817,12 @@
         const isVisible = matchesMonth && matchesQuery;
         card.hidden = !isVisible;
         if (isVisible) visibleCount += 1;
+      });
+
+      days.forEach((day) => {
+        day.hidden = ![...day.querySelectorAll("[data-moment-card]")].some(
+          (card) => !card.hidden,
+        );
       });
 
       resultCount.textContent = String(visibleCount);
@@ -803,6 +843,36 @@
     });
 
     applyFilter();
+  }
+
+  function decorateContentSection() {
+    const route = window.location.pathname.replace(/\/+$/, "") || "/";
+    const sections = [
+      ["/now", "now"],
+      ["/moments", "moments"],
+      ["/archives", "archive"],
+      ["/tags", "tags"],
+      ["/categories", "categories"],
+      ["/about", "about"],
+    ];
+    const section = sections.find(
+      ([path]) => route === path || route.startsWith(`${path}/`),
+    )?.[1];
+
+    if (section) {
+      document.documentElement.dataset.blogSection = section;
+    } else {
+      delete document.documentElement.dataset.blogSection;
+    }
+
+    if (section !== "archive") return;
+    const archive = document.querySelector(".archive-container");
+    if (!archive || archive.querySelector(".archive-page-title")) return;
+
+    const title = document.createElement("h1");
+    title.className = "page-title-header archive-page-title";
+    title.textContent = "归档";
+    archive.prepend(title);
   }
 
   function classifyPage() {
@@ -908,6 +978,7 @@
   }
 
   function syncPage() {
+    decorateContentSection();
     const pageType = classifyPage();
     document.documentElement.dataset.blogPage = pageType;
 
@@ -928,6 +999,9 @@
 
     if (pageType === "moments") {
       initializeMomentsPage();
+    } else {
+      state.momentRevealObserver?.disconnect();
+      state.momentRevealObserver = null;
     }
 
     observeSideToolsVisibility();

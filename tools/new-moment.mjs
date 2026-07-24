@@ -4,7 +4,7 @@ import process from "node:process";
 
 const title = process.argv.slice(2).join(" ").trim();
 if (!title) {
-  console.error('用法：npm run new:moment -- "这条随想的简短名称"');
+  console.error('用法：npm run new:moment -- "这条动态的简短名称"');
   process.exitCode = 1;
 } else {
   const now = new Date();
@@ -28,7 +28,24 @@ if (!title) {
   } else {
     const momentsDirectory = path.join(process.cwd(), "source", "_moments");
     const filePath = path.join(momentsDirectory, `${date}-${slug}.md`);
-    const content = `---\ndate: ${date} ${hour}:${minute}:${second}\ntags:\n  - 随想\n---\n\n在这里写下这条随想。\n`;
+    const content = `---
+date: ${date} ${hour}:${minute}:${second}
+# 可选：text、photo、link、music；留空会按附件自动判断
+# type: text
+tags:
+  - 动态
+# 可选：发布照片
+# images:
+#   - src: /images/moments/照片.jpg
+#     alt: 照片说明
+# 可选：分享普通链接
+# link: https://example.com
+# 可选：分享音乐
+# music: https://music.163.com/song?id=123456
+---
+
+在这里写下这条动态。
+`;
 
     await fs.mkdir(momentsDirectory, { recursive: true });
     try {
