@@ -9,6 +9,9 @@ const MOMENT_TYPES = {
   music: { label: "音乐", icon: "fa-regular fa-music" },
 };
 
+const netEaseMetadataCache = new Map();
+let staticNetEaseMetadata;
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -104,24 +107,164 @@ function isAudioSource(url) {
   return /\.(?:mp3|m4a|ogg|wav|flac|aac)(?:$|[?#])/i.test(url);
 }
 
+function netEaseSongId(value) {
+  try {
+    const parsed = new URL(String(value || ""));
+    const hostname = parsed.hostname.toLowerCase();
+    if (!["music.163.com", "y.music.163.com"].includes(hostname)) return "";
+    const songId = parsed.searchParams.get("id") || "";
+    return /^\d+$/.test(songId) ? songId : "";
+  } catch {
+    return "";
+  }
+}
+
+function httpsUrl(value) {
+  const url = safeUrl(value);
+  return url.startsWith("http://") ? `https://${url.slice(7)}` : url;
+}
+
+function loadStaticNetEaseMetadata() {
+  if (staticNetEaseMetadata) return staticNetEaseMetadata;
+
+  staticNetEaseMetadata = new Map();
+  const metadataPath = path.join(
+    hexo.source_dir,
+    "_data",
+    "netease-songs.json",
+  );
+  if (!fs.existsSync(metadataPath)) return staticNetEaseMetadata;
+
+  try {
+    const entries = JSON.parse(fs.readFileSync(metadataPath, "utf8"));
+    Object.entries(entries).forEach(([songId, song]) => {
+      if (!/^\d+$/.test(songId) || !song || typeof song !== "object") return;
+      staticNetEaseMetadata.set(songId, {
+        title: String(song.title || ""),
+        artist: String(song.artist || ""),
+        cover: httpsUrl(song.cover),
+      });
+    });
+  } catch (error) {
+    hexo.log.warn(`[moments] 本地网易云歌曲资料读取失败：${error.message}`);
+  }
+
+  return staticNetEaseMetadata;
+}
+
 function normalizeMusic(value) {
   if (!value) return null;
   const isShorthand = typeof value === "string";
   const music = isShorthand ? { url: value } : normalizeObject(value);
   const explicitAudio = safeUrl(music.audio || music.src);
   const explicitUrl = safeUrl(music.url);
+  const neteaseId = netEaseSongId(explicitUrl);
   const audio =
     explicitAudio || (isAudioSource(explicitUrl) ? explicitUrl : "");
-  const url = explicitUrl || audio;
+  const url = neteaseId
+    ? `https://music.163.com/song?id=${neteaseId}`
+    : explicitUrl || audio;
   if (!audio && !url) return null;
   return {
     title: String(
-      music.title || (audio && isShorthand ? "音频分享" : "音乐链接"),
+      music.title ||
+        (neteaseId
+          ? "网易云音乐"
+          : audio && isShorthand
+            ? "音频分享"
+            : "音乐链接"),
     ),
-    artist: String(music.artist || (isShorthand ? displayHost(url) : "")),
-    cover: safeUrl(music.cover),
+    artist: String(
+      music.artist ||
+        (neteaseId ? "点击查看歌曲" : isShorthand ? displayHost(url) : ""),
+    ),
+    cover: httpsUrl(music.cover),
     audio,
     url,
+    neteaseId,
+    provider: neteaseId ? "网易云音乐" : audio ? "音频分享" : "分享音乐",
+    hasExplicitTitle: Boolean(music.title),
+    hasExplicitArtist: Boolean(music.artist),
+    hasExplicitCover: Boolean(music.cover),
+  };
+}
+
+async function fetchNetEaseMetadata(songId) {
+  const staticMetadata = loadStaticNetEaseMetadata().get(songId);
+  if (staticMetadata) return staticMetadata;
+
+  if (netEaseMetadataCache.has(songId)) {
+    return netEaseMetadataCache.get(songId);
+  }
+
+  const metadataRequest = (async () => {
+    try {
+      const endpoint = `https://music.163.com/api/song/detail/?id=${songId}&ids=%5B${songId}%5D`;
+      const response = await fetch(endpoint, {
+        headers: {
+          Accept: "application/json",
+          "User-Agent":
+            "Mozilla/5.0 (compatible; JackkniferBlog/1.0; +https://jackknifer.github.io/)",
+        },
+        signal: AbortSignal.timeout(4500),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const payload = await response.json();
+      const song = Array.isArray(payload?.songs) ? payload.songs[0] : null;
+      if (!song || String(song.id) !== songId) {
+        throw new Error("歌曲元数据为空");
+      }
+
+      const artists = Array.isArray(song.artists)
+        ? song.artists.map((artist) => artist?.name).filter(Boolean)
+        : [];
+      return {
+        title: String(song.name || ""),
+        artist: artists.join(" / "),
+        cover: httpsUrl(song.album?.picUrl),
+      };
+    } catch (error) {
+      hexo.log.warn(
+        `[moments] 网易云歌曲 ${songId} 元数据读取失败，已使用链接回退：${error.message}`,
+      );
+      return null;
+    }
+  })();
+
+  netEaseMetadataCache.set(songId, metadataRequest);
+  return metadataRequest;
+}
+
+async function enrichMusic(music) {
+  if (!music?.neteaseId) return music;
+
+  const metadata =
+    music.hasExplicitTitle &&
+    music.hasExplicitArtist &&
+    music.hasExplicitCover
+      ? null
+      : await fetchNetEaseMetadata(music.neteaseId);
+
+  return {
+    ...music,
+    title:
+      music.hasExplicitTitle || !metadata?.title
+        ? music.title
+        : metadata.title,
+    artist:
+      music.hasExplicitArtist || !metadata?.artist
+        ? music.artist
+        : metadata.artist,
+    cover:
+      music.hasExplicitCover || !metadata?.cover
+        ? music.cover
+        : metadata.cover,
+    audio:
+      music.audio ||
+      `https://music.163.com/song/media/outer/url?id=${music.neteaseId}.mp3`,
   };
 }
 
@@ -178,11 +321,6 @@ function monthLabel(month) {
   return `${year.slice(-2)}年${Number(number)}月`;
 }
 
-function weekdayLabel(date) {
-  const weekday = new Date(`${date}T12:00:00+08:00`).getDay();
-  return `周${"日一二三四五六"[weekday]}`;
-}
-
 function renderGallery(images) {
   if (!images.length) return "";
   return `
@@ -222,15 +360,21 @@ function renderShareCard(share) {
 function renderMusicCard(music) {
   if (!music) return "";
   return `
-    <div class="moment-music-card">
+    <div class="moment-music-card" data-moment-music data-provider="${escapeHtml(music.provider)}">
       <div class="moment-music-main">
-        ${
-          music.cover
-            ? `<img src="${escapeHtml(music.cover)}" alt="" loading="lazy" decoding="async">`
-            : '<span class="moment-attachment-icon" aria-hidden="true"><i class="fa-regular fa-music"></i></span>'
-        }
+        <span class="moment-music-cover">
+          ${
+            music.cover
+              ? `<img src="${escapeHtml(music.cover)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">`
+              : '<span class="moment-attachment-icon" aria-hidden="true"><i class="fa-regular fa-music"></i></span>'
+          }
+          ${
+            music.audio
+              ? `<button class="moment-music-toggle" type="button" data-moment-music-toggle aria-label="播放 ${escapeHtml(music.title)}" aria-pressed="false"><i class="fa-solid fa-play" aria-hidden="true"></i></button>`
+              : ""
+          }
+        </span>
         <span class="moment-attachment-copy">
-          <small>分享音乐</small>
           <strong>${escapeHtml(music.title)}</strong>
           ${music.artist ? `<span>${escapeHtml(music.artist)}</span>` : ""}
         </span>
@@ -242,14 +386,14 @@ function renderMusicCard(music) {
       </div>
       ${
         music.audio
-          ? `<audio class="moment-audio" controls preload="metadata" src="${escapeHtml(music.audio)}">当前浏览器不支持音频播放。</audio>`
+          ? `<audio class="moment-audio" data-moment-audio preload="none" src="${escapeHtml(music.audio)}">当前浏览器不支持音频播放。</audio>`
           : ""
       }
     </div>
   `;
 }
 
-function renderMomentsPage() {
+async function renderMomentsPage() {
   const momentsDirectory = path.join(hexo.source_dir, "_moments");
   const defaultAvatar =
     safeUrl(hexo.theme?.config?.defaults?.avatar) ||
@@ -266,45 +410,48 @@ function renderMomentsPage() {
         .map((entry) => entry.name)
     : [];
 
-  const moments = files
-    .map((fileName) => {
-      const filePath = path.join(momentsDirectory, fileName);
-      const parsed = frontMatter.parse(fs.readFileSync(filePath, "utf8"));
-      const normalizedDate = dateParts(parsed.date);
-      if (!normalizedDate) {
-        hexo.log.warn(`[moments] Skip ${fileName}: missing or invalid date.`);
-        return null;
-      }
+  const moments = (
+    await Promise.all(
+      files.map(async (fileName) => {
+        const filePath = path.join(momentsDirectory, fileName);
+        const parsed = frontMatter.parse(fs.readFileSync(filePath, "utf8"));
+        const normalizedDate = dateParts(parsed.date);
+        if (!normalizedDate) {
+          hexo.log.warn(`[moments] Skip ${fileName}: missing or invalid date.`);
+          return null;
+        }
 
-      const images = normalizeImages(parsed.images);
-      const share = normalizeShare(parsed.link);
-      const music = normalizeMusic(parsed.music);
-      const inferredType = music
-        ? "music"
-        : images.length
-          ? "photo"
-          : share
-            ? "link"
-            : "text";
-      const type = MOMENT_TYPES[parsed.type] ? parsed.type : inferredType;
+        const images = normalizeImages(parsed.images);
+        const share = normalizeShare(parsed.link);
+        const music = normalizeMusic(parsed.music);
+        const inferredType = music
+          ? "music"
+          : images.length
+            ? "photo"
+            : share
+              ? "link"
+              : "text";
+        const type = MOMENT_TYPES[parsed.type] ? parsed.type : inferredType;
 
-      return {
-        fileName,
-        ...normalizedDate,
-        type,
-        tags: normalizeTags(parsed.tags),
-        author: String(parsed.author || hexo.config.author || "Jackknifer"),
-        avatar: safeUrl(parsed.avatar) || defaultAvatar,
-        location: String(parsed.location || ""),
-        images,
-        share,
-        music,
-        html: hexo.render.renderSync({
-          text: parsed._content || "",
-          engine: "markdown",
-        }),
-      };
-    })
+        return {
+          fileName,
+          ...normalizedDate,
+          type,
+          tags: normalizeTags(parsed.tags),
+          author: String(parsed.author || hexo.config.author || "Jackknifer"),
+          avatar: safeUrl(parsed.avatar) || defaultAvatar,
+          location: String(parsed.location || ""),
+          images,
+          share,
+          music: await enrichMusic(music),
+          html: hexo.render.renderSync({
+            text: parsed._content || "",
+            engine: "markdown",
+          }),
+        };
+      }),
+    )
+  )
     .filter(Boolean)
     .sort(
       (left, right) =>
@@ -340,7 +487,7 @@ function renderMomentsPage() {
             <strong class="moment-author">${escapeHtml(moment.author)}</strong>
             <span class="moment-type"><i class="${type.icon}" aria-hidden="true"></i>${type.label}</span>
             <div class="moment-meta">
-              <time class="moment-date" datetime="${escapeHtml(moment.date)}T${escapeHtml(moment.time)}"><i class="fa-regular fa-clock" aria-hidden="true"></i>${escapeHtml(moment.time)}</time>
+              <time class="moment-date" datetime="${escapeHtml(moment.date)}">${escapeHtml(moment.date)}</time>
               ${location}
             </div>
           </header>
@@ -367,14 +514,7 @@ function renderMomentsPage() {
   const dayGroups = days
     .map(
       (day) => `
-        <section class="moment-day" data-moment-day>
-          <header class="moment-day-header">
-            <time class="moment-day-date" datetime="${escapeHtml(day.date)}">
-              <i class="fa-regular fa-calendar" aria-hidden="true"></i>
-              <span>${escapeHtml(day.date)}</span>
-              <small>${escapeHtml(weekdayLabel(day.date))}</small>
-            </time>
-          </header>
+        <section class="moment-day" data-moment-day aria-label="${escapeHtml(day.date)}">
           <div class="moment-day-list">
             ${day.moments.map(renderMomentCard).join("")}
           </div>
@@ -400,4 +540,4 @@ function renderMomentsPage() {
   `;
 }
 
-hexo.extend.tag.register("moments", renderMomentsPage);
+hexo.extend.tag.register("moments", renderMomentsPage, { async: true });

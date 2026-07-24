@@ -799,10 +799,61 @@
       cards.forEach((card) => card.classList.add("is-visible"));
     }
 
-    page.querySelectorAll(".moment-audio").forEach((audio) => {
+    const momentAudios = [...page.querySelectorAll("[data-moment-audio]")];
+
+    const syncMomentAudio = (audio) => {
+      const musicCard = audio.closest("[data-moment-music]");
+      const toggle = musicCard?.querySelector("[data-moment-music-toggle]");
+      const icon = toggle?.querySelector("i");
+      if (!musicCard || !toggle || !icon) return;
+
+      const isPlaying = !audio.paused && !audio.ended;
+      musicCard.classList.toggle("is-playing", isPlaying);
+      toggle.setAttribute("aria-pressed", String(isPlaying));
+      toggle.setAttribute(
+        "aria-label",
+        musicCard.classList.contains("is-error")
+          ? "暂时无法播放，请打开音乐页面"
+          : `${isPlaying ? "暂停" : "播放"} ${musicCard.querySelector("strong")?.textContent || "音乐"}`,
+      );
+      icon.className = isPlaying ? "fa-solid fa-pause" : "fa-solid fa-play";
+    };
+
+    momentAudios.forEach((audio) => {
+      const musicCard = audio.closest("[data-moment-music]");
+      const toggle = musicCard?.querySelector("[data-moment-music-toggle]");
+      audio.volume = DEFAULT_VOLUME;
+
       audio.addEventListener("play", () => {
+        momentAudios.forEach((candidate) => {
+          if (candidate !== audio && !candidate.paused) candidate.pause();
+        });
         if (state.audio && !state.audio.paused) state.audio.pause();
+        musicCard?.classList.remove("is-error");
+        syncMomentAudio(audio);
       });
+      audio.addEventListener("pause", () => syncMomentAudio(audio));
+      audio.addEventListener("ended", () => syncMomentAudio(audio));
+      audio.addEventListener("error", () => {
+        musicCard?.classList.add("is-error");
+        if (toggle) toggle.setAttribute("aria-label", "暂时无法播放，请打开音乐页面");
+        syncMomentAudio(audio);
+      });
+
+      toggle?.addEventListener("click", () => {
+        musicCard?.classList.remove("is-error");
+        if (audio.paused) {
+          if (audio.error || audio.networkState === 3) audio.load();
+          audio.play().catch(() => {
+            musicCard?.classList.add("is-error");
+            syncMomentAudio(audio);
+          });
+        } else {
+          audio.pause();
+        }
+      });
+
+      syncMomentAudio(audio);
     });
 
     const applyFilter = () => {
@@ -816,6 +867,7 @@
           !query || card.textContent.toLocaleLowerCase("zh-CN").includes(query);
         const isVisible = matchesMonth && matchesQuery;
         card.hidden = !isVisible;
+        if (!isVisible) card.querySelector("[data-moment-audio]")?.pause();
         if (isVisible) visibleCount += 1;
       });
 

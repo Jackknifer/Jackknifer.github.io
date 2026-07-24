@@ -84,28 +84,28 @@ html .preloader .ml13::after {
     "SimSun", Georgia, serif;
   --blog-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
     "Microsoft YaHei", sans-serif;
-  /* Custom surfaces stay neutral at rest and borrow the theme primary only
-     during hover/focus, matching article-title interactions on the homepage. */
-  --blog-interaction-accent: var(--primary-color);
-  --blog-interaction-accent-strong: #7f1a2a;
-  --blog-interaction-accent-soft: rgba(163, 31, 52, 0.11);
-  --blog-player-accent: #7a666c;
-  --blog-player-accent-strong: #5c494f;
-  --blog-player-accent-soft: rgba(122, 102, 108, 0.11);
+  /* Reuse the navbar's restrained blue-gray instead of introducing another
+     saturated theme color on custom pages and widgets. */
+  --blog-interaction-accent: #4d6b8a;
+  --blog-interaction-accent-strong: #405a73;
+  --blog-interaction-accent-soft: rgba(77, 107, 138, 0.11);
+  --blog-player-accent: #627b95;
+  --blog-player-accent-strong: #4d6b8a;
+  --blog-player-accent-soft: rgba(77, 107, 138, 0.1);
   /* Custom content pages use the theme's native canvas. Muted color remains
      limited to labels and interaction states instead of tinting the page. */
   --blog-index-page-surface: var(--background-color);
   --blog-index-surface: var(--background-color);
   --blog-index-border: var(--border-color);
-  --blog-index-primary: #826d73;
-  --blog-index-primary-strong: #5c494f;
-  --blog-index-primary-soft: rgba(130, 109, 115, 0.1);
-  --blog-index-primary-border: rgba(130, 109, 115, 0.2);
+  --blog-index-primary: #627b95;
+  --blog-index-primary-strong: #4d6b8a;
+  --blog-index-primary-soft: rgba(77, 107, 138, 0.1);
+  --blog-index-primary-border: rgba(77, 107, 138, 0.22);
   --blog-index-interactive: var(--blog-interaction-accent);
   --blog-index-interactive-soft: var(--blog-interaction-accent-soft);
-  --blog-index-secondary: #8a7768;
-  --blog-index-secondary-soft: rgba(138, 119, 104, 0.09);
-  --blog-index-secondary-border: rgba(138, 119, 104, 0.19);
+  --blog-index-secondary: #7d8791;
+  --blog-index-secondary-soft: rgba(101, 115, 129, 0.07);
+  --blog-index-secondary-border: rgba(101, 115, 129, 0.16);
   --blog-index-radius-card: 20px;
   --blog-index-radius-control: 14px;
   --blog-index-radius-pill: 999px;
@@ -121,21 +121,22 @@ html .preloader .ml13::after {
 }
 
 html.dark {
-  --blog-interaction-accent-strong: #d18a96;
-  --blog-interaction-accent-soft: rgba(192, 113, 126, 0.14);
-  --blog-player-accent: #c0a9af;
-  --blog-player-accent-strong: #eadde0;
-  --blog-player-accent-soft: rgba(192, 169, 175, 0.13);
+  --blog-interaction-accent: #a9bed2;
+  --blog-interaction-accent-strong: #c7d6e4;
+  --blog-interaction-accent-soft: rgba(169, 190, 210, 0.14);
+  --blog-player-accent: #91abc4;
+  --blog-player-accent-strong: #b7c9db;
+  --blog-player-accent-soft: rgba(145, 171, 196, 0.13);
   --blog-index-page-surface: var(--background-color);
   --blog-index-surface: var(--background-color);
   --blog-index-border: var(--border-color);
-  --blog-index-primary: #c0a9af;
-  --blog-index-primary-strong: #eadde0;
-  --blog-index-primary-soft: rgba(192, 169, 175, 0.11);
-  --blog-index-primary-border: rgba(192, 169, 175, 0.21);
-  --blog-index-secondary: #c4b29f;
-  --blog-index-secondary-soft: rgba(196, 178, 159, 0.1);
-  --blog-index-secondary-border: rgba(196, 178, 159, 0.2);
+  --blog-index-primary: #91abc4;
+  --blog-index-primary-strong: #b7c9db;
+  --blog-index-primary-soft: rgba(145, 171, 196, 0.13);
+  --blog-index-primary-border: rgba(145, 171, 196, 0.24);
+  --blog-index-secondary: #9fa9b3;
+  --blog-index-secondary-soft: rgba(159, 169, 179, 0.11);
+  --blog-index-secondary-border: rgba(159, 169, 179, 0.2);
   --blog-index-interactive-soft: var(--blog-interaction-accent-soft);
   --blog-index-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   --blog-index-shadow-hover: 0 14px 34px rgba(0, 0, 0, 0.3);
@@ -285,11 +286,23 @@ html[data-blog-section="archive"] .archive-page-title::after {
 }
 
 .archive-container .archive-list-container .article-list {
+  position: relative;
   margin: 0;
-  padding-left: 0 !important;
+  padding-left: 30px !important;
+}
+
+.archive-container .archive-list-container .article-list::before {
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+  left: 7px;
+  width: 1px;
+  background: var(--blog-index-primary-border);
+  content: "";
 }
 
 .archive-container .archive-list-container .article-item {
+  position: relative;
   display: grid;
   grid-template-columns: 56px minmax(0, 1fr);
   align-items: baseline;
@@ -336,7 +349,23 @@ html[data-blog-section="archive"] .archive-page-title::after {
 }
 
 .archive-container .archive-list-container .article-item::after {
-  display: none !important;
+  position: absolute;
+  top: 17px;
+  left: -27px;
+  display: block !important;
+  box-sizing: border-box;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--blog-index-primary);
+  border-radius: 50%;
+  background: var(--blog-index-surface);
+  box-shadow: 0 0 0 3px var(--blog-index-primary-soft);
+  content: "";
+  transition:
+    border-color var(--blog-index-motion),
+    background-color var(--blog-index-motion),
+    box-shadow var(--blog-index-motion),
+    transform var(--blog-index-motion);
 }
 
 .archive-container
@@ -419,6 +448,7 @@ html .tagcloud-content .tag-list[data-show-value] li a::after {
 html .tagcloud-content .tag-list li a:focus-visible {
   border-color: var(--blog-index-interactive);
   color: var(--blog-index-interactive);
+  background-color: var(--blog-index-interactive-soft) !important;
   box-shadow: var(--blog-index-focus-ring), var(--blog-index-shadow-hover);
 }
 
@@ -526,7 +556,8 @@ html
   }
 
   html .tagcloud-content .tag-list li a:hover {
-    color: var(--blog-index-interactive);
+    color: var(--blog-index-interactive) !important;
+    background-color: var(--blog-index-interactive-soft) !important;
   }
 
   .category-list-content
@@ -1402,10 +1433,10 @@ html[data-blog-page="moments"] .main-content {
 }
 
 .moments-filter.is-active {
-  border-color: var(--blog-index-primary-strong);
-  color: #fff;
-  background: var(--blog-index-primary-strong);
-  box-shadow: 0 8px 18px var(--blog-index-primary-soft);
+  border-color: var(--blog-index-primary-border);
+  color: var(--blog-index-primary-strong);
+  background: var(--blog-index-primary-soft);
+  box-shadow: 0 7px 16px rgba(42, 46, 54, 0.07);
 }
 
 .moments-filter:focus-visible {
@@ -1424,25 +1455,13 @@ html[data-blog-page="moments"] .main-content {
 }
 
 .moments-feed {
-  position: relative;
   width: min(100%, 820px);
   margin: 0 auto;
-  padding-left: 42px;
-}
-
-.moments-feed::before {
-  position: absolute;
-  top: 16px;
-  bottom: 24px;
-  left: 10px;
-  width: 1px;
-  background: var(--blog-index-primary-border);
-  content: "";
+  padding-left: 0;
 }
 
 .moment-day {
-  position: relative;
-  margin-bottom: 34px;
+  margin-bottom: 14px;
 }
 
 .moment-day[hidden] {
@@ -1451,50 +1470,6 @@ html[data-blog-page="moments"] .main-content {
 
 .moment-day:last-child {
   margin-bottom: 0;
-}
-
-.moment-day-header {
-  position: relative;
-  margin-bottom: 14px;
-}
-
-.moment-day-header::before {
-  position: absolute;
-  top: 50%;
-  left: -37px;
-  width: 9px;
-  height: 9px;
-  border: 3px solid var(--blog-index-surface);
-  border-radius: 50%;
-  background: var(--blog-index-primary);
-  box-shadow: 0 0 0 1px var(--blog-index-primary-border);
-  content: "";
-  transform: translateY(-50%);
-}
-
-.moment-day-date {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 13px;
-  border: 1px solid var(--blog-index-primary-border);
-  border-radius: 11px;
-  color: var(--blog-index-primary-strong);
-  background: var(--blog-index-primary-soft);
-  font-family: var(--blog-sans);
-  font-size: 0.79rem;
-  font-weight: 700;
-  letter-spacing: 0.025em;
-  gap: 7px;
-}
-
-.moment-day-date i {
-  color: var(--blog-index-primary);
-}
-
-.moment-day-date small {
-  color: var(--blog-index-secondary);
-  font-size: 0.7rem;
-  font-weight: 650;
 }
 
 .moment-day-list {
@@ -1566,14 +1541,16 @@ html[data-blog-page="moments"] .main-content {
 }
 
 .moment-content {
+  display: contents;
   min-width: 0;
 }
 
 .moment-header {
   display: grid;
+  grid-column: 2;
   grid-template-columns: 1fr auto;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 0;
   column-gap: 12px;
 }
 
@@ -1612,16 +1589,12 @@ html[data-blog-page="moments"] .main-content {
 .moment-date {
   display: inline-flex;
   align-items: center;
-  color: var(--third-text-color);
+  color: var(--blog-index-secondary);
   font-family: var(--blog-sans);
   font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.015em;
   gap: 5px;
-}
-
-.moment-date i {
-  color: var(--blog-index-primary);
 }
 
 .moment-location {
@@ -1634,6 +1607,8 @@ html[data-blog-page="moments"] .main-content {
 }
 
 .moment-body {
+  grid-column: 1 / -1;
+  margin-top: 12px;
   color: var(--default-text-color);
   font-size: 1rem;
   line-height: 1.85;
@@ -1662,6 +1637,7 @@ html[data-blog-page="moments"] .main-content {
 
 .moment-gallery {
   display: grid;
+  grid-column: 1 / -1;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 14px;
   gap: 6px;
@@ -1699,6 +1675,7 @@ html[data-blog-page="moments"] .main-content {
 
 .moment-share-card,
 .moment-music-card {
+  grid-column: 1 / -1;
   box-sizing: border-box;
   width: 100%;
   margin-top: 14px;
@@ -1724,7 +1701,6 @@ html[data-blog-page="moments"] .main-content {
 }
 
 .moment-share-card > img,
-.moment-music-main > img,
 .moment-attachment-icon {
   width: 58px;
   height: 58px;
@@ -1781,14 +1757,98 @@ html[data-blog-page="moments"] .main-content {
 }
 
 .moment-music-card {
+  width: min(100%, 520px);
   padding: 10px;
+  justify-self: start;
 }
 
 .moment-music-main {
   display: grid;
-  grid-template-columns: 58px minmax(0, 1fr) auto;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
+}
+
+.moment-music-cover {
+  position: relative;
+  display: block;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: 11px;
+  background: var(--second-background-color);
+  line-height: 0;
+}
+
+.moment-music-cover > img,
+.moment-music-cover > figure,
+.moment-music-cover > figure img,
+.moment-music-cover > .moment-attachment-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.moment-music-cover > figure {
+  margin: 0 !important;
+  line-height: 0;
+}
+
+.moment-music-cover > figure figcaption {
+  display: none;
+}
+
+.moment-music-cover > .moment-attachment-icon {
+  display: inline-flex;
+}
+
+.moment-music-toggle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  border-radius: 50%;
+  outline: none;
+  color: #fff;
+  background: rgba(29, 37, 46, 0.72);
+  box-shadow: 0 4px 12px rgba(18, 24, 31, 0.2);
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition:
+    background-color var(--blog-index-motion),
+    box-shadow var(--blog-index-motion),
+    transform var(--blog-index-motion);
+}
+
+.moment-music-toggle i {
+  margin-left: 2px;
+  font-size: 0.72rem;
+}
+
+.moment-music-toggle[aria-pressed="true"] i {
+  margin-left: 0;
+}
+
+.moment-music-toggle:focus-visible {
+  box-shadow:
+    0 0 0 4px var(--blog-index-interactive-soft),
+    0 4px 12px rgba(18, 24, 31, 0.24);
+}
+
+.moment-music-card.is-playing .moment-music-toggle {
+  background: var(--blog-index-interactive);
+}
+
+.moment-music-card.is-error .moment-music-toggle {
+  background: var(--third-text-color);
 }
 
 .moment-music-open {
@@ -1802,15 +1862,12 @@ html[data-blog-page="moments"] .main-content {
 }
 
 .moment-audio {
-  display: block;
-  width: 100%;
-  height: 34px;
-  margin-top: 10px;
-  accent-color: var(--blog-player-accent);
+  display: none;
 }
 
 .moment-tags {
   display: flex;
+  grid-column: 1 / -1;
   flex-wrap: wrap;
   margin-top: 14px;
   gap: 7px;
@@ -1885,6 +1942,12 @@ html[data-blog-page="moments"] .main-content {
     border-color: var(--blog-index-interactive-soft);
     box-shadow: 0 10px 22px rgba(42, 46, 54, 0.09);
     transform: translateY(-2px);
+  }
+
+  .moment-music-toggle:hover {
+    background: var(--blog-index-interactive);
+    box-shadow: 0 6px 15px rgba(18, 24, 31, 0.26);
+    transform: translate(-50%, -50%) scale(1.06);
   }
 }
 
@@ -2017,28 +2080,8 @@ html[data-blog-page="moments"] .main-content {
     font-size: 0.82rem;
   }
 
-  .moments-feed {
-    padding-left: 30px;
-  }
-
-  .moments-feed::before {
-    left: 7px;
-  }
-
   .moment-day {
-    margin-bottom: 28px;
-  }
-
-  .moment-day-header::before {
-    left: -27px;
-    width: 8px;
-    height: 8px;
-    border-width: 2px;
-  }
-
-  .moment-day-date {
-    padding: 7px 11px;
-    font-size: 0.75rem;
+    margin-bottom: 12px;
   }
 
   .moment-card {
@@ -2065,8 +2108,12 @@ html[data-blog-page="moments"] .main-content {
   }
 
   .moment-share-card > img,
-  .moment-music-main > img,
   .moment-attachment-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .moment-music-cover {
     width: 52px;
     height: 52px;
   }
@@ -2108,24 +2155,6 @@ html[data-blog-page="moments"] .main-content {
     padding: 7px 11px;
   }
 
-  .moments-feed {
-    padding-left: 24px;
-  }
-
-  .moments-feed::before {
-    left: 5px;
-  }
-
-  .moment-day-header::before {
-    left: -23px;
-  }
-
-  .moment-day-date {
-    padding: 6px 9px;
-    font-size: 0.7rem;
-    gap: 5px;
-  }
-
   .moment-card {
     grid-template-columns: 38px minmax(0, 1fr);
     padding: 16px 13px;
@@ -2156,10 +2185,28 @@ html[data-blog-page="moments"] .main-content {
   }
 
   .moment-share-card > img,
-  .moment-music-main > img,
   .moment-attachment-icon {
     width: 46px;
     height: 46px;
+  }
+
+  .moment-music-cover {
+    width: 46px;
+    height: 46px;
+  }
+
+  .archive-container .archive-list-container .article-list {
+    padding-left: 24px !important;
+  }
+
+  .archive-container .archive-list-container .article-list::before {
+    left: 5px;
+  }
+
+  .archive-container .archive-list-container .article-item::after {
+    left: -23px;
+    width: 8px;
+    height: 8px;
   }
 }
 
@@ -2202,6 +2249,7 @@ html[data-blog-page="moments"] .main-content {
   .moment-music-card,
   .moment-attachment-open,
   .moment-music-open,
+  .moment-music-toggle,
   .archive-container .archive-list-container .article-item > a,
   .archive-container .archive-list-container .article-item::before,
   .archive-container .archive-list-container .article-item::after,
