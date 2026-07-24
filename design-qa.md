@@ -1,59 +1,42 @@
 # Design QA
 
-## Comparison target
+## Current comparison target
 
-- Archive source visual truth: `/var/folders/9g/7wbr3g8573n2v6jw1dtx1ks40000gn/T/TemporaryItems/NSIRD_screencaptureui_nCMr2p/截屏2026-07-24 16.17.38.png`
-- Moments source visual truth: `/var/folders/9g/7wbr3g8573n2v6jw1dtx1ks40000gn/T/codex-clipboard-bd865817-d845-41df-8752-c2420359aaad.png`
-- Archive implementation: `/private/tmp/output/blog-content-refinement-qa/archive-desktop.png`
-- Moments implementation: `/private/tmp/output/blog-content-refinement-qa/moments-desktop.png`
-- Mobile implementations:
-  - `/private/tmp/output/blog-content-refinement-qa/archive-mobile.png`
-  - `/private/tmp/output/blog-content-refinement-qa/moments-mobile.png`
+- Tag hover reference: `/var/folders/9g/7wbr3g8573n2v6jw1dtx1ks40000gn/T/codex-clipboard-f965d9a7-7495-4f52-84a8-4b9c8d786a70.png`
+- Moments color/date reference: `/var/folders/9g/7wbr3g8573n2v6jw1dtx1ks40000gn/T/codex-clipboard-3b160683-0c5d-497b-be7c-d1275af76ea8.png`
+- Current music-card reference: `/var/folders/9g/7wbr3g8573n2v6jw1dtx1ks40000gn/T/codex-clipboard-26889d02-5cf5-4301-aac8-f8953eec4ba7.png`
+- Compact music-card target: `/var/folders/9g/7wbr3g8573n2v6jw1dtx1ks40000gn/T/codex-clipboard-9dc9d494-f936-4416-a38f-744fb183dafc.png`
+- The references are selective design directions, not full-page pixel targets.
 
-## Viewport and normalization
+## Implemented visual system
 
-- Desktop CSS viewport: `1280 × 900`; browser captures: `1266 × 890`.
-- Mobile CSS viewport: `390 × 844`.
-- Archive reference pixels: `1942 × 1028`.
-- Moments reference pixels: `2258 × 1202`.
-- The references are layout-direction examples, not same-site pixel targets. No density-based pixel matching was used because the user explicitly requested selective adaptation rather than full reproduction.
-- State: light theme, default filter, first viewport after the page transition completed.
+- Custom content pages and widgets now reuse the navbar's muted blue-gray family: `#4d6b8a`, `#627b95` and low-opacity variants. Page and card surfaces remain the theme's native neutral background.
+- Tag hover/focus explicitly pairs blue-gray text with a translucent blue-gray background. It overrides Theme Redefine's solid primary hover, so text and count remain readable.
+- Moments no longer render the left rail, date node or separate day badge. Each card keeps the configured GitHub avatar and shows the publication date beneath the author; the exact time is not rendered.
+- Music shares use a compact card with cover, play/pause control, title, artist and outbound link. The large native audio control is hidden while retaining a real audio element and accessible labels.
+- Archives now own the slim left rail and one outlined node per date group. The existing compact date/title grid is retained, keeping the two columns aligned and close together.
+- Desktop and mobile rules share the same structure. At `<=768px` and `<=480px`, cards, covers, archive rail and nodes reduce proportionally without introducing an alternate visual language.
 
-## Full-view comparison evidence
+## Generated-output checks
 
-- Archive preserves the reference's readable left-date/right-title relationship, but intentionally removes its descriptions and highlighted row treatment to stay consistent with the existing Hexo archive data.
-- Moments preserves the reference's thin left rail, date node, date badge and content-card rhythm. Comments, reactions and publishing controls were intentionally omitted because the current site has no matching backend data.
-- All six content pages use a `920px` desktop shell and the same title origin. Measured title origin is `x=212, y=143` for 近况、动态、归档、标签、分类、关于.
-- Focused crops were not required: the full-view captures keep the title, date column, timeline node, card boundary, avatar and typography readable.
+- A temporary moment containing only the exact URL supplied by the user was built, inspected and removed before commit.
+- The generated card resolved to `东京不太热`, `封茗囧菌`, the verified NetEase cover, canonical song URL and stable NetEase outer audio URL.
+- Generated markup contained `2099-12-31` but no `12:34` time text or `.moment-day-header`.
+- Final production build generated 315 files. `node --check` passed for the custom Hexo tag, frontend script and moment creation tool; `git diff --check` passed.
+- Static interaction review covered play/pause state, error fallback, mutual exclusion with the site player, filter-triggered pause, focus-visible states and reduced motion.
+- Source review found no remaining P0, P1 or P2 issue in tag readability, moments structure, archive structure or the requested NetEase share path.
 
-## Required fidelity surfaces
+## Deployment evidence
 
-- Fonts and typography: existing blog serif remains the primary content/title face; dates, times and controls use the site sans stack. Weight and line-height remain readable on desktop and mobile.
-- Spacing and layout rhythm: title padding, shell width, border radius and interior margins are shared. Archive uses compact rows; moments uses grouped day sections without horizontal overflow.
-- Colors and visual tokens: page shells and cards use the theme's native background and border variables. Muted mauve and warm taupe remain limited to small labels and states; stronger wine red remains reserved for interaction states.
-- Image quality and assets: moments use the configured GitHub avatar URL with deterministic centered square cropping. Browser verification reported a loaded `460 × 460` source image.
-- Copy and content: existing archive titles and moment content are unchanged. Moments add date, weekday and time labels derived from each Markdown entry.
+- Commit: `4773f52cd9d665ad4f17eb89e65527a17e5414d9`
+- GitHub Pages run: `30083805062` (`Pages #87`)
+- Result: build success, deploy success, 40 seconds.
+- Published artifact: `github-pages`, digest `sha256:2c120f8c83aadefdc8d9880f2971984820a661c397317fa12f08c092db527ad6`.
 
-## Comparison history
+## Browser verification exception
 
-1. First pass found one P2 consistency issue: moments still inherited an older transparent-container rule and centered title padding, producing title origin `x=221, y=170` while the other pages used `x=212, y=143`.
-2. Removed the obsolete moments-only container/title overrides and applied the shared content shell.
-3. Post-fix measurements show the same shell width and title origin across all six target pages, with no desktop or mobile horizontal overflow.
-4. Follow-up refinement removed the custom page tint, reduced archive date/title spacing, baseline-aligned each row and added URL-only link/music parsing.
-
-## Findings
-
-- No remaining P0, P1 or P2 visual differences within the requested selective-reference scope.
-- P3: the Theme Redefine side-tools button can visually approach the lower-right edge of a moments card on a narrow mobile viewport. This is pre-existing behavior and outside the requested content-page layout change.
-
-## Interaction and runtime checks
-
-- Month filter: selecting `26 年 7 月` shows one card and one date group.
-- Search empty state: searching for a missing phrase shows zero cards, zero date groups and the empty state.
-- Search reset: clearing the query restores all three cards.
-- Archive date-to-link distance is `64px` on desktop and `56px` on mobile; both layouts use baseline alignment.
-- Avatar source is the configured GitHub URL. The loaded `460 × 460` image is centered inside its frame with only the intended `1px` border inset.
-- URL-only share cards preserve the exact outbound URL and display its real domain. URL-only music cards display the real provider domain; direct audio URLs add native playback controls.
-- Page identity, meaningful content, no framework overlay, no horizontal overflow and console warnings/errors all passed.
+- The local preview port could not be authorized in this environment.
+- The selected in-app browser then rejected navigation to `https://jackknifer.github.io` because of a saved user browser policy. The restriction was respected; no alternate browser or indirect navigation was used.
+- Consequently, this iteration does not claim a new implementation screenshot, computed hover-style capture or live audio click capture. Verification is based on the generated output, source-level interaction review, exact-link fixture, successful Pages workflow and published artifact.
 
 final result: passed
