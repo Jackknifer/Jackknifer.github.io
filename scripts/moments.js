@@ -469,10 +469,6 @@ async function renderMomentsPage() {
   ].join("");
 
   const renderMomentCard = (moment) => {
-    const type = MOMENT_TYPES[moment.type];
-    const tags = moment.tags
-      .map((tag) => `<span class="moment-tag"># ${escapeHtml(tag)}</span>`)
-      .join("");
     const location = moment.location
       ? `<span class="moment-location"><i class="fa-regular fa-location-dot" aria-hidden="true"></i>${escapeHtml(moment.location)}</span>`
       : "";
@@ -485,7 +481,6 @@ async function renderMomentsPage() {
         <div class="moment-content">
           <header class="moment-header">
             <strong class="moment-author">${escapeHtml(moment.author)}</strong>
-            <span class="moment-type"><i class="${type.icon}" aria-hidden="true"></i>${type.label}</span>
             <div class="moment-meta">
               <time class="moment-date" datetime="${escapeHtml(moment.date)}">${escapeHtml(moment.date)}</time>
               ${location}
@@ -495,7 +490,6 @@ async function renderMomentsPage() {
           ${renderGallery(moment.images)}
           ${renderShareCard(moment.share)}
           ${renderMusicCard(moment.music)}
-          ${tags ? `<footer class="moment-tags">${tags}</footer>` : ""}
         </div>
       </article>
     `;

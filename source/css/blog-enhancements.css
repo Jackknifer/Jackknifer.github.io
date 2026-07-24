@@ -84,28 +84,37 @@ html .preloader .ml13::after {
     "SimSun", Georgia, serif;
   --blog-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
     "Microsoft YaHei", sans-serif;
-  /* Reuse the navbar's restrained blue-gray instead of introducing another
-     saturated theme color on custom pages and widgets. */
-  --blog-interaction-accent: #4d6b8a;
-  --blog-interaction-accent-strong: #405a73;
-  --blog-interaction-accent-soft: rgba(77, 107, 138, 0.11);
+  /* Wine (theme primary) drives inner-page focus; blue-gray plays the
+     supporting role on secondary chrome and homepage widget bodies. */
+  --blog-wine: #a31f34;
+  --blog-wine-strong: #86182a;
+  --blog-wine-soft: rgba(163, 31, 52, 0.1);
+  --blog-wine-border: rgba(163, 31, 52, 0.22);
+  --blog-interaction-accent: #a31f34;
+  --blog-interaction-accent-strong: #86182a;
+  --blog-interaction-accent-soft: rgba(163, 31, 52, 0.1);
   --blog-player-accent: #627b95;
   --blog-player-accent-strong: #4d6b8a;
   --blog-player-accent-soft: rgba(77, 107, 138, 0.1);
+  /* Focus accents (play button, seek fill, kicker, weather main icon) borrow
+     the theme's wine so the homepage widgets stop reading as fully blue-gray. */
+  --blog-player-focus: var(--blog-wine);
+  --blog-player-focus-strong: var(--blog-wine-strong);
+  --blog-player-focus-soft: var(--blog-wine-soft);
   /* Custom content pages use the theme's native canvas. Muted color remains
      limited to labels and interaction states instead of tinting the page. */
   --blog-index-page-surface: var(--background-color);
   --blog-index-surface: var(--background-color);
   --blog-index-border: var(--border-color);
-  --blog-index-primary: #627b95;
-  --blog-index-primary-strong: #4d6b8a;
-  --blog-index-primary-soft: rgba(77, 107, 138, 0.1);
-  --blog-index-primary-border: rgba(77, 107, 138, 0.22);
+  --blog-index-primary: var(--blog-wine);
+  --blog-index-primary-strong: var(--blog-wine-strong);
+  --blog-index-primary-soft: var(--blog-wine-soft);
+  --blog-index-primary-border: var(--blog-wine-border);
   --blog-index-interactive: var(--blog-interaction-accent);
   --blog-index-interactive-soft: var(--blog-interaction-accent-soft);
-  --blog-index-secondary: #7d8791;
-  --blog-index-secondary-soft: rgba(101, 115, 129, 0.07);
-  --blog-index-secondary-border: rgba(101, 115, 129, 0.16);
+  --blog-index-secondary: #627b95;
+  --blog-index-secondary-soft: rgba(77, 107, 138, 0.09);
+  --blog-index-secondary-border: rgba(77, 107, 138, 0.2);
   --blog-index-radius-card: 20px;
   --blog-index-radius-control: 14px;
   --blog-index-radius-pill: 999px;
@@ -121,22 +130,29 @@ html .preloader .ml13::after {
 }
 
 html.dark {
-  --blog-interaction-accent: #a9bed2;
-  --blog-interaction-accent-strong: #c7d6e4;
-  --blog-interaction-accent-soft: rgba(169, 190, 210, 0.14);
+  --blog-wine: #d66b7d;
+  --blog-wine-strong: #e58998;
+  --blog-wine-soft: rgba(214, 107, 125, 0.14);
+  --blog-wine-border: rgba(214, 107, 125, 0.26);
+  --blog-interaction-accent: var(--blog-wine);
+  --blog-interaction-accent-strong: var(--blog-wine-strong);
+  --blog-interaction-accent-soft: var(--blog-wine-soft);
   --blog-player-accent: #91abc4;
   --blog-player-accent-strong: #b7c9db;
   --blog-player-accent-soft: rgba(145, 171, 196, 0.13);
+  --blog-player-focus: var(--blog-wine);
+  --blog-player-focus-strong: var(--blog-wine-strong);
+  --blog-player-focus-soft: var(--blog-wine-soft);
   --blog-index-page-surface: var(--background-color);
   --blog-index-surface: var(--background-color);
   --blog-index-border: var(--border-color);
-  --blog-index-primary: #91abc4;
-  --blog-index-primary-strong: #b7c9db;
-  --blog-index-primary-soft: rgba(145, 171, 196, 0.13);
-  --blog-index-primary-border: rgba(145, 171, 196, 0.24);
-  --blog-index-secondary: #9fa9b3;
-  --blog-index-secondary-soft: rgba(159, 169, 179, 0.11);
-  --blog-index-secondary-border: rgba(159, 169, 179, 0.2);
+  --blog-index-primary: var(--blog-wine);
+  --blog-index-primary-strong: var(--blog-wine-strong);
+  --blog-index-primary-soft: var(--blog-wine-soft);
+  --blog-index-primary-border: var(--blog-wine-border);
+  --blog-index-secondary: #91abc4;
+  --blog-index-secondary-soft: rgba(145, 171, 196, 0.14);
+  --blog-index-secondary-border: rgba(145, 171, 196, 0.22);
   --blog-index-interactive-soft: var(--blog-interaction-accent-soft);
   --blog-index-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
   --blog-index-shadow-hover: 0 14px 34px rgba(0, 0, 0, 0.3);
@@ -743,7 +759,7 @@ html[data-blog-page="home"] .main-content-body {
 .blog-widget-kicker {
   display: inline-block;
   margin-bottom: 5px;
-  color: var(--blog-player-accent-strong);
+  color: var(--blog-player-focus-strong);
   font-size: 0.66rem;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -798,7 +814,7 @@ html[data-blog-page="home"] .main-content-body {
   outline: none;
   background: linear-gradient(
     90deg,
-    var(--blog-player-accent) var(--player-progress),
+    var(--blog-player-focus) var(--player-progress),
     rgba(123, 112, 101, 0.2) var(--player-progress)
   );
   cursor: pointer;
@@ -873,12 +889,12 @@ html[data-blog-page="home"] .main-content-body {
   width: 48px;
   height: 48px;
   color: #fff;
-  background: var(--blog-player-accent);
-  box-shadow: 0 8px 20px rgba(58, 64, 72, 0.22);
+  background: var(--blog-player-focus);
+  box-shadow: 0 8px 20px rgba(163, 31, 52, 0.22);
 }
 
 .blog-player-button-primary:hover {
-  background: var(--blog-player-accent-strong);
+  background: var(--blog-player-focus-strong);
   transform: translateY(-1px) scale(1.05);
 }
 
@@ -1075,7 +1091,7 @@ html.dark .blog-floating-player {
 }
 
 .blog-weather-location i {
-  color: var(--blog-player-accent);
+  color: var(--blog-player-focus);
   font-size: 0.84rem;
   transition: color 0.22s ease;
 }
@@ -1149,8 +1165,8 @@ html.dark .blog-weather-mode {
   align-items: center;
   justify-content: center;
   border-radius: 22px;
-  color: var(--blog-player-accent);
-  background: var(--blog-player-accent-soft);
+  color: var(--blog-player-focus);
+  background: var(--blog-player-focus-soft);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
   font-size: 2rem;
   transition:
@@ -1260,8 +1276,8 @@ html.dark .blog-weather-details > div {
 }
 
 .blog-weather-card.has-error .blog-weather-main-icon {
-  color: var(--blog-player-accent-strong);
-  background: var(--blog-player-accent-soft);
+  color: var(--blog-player-focus-strong);
+  background: var(--blog-player-focus-soft);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -1480,16 +1496,16 @@ html[data-blog-page="moments"] .main-content {
 .moment-card {
   position: relative;
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr);
+  grid-template-columns: 44px minmax(0, 1fr);
   box-sizing: border-box;
   width: 100%;
   margin-bottom: 0;
-  padding: 22px 24px;
+  padding: 18px 20px;
   border: 1px solid var(--blog-index-border);
   border-radius: var(--blog-index-radius-card);
   background-color: var(--blog-index-surface);
   box-shadow: var(--blog-index-shadow);
-  gap: 14px;
+  gap: 6px 14px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   transition:
@@ -1519,8 +1535,8 @@ html[data-blog-page="moments"] .main-content {
   align-self: start;
   aspect-ratio: 1;
   flex: none;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   overflow: hidden;
   border: 1px solid var(--blog-index-primary-border);
   border-radius: 50%;
@@ -1546,44 +1562,30 @@ html[data-blog-page="moments"] .main-content {
 }
 
 .moment-header {
-  display: grid;
+  display: flex;
   grid-column: 2;
-  grid-template-columns: 1fr auto;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   margin-bottom: 0;
-  column-gap: 12px;
+  padding-top: 1px;
+  gap: 2px;
 }
 
 .moment-author {
   min-width: 0;
   color: var(--second-text-color);
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.3;
   transition: color var(--blog-index-motion);
-}
-
-.moment-type {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--third-text-color);
-  font-family: var(--blog-sans);
-  font-size: 0.7rem;
-  transition: color var(--blog-index-motion);
-}
-
-.moment-type i {
-  font-size: 0.72rem;
 }
 
 .moment-meta {
   display: flex;
-  grid-column: 1 / -1;
   flex-wrap: wrap;
   align-items: center;
-  margin-top: 3px;
-  gap: 6px 12px;
+  margin-top: 0;
+  gap: 4px 10px;
 }
 
 .moment-date {
@@ -1608,10 +1610,10 @@ html[data-blog-page="moments"] .main-content {
 
 .moment-body {
   grid-column: 1 / -1;
-  margin-top: 12px;
+  margin-top: 6px;
   color: var(--default-text-color);
   font-size: 1rem;
-  line-height: 1.85;
+  line-height: 1.8;
 }
 
 .moment-body > :first-child {
@@ -1757,26 +1759,28 @@ html[data-blog-page="moments"] .main-content {
 }
 
 .moment-music-card {
-  width: min(100%, 520px);
-  padding: 10px;
-  justify-self: start;
+  width: 100%;
+  padding: 12px;
+  background: var(--second-background-color);
+  border-color: transparent;
+  justify-self: stretch;
 }
 
 .moment-music-main {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) auto;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .moment-music-cover {
   position: relative;
   display: block;
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   overflow: hidden;
-  border-radius: 11px;
-  background: var(--second-background-color);
+  border-radius: 10px;
+  background: var(--third-background-color);
   line-height: 0;
 }
 
@@ -1809,28 +1813,37 @@ html[data-blog-page="moments"] .main-content {
   top: 50%;
   left: 50%;
   display: inline-flex;
-  width: 36px;
-  height: 36px;
+  width: 30px;
+  height: 30px;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 50%;
   outline: none;
   color: #fff;
-  background: rgba(29, 37, 46, 0.72);
-  box-shadow: 0 4px 12px rgba(18, 24, 31, 0.2);
+  background: rgba(20, 26, 34, 0.55);
+  box-shadow: 0 3px 10px rgba(18, 24, 31, 0.18);
   cursor: pointer;
+  opacity: 0;
   transform: translate(-50%, -50%);
   transition:
+    opacity var(--blog-index-motion),
     background-color var(--blog-index-motion),
     box-shadow var(--blog-index-motion),
     transform var(--blog-index-motion);
 }
 
+.moment-music-cover:hover .moment-music-toggle,
+.moment-music-toggle:focus-visible,
+.moment-music-card.is-playing .moment-music-toggle,
+.moment-music-card.is-error .moment-music-toggle {
+  opacity: 1;
+}
+
 .moment-music-toggle i {
   margin-left: 2px;
-  font-size: 0.72rem;
+  font-size: 0.66rem;
 }
 
 .moment-music-toggle[aria-pressed="true"] i {
@@ -1840,7 +1853,7 @@ html[data-blog-page="moments"] .main-content {
 .moment-music-toggle:focus-visible {
   box-shadow:
     0 0 0 4px var(--blog-index-interactive-soft),
-    0 4px 12px rgba(18, 24, 31, 0.24);
+    0 3px 10px rgba(18, 24, 31, 0.24);
 }
 
 .moment-music-card.is-playing .moment-music-toggle {
@@ -1849,6 +1862,19 @@ html[data-blog-page="moments"] .main-content {
 
 .moment-music-card.is-error .moment-music-toggle {
   background: var(--third-text-color);
+}
+
+.moment-music-card .moment-attachment-copy strong {
+  color: var(--second-text-color);
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+}
+
+.moment-music-card .moment-attachment-copy > span {
+  margin-top: 4px;
+  color: var(--third-text-color);
+  font-size: 0.78rem;
 }
 
 .moment-music-open {
@@ -1863,29 +1889,6 @@ html[data-blog-page="moments"] .main-content {
 
 .moment-audio {
   display: none;
-}
-
-.moment-tags {
-  display: flex;
-  grid-column: 1 / -1;
-  flex-wrap: wrap;
-  margin-top: 14px;
-  gap: 7px;
-}
-
-.moment-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 8px;
-  border-radius: var(--blog-index-radius-pill);
-  color: var(--third-text-color);
-  background: var(--blog-index-primary-soft);
-  font-size: 0.7rem;
-  font-weight: 600;
-  transition:
-    background-color var(--blog-index-motion),
-    color var(--blog-index-motion),
-    transform var(--blog-index-motion);
 }
 
 .moments-empty {
@@ -1920,17 +1923,10 @@ html[data-blog-page="moments"] .main-content {
   }
 
   .moment-card:hover .moment-author,
-  .moment-card:hover .moment-type,
   .moment-card:hover .moment-body a,
   .moment-card:hover .moment-attachment-open,
   .moment-card:hover .moment-music-open {
     color: var(--blog-index-interactive);
-  }
-
-  .moment-card:hover .moment-tag {
-    color: var(--blog-index-interactive);
-    background: var(--blog-index-interactive-soft);
-    transform: translateY(-1px);
   }
 
   .moment-photo:hover img {
@@ -2085,20 +2081,20 @@ html[data-blog-page="moments"] .main-content {
   }
 
   .moment-card {
-    grid-template-columns: 42px minmax(0, 1fr);
-    padding: 18px 16px;
+    grid-template-columns: 40px minmax(0, 1fr);
+    padding: 16px 15px;
     border-radius: 18px;
-    gap: 12px;
+    gap: 5px 12px;
   }
 
   .moment-avatar {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
   }
 
   .moment-body {
     font-size: 0.96rem;
-    line-height: 1.78;
+    line-height: 1.76;
   }
 
   .moment-share-card,
@@ -2114,8 +2110,8 @@ html[data-blog-page="moments"] .main-content {
   }
 
   .moment-music-cover {
-    width: 52px;
-    height: 52px;
+    width: 50px;
+    height: 50px;
   }
 }
 
@@ -2157,8 +2153,8 @@ html[data-blog-page="moments"] .main-content {
 
   .moment-card {
     grid-template-columns: 38px minmax(0, 1fr);
-    padding: 16px 13px;
-    gap: 10px;
+    padding: 15px 14px;
+    gap: 5px 10px;
   }
 
   .moment-avatar {
@@ -2167,11 +2163,7 @@ html[data-blog-page="moments"] .main-content {
   }
 
   .moment-header {
-    column-gap: 8px;
-  }
-
-  .moment-type {
-    font-size: 0.64rem;
+    gap: 2px;
   }
 
   .moment-gallery {
@@ -2242,8 +2234,6 @@ html[data-blog-page="moments"] .main-content {
   .moments-search i,
   .moment-card,
   .moment-author,
-  .moment-type,
-  .moment-tag,
   .moment-photo img,
   .moment-share-card,
   .moment-music-card,
