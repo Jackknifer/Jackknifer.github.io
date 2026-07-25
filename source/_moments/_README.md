@@ -10,13 +10,13 @@ npm run new:moment -- "动态的简短名称"
 
 ## 发布照片
 
-先把图片放到 `source/images/moments/`，再在动态文件中加入：
+每条动态的图片单独放在以该动态文件名（不含扩展名）命名的子目录里，例如动态 `2025-07-26-baojia-street-43.md` 的图片放在 `source/images/moments/2025-07-26-baojia-street-43/`。再在动态文件中加入：
 
 ```yaml
 images:
-  - src: /images/moments/第一张.jpg
+  - src: /images/moments/2025-07-26-baojia-street-43/第一张.jpg
     alt: 第一张照片的说明
-  - src: /images/moments/第二张.jpg
+  - src: /images/moments/2025-07-26-baojia-street-43/第二张.jpg
     alt: 第二张照片的说明
 ```
 
