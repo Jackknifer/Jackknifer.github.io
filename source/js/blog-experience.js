@@ -413,7 +413,7 @@
     element.className = `fa-solid ${iconName}${extraClass ? ` ${extraClass}` : ""}`;
   }
 
-  async function fetchJson(url, timeout = 12000) {
+  async function fetchJson(url, timeout = 6000) {
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), timeout);
     try {
