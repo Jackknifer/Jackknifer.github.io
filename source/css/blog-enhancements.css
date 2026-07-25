@@ -1501,7 +1501,7 @@ html[data-blog-page="moments"] .main-content {
 .moment-card {
   position: relative;
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr);
+  grid-template-columns: 40px minmax(0, 1fr);
   box-sizing: border-box;
   width: 100%;
   margin-bottom: 0;
@@ -1543,8 +1543,8 @@ html[data-blog-page="moments"] .main-content {
   align-self: start;
   aspect-ratio: 1;
   flex: none;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   overflow: visible;
   border-radius: 50%;
   line-height: 0;
@@ -1552,8 +1552,9 @@ html[data-blog-page="moments"] .main-content {
 
 .moment-avatar img {
   display: block;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
+  margin: 0 !important;
   border: 1px solid var(--blog-index-primary-border);
   border-radius: 50%;
   background: var(--third-background-color);
@@ -1567,24 +1568,11 @@ html[data-blog-page="moments"] .main-content {
   position: absolute;
   right: 1px;
   bottom: 1px;
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border: 2px solid var(--blog-index-surface);
   border-radius: 50%;
   background: var(--blog-index-primary);
-}
-
-.moment-avatar img {
-  display: block;
-  width: 48px;
-  height: 48px;
-  margin: 0 !important;
-  border: 1px solid var(--blog-index-primary-border);
-  border-radius: 50%;
-  background: var(--third-background-color);
-  box-shadow: 0 4px 12px rgba(42, 46, 54, 0.1);
-  object-fit: cover;
-  object-position: 50% 50%;
 }
 
 .moment-content {
@@ -1798,16 +1786,17 @@ html[data-blog-page="moments"] .main-content {
 }
 
 .moment-music-card {
-  width: 100%;
+  width: fit-content;
+  max-width: 100%;
   padding: 14px 16px;
   background: var(--second-background-color);
   border-color: transparent;
-  justify-self: stretch;
+  justify-self: start;
 }
 
 .moment-music-main {
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) auto;
+  grid-template-columns: 56px minmax(140px, 260px) auto;
   align-items: center;
   gap: 14px;
 }
@@ -1891,8 +1880,8 @@ html[data-blog-page="moments"] .main-content {
 
 .moment-music-card .moment-attachment-copy strong {
   color: var(--second-text-color);
-  font-size: 0.98rem;
-  font-weight: 600;
+  font-size: 1.02rem;
+  font-weight: 700;
   letter-spacing: 0.005em;
 }
 
@@ -2106,15 +2095,20 @@ html[data-blog-page="moments"] .main-content {
   }
 
   .moment-card {
-    grid-template-columns: 40px minmax(0, 1fr);
+    grid-template-columns: 36px minmax(0, 1fr);
     padding: 16px 15px;
     border-radius: 18px;
     gap: 5px 12px;
   }
 
   .moment-avatar {
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
+  }
+
+  .moment-avatar img {
+    width: 34px;
+    height: 34px;
   }
 
   .moment-body {
@@ -2178,14 +2172,19 @@ html[data-blog-page="moments"] .main-content {
   }
 
   .moment-card {
-    grid-template-columns: 38px minmax(0, 1fr);
+    grid-template-columns: 34px minmax(0, 1fr);
     padding: 15px 14px;
     gap: 5px 10px;
   }
 
   .moment-avatar {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .moment-avatar img {
+    width: 32px;
+    height: 32px;
   }
 
   .moment-header {
