@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git commit -m 'style: symmetric home rails, refined players, moments title' -m '- Match right widget rail to left sidebar \\(widths, 38px gutter, 22px gap, synced heights\\) *)",
+      "Bash(git push *)",
+      "Bash(curl -s -H \"User-Agent: Mozilla/5.0 \\(compatible; JackkniferBlog/1.0; +https://jackknifer.github.io/\\)\" \"https://music.163.com/api/song/detail/?id=863344341&ids=%5B863344341%5D\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const p=JSON.parse\\(d\\);const s=p.songs&&p.songs[0];console.log\\(JSON.stringify\\({id:s&&s.id,name:s&&s.name,artists:s&&s.artists&&s.artists.map\\(a=>a.name\\),cover:s&&s.album&&s.album.picUrl},null,2\\)\\);}\\)\")"
+    ]
+  }
+}
