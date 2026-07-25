@@ -316,11 +316,6 @@ function dateParts(value) {
   };
 }
 
-function monthLabel(month) {
-  const [year, number] = month.split("-");
-  return `${year.slice(-2)}年${Number(number)}月`;
-}
-
 function renderGallery(images) {
   if (!images.length) return "";
   return `
@@ -459,15 +454,6 @@ async function renderMomentsPage() {
         right.fileName.localeCompare(left.fileName, "zh-CN"),
     );
 
-  const months = [...new Set(moments.map((moment) => moment.month))];
-  const filters = [
-    '<button class="moments-filter is-active" type="button" data-moments-filter="all" aria-pressed="true">全部</button>',
-    ...months.map(
-      (month) =>
-        `<button class="moments-filter" type="button" data-moments-filter="${escapeHtml(month)}" aria-pressed="false">${escapeHtml(monthLabel(month))}</button>`,
-    ),
-  ].join("");
-
   const renderMomentCard = (moment) => {
     const location = moment.location
       ? `<span class="moment-location"><i class="fa-regular fa-location-dot" aria-hidden="true"></i>${escapeHtml(moment.location)}</span>`
@@ -525,7 +511,6 @@ async function renderMomentsPage() {
           <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
           <input type="search" data-moments-search aria-label="搜索动态" placeholder="搜索动态内容…" autocomplete="off">
         </label>
-        <div class="moments-filters" aria-label="按月份筛选">${filters}</div>
       </div>
       <p class="moments-summary">当前显示 <span data-moments-count>${moments.length}</span> 条动态</p>
       <div class="moments-feed">${dayGroups}</div>
