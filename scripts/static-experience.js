@@ -192,8 +192,35 @@ function normalizeCategoryCards(html) {
   );
 }
 
+function normalizeArticleIndexes(html) {
+  let output = html
+    .replace('class="tag-post-list"', 'class="tag-post-list blog-index-list"')
+    .replace(
+      'class="category-post-list"',
+      'class="category-post-list blog-index-list"',
+    )
+    .replace(
+      'class="archive-container ',
+      'class="archive-container blog-index-list ',
+    );
+
+  if (
+    output.includes('class="archive-container blog-index-list ') &&
+    !output.includes('class="archive-page-title"')
+  ) {
+    output = output.replace(
+      /(<div class="archive-container blog-index-list [^"]*">)/,
+      '$1\n<h1 class="page-title-header archive-page-title">归档</h1>',
+    );
+  }
+
+  return output;
+}
+
 hexo.extend.filter.register("after_render:html", (html) => {
-  let output = normalizeCategoryCards(replaceNavigationIcons(html));
+  let output = normalizeArticleIndexes(
+    normalizeCategoryCards(replaceNavigationIcons(html)),
+  );
 
   if (output.includes(HOME_MARKER)) {
     if (!output.includes('class="blog-sidebar-socials"')) {

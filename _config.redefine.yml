@@ -601,7 +601,10 @@ inject:
       <style>
         /* Typography polish: keep template pages readable instead of display-sized. */
         .page-title-header,
-        .page-template-content.markdown-body > h1:first-child {
+        .page-template-content.markdown-body > h1:first-child,
+        .page-template-container > .tag-name,
+        .page-template-container > .category-name,
+        .archive-page-title {
           font-size: 2.25rem;
           line-height: 1.18;
           margin-bottom: 1.65rem;
@@ -912,7 +915,10 @@ inject:
 
         @media (max-width: 640px) {
           .page-title-header,
-          .page-template-content.markdown-body > h1:first-child {
+          .page-template-content.markdown-body > h1:first-child,
+          .page-template-container > .tag-name,
+          .page-template-container > .category-name,
+          .archive-page-title {
             font-size: 1.9rem;
             line-height: 1.22;
             margin-bottom: 1.2rem;
