@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "hexo generate",
+    "build": "npm run build:client && hexo generate",
+    "build:client": "node tools/build-browser-js.mjs",
+    "check:mobile": "node tools/check-mobile-resilience.mjs",
     "clean": "hexo clean",
     "new": "hexo new post",
     "new:post": "hexo new post",
@@ -16,6 +18,8 @@
     "notify:indexnow": "node tools/submit-indexnow.mjs",
     "server": "hexo server",
     "server:drafts": "hexo server --draft",
+    "preserver": "npm run build:client",
+    "preserver:drafts": "npm run build:client",
     "doctor": "hexo doctor"
   },
   "hexo": {
@@ -35,5 +39,8 @@
     "hexo-server": "^3.0.0",
     "hexo-theme-redefine": "^2.9.0",
     "hexo-wordcount": "^6.0.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.6"
   }
 }

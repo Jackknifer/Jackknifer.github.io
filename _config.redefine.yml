@@ -516,42 +516,47 @@ inject:
       </style>
     - |
       <script>
-        (() => {
-          const fallbackImage =
+        (function () {
+          var fallbackImage =
             "data:image/svg+xml;charset=UTF-8," +
             encodeURIComponent(
-              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540"><rect width="960" height="540" fill="#ece8e3"/><text x="480" y="280" text-anchor="middle" fill="#6f7479" font-family="sans-serif" font-size="30">图片暂时无法加载</text></svg>',
+              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540"><rect width="960" height="540" fill="#ece8e3"/><text x="480" y="280" text-anchor="middle" fill="#6f7479" font-family="sans-serif" font-size="30">图片暂时无法加载</text></svg>'
             );
 
           window.scrollToMain =
             window.scrollToMain ||
-            (() => {
-              const target = document.querySelector(
-                ".main-content-container, .home-content-container, main",
+            function () {
+              var target = document.querySelector(
+                ".main-content-container, .home-content-container, main"
               );
-              target?.scrollIntoView({ behavior: "smooth", block: "start" });
-            });
+              if (!target) return;
+              try {
+                target.scrollIntoView({ behavior: "smooth", block: "start" });
+              } catch (_error) {
+                target.scrollIntoView();
+              }
+            };
 
           document.addEventListener(
             "error",
-            (event) => {
-              const image = event.target;
+            function (event) {
+              var image = event.target;
               if (!(image instanceof HTMLImageElement)) return;
-              if (image.dataset.blogFallback === "true") return;
+              if (image.getAttribute("data-blog-fallback") === "true") return;
 
-              if (image.dataset.blogRetried !== "true") {
-                image.dataset.blogRetried = "true";
-                const failedUrl = image.currentSrc || image.src;
+              if (image.getAttribute("data-blog-retried") !== "true") {
+                image.setAttribute("data-blog-retried", "true");
+                var failedUrl = image.currentSrc || image.src;
                 image.removeAttribute("srcset");
-                window.setTimeout(() => {
-                  const retryUrl = new URL(failedUrl, window.location.href);
-                  retryUrl.searchParams.set("_retry", Date.now().toString());
-                  image.src = retryUrl.href;
+                window.setTimeout(function () {
+                  var separator = failedUrl.indexOf("?") === -1 ? "?" : "&";
+                  image.src =
+                    failedUrl + separator + "_retry=" + String(Date.now());
                 }, 650);
                 return;
               }
 
-              image.dataset.blogFallback = "true";
+              image.setAttribute("data-blog-fallback", "true");
               image.classList.add("blog-image-failed");
               if (image.alt === "home-banner-background") {
                 image.hidden = true;
@@ -560,20 +565,31 @@ inject:
                 image.src = fallbackImage;
               }
             },
-            true,
+            true
           );
 
-          document.addEventListener("click", (event) => {
-            const button = event.target.closest(".toggle-tools-list");
+          document.addEventListener("click", function (event) {
+            var element = event.target;
+            var button = null;
+            while (element && element !== document) {
+              if (
+                element.classList &&
+                element.classList.contains("toggle-tools-list")
+              ) {
+                button = element;
+                break;
+              }
+              element = element.parentNode;
+            }
             if (!button) return;
-            const list = document.querySelector(".hidden-tools-list");
+            var list = document.querySelector(".hidden-tools-list");
             if (!list) return;
-            const wasOpen = list.classList.contains("show");
-            queueMicrotask(() => {
+            var wasOpen = list.classList.contains("show");
+            window.setTimeout(function () {
               if (list.classList.contains("show") === wasOpen) {
                 list.classList.toggle("show");
               }
-            });
+            }, 0);
           }, true);
         })();
       </script>

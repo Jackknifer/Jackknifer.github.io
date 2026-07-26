@@ -5,6 +5,7 @@ const path = require("node:path");
 
 const IMAGE_TAG = /<img\b[^>]*\bsrc=(["'])(\/images\/[^"']+)\1[^>]*>/gi;
 const HOME_MARKER = 'class="home-content-container';
+const POST_MARKER = 'class="post-page-container';
 const RESPONSIVE_WIDTH = 960;
 
 function imageWidth(filePath) {
@@ -75,6 +76,11 @@ function enhanceImage(tag, url) {
   let output = addAttribute(tag, "decoding", "async");
   output = addAttribute(output, "loading", isCritical ? "eager" : "lazy");
   if (isCritical) output = addAttribute(output, "fetchpriority", "high");
+  if (url === "/images/avatar.jpg") {
+    output = addAttribute(output, "alt", "Jackknifer");
+    output = addAttribute(output, "width", "128");
+    output = addAttribute(output, "height", "128");
+  }
 
   if (!fs.existsSync(originalPath) || !fs.existsSync(responsivePath)) {
     return output;
@@ -110,6 +116,23 @@ hexo.extend.filter.register("after_render:html", (html) => {
     !/<html\b[^>]*data-blog-page=/.test(output)
   ) {
     output = output.replace("<html", '<html data-blog-page="home"');
+
+    // The profile is part of the first meaningful mobile screen. Embedding this
+    // small local image removes an extra github.io request, so a transient
+    // asset failure cannot leave the author card blank.
+    const avatarPath = path.join(hexo.source_dir, "images", "avatar.jpg");
+    if (fs.existsSync(avatarPath)) {
+      const avatarData = fs.readFileSync(avatarPath).toString("base64");
+      output = output.replace(
+        /src=(["'])\/images\/avatar\.jpg\1/g,
+        `src="data:image/jpeg;base64,${avatarData}"`,
+      );
+    }
+  } else if (
+    output.includes(POST_MARKER) &&
+    !/<html\b[^>]*data-blog-page=/.test(output)
+  ) {
+    output = output.replace("<html", '<html data-blog-page="post"');
   }
 
   return output;

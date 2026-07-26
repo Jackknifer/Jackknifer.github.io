@@ -18,21 +18,26 @@ const COUNTER_SCRIPT =
   /<script[^>]*\ssrc="https:\/\/cn\.vercount\.one\/js"[^>]*><\/script>/g;
 
 const COUNTER_LOADER = `<script data-swup-reload-script>
-  (() => {
-    const loadCounter = () => {
-      document.querySelectorAll("script[data-blog-counter]").forEach((script) => script.remove());
-      const script = document.createElement("script");
+  (function () {
+    function loadCounter() {
+      var existing = document.querySelectorAll("script[data-blog-counter]");
+      for (var index = 0; index < existing.length; index += 1) {
+        if (existing[index].parentNode) {
+          existing[index].parentNode.removeChild(existing[index]);
+        }
+      }
+      var script = document.createElement("script");
       script.src = "https://cn.vercount.one/js";
       script.async = true;
-      script.dataset.blogCounter = "true";
+      script.setAttribute("data-blog-counter", "true");
       document.head.appendChild(script);
-    };
+    }
 
     if (document.readyState === "complete") {
       window.setTimeout(loadCounter, 400);
     } else {
-      window.addEventListener("load", () => window.setTimeout(loadCounter, 400), {
-        once: true,
+      window.addEventListener("load", function () {
+        window.setTimeout(loadCounter, 400);
       });
     }
   })();

@@ -1,0 +1,91 @@
+import fs from "node:fs";
+import path from "node:path";
+
+const homePath = "public/index.html";
+const postPath = "public/2026/06/14/welcome/index.html";
+const bundlePath = "public/js/blog-experience.js";
+
+for (const filePath of [homePath, postPath, bundlePath]) {
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`missing generated file: ${filePath}`);
+  }
+}
+
+const home = fs.readFileSync(homePath, "utf8");
+const post = fs.readFileSync(postPath, "utf8");
+const bundle = fs.readFileSync(bundlePath, "utf8");
+const noScriptHome = home
+  .replace(/<script\b[\s\S]*?<\/script>/gi, "")
+  .replace(/<link[^>]+fontawesome[^>]*>/gi, "");
+const noScriptPost = post.replace(/<script\b[\s\S]*?<\/script>/gi, "");
+
+const checks = {
+  "home page identity is static": /data-blog-page="home"/.test(home),
+  "post page identity is static": /data-blog-page="post"/.test(post),
+  "profile avatar is embedded": /data:image\/jpeg;base64/.test(noScriptHome),
+  "social links are static SVG":
+    /blog-sidebar-socials[\s\S]*?<svg/.test(noScriptHome),
+  "navigation icons do not need font files":
+    (noScriptHome.match(/blog-inline-icon (?:fa-sm fa-fw|fa-fw|icon-space)/g) ||
+      []).length >= 21,
+  "home player has native fallback":
+    /data-player-surface="home"[\s\S]*?blog-player-native-fallback/.test(
+      noScriptHome,
+    ),
+  "weather card has static status":
+    /data-weather-widget[\s\S]*?若长时间没有更新/.test(noScriptHome),
+  "post player has native fallback":
+    /blog-post-player-section[\s\S]*?blog-player-native-fallback/.test(
+      noScriptPost,
+    ),
+  "image retry and fallback are inline":
+    home.includes("data-blog-retried") && home.includes("图片暂时无法加载"),
+  "browser bundle excludes unsupported APIs":
+    !/replaceAll|matchAll|Promise\.allSettled|queueMicrotask|\?\./.test(bundle),
+  "counter is not parser blocking":
+    !/<script[^>]+src="https:\/\/cn\.vercount\.one\/js/.test(home),
+};
+
+const missingAssets = [];
+const htmlFiles = [];
+
+function collectHtml(directory) {
+  for (const name of fs.readdirSync(directory)) {
+    const filePath = path.join(directory, name);
+    const stat = fs.statSync(filePath);
+    if (stat.isDirectory()) collectHtml(filePath);
+    else if (name.endsWith(".html")) htmlFiles.push(filePath);
+  }
+}
+
+collectHtml("public");
+
+for (const filePath of htmlFiles) {
+  const html = fs.readFileSync(filePath, "utf8");
+  const referencePattern =
+    /(?:src|href)=["'](\/[^"'#?]+)(?:[?#][^"']*)?["']/g;
+  let match;
+  while ((match = referencePattern.exec(html))) {
+    const assetPath = path.join(
+      "public",
+      decodeURIComponent(match[1]).replace(/^\//, ""),
+    );
+    if (!fs.existsSync(assetPath)) {
+      missingAssets.push(`${filePath}: ${match[1]}`);
+    }
+  }
+}
+
+checks["all local asset references exist"] = missingAssets.length === 0;
+
+for (const [name, passed] of Object.entries(checks)) {
+  console.log(`${passed ? "PASS" : "FAIL"} ${name}`);
+}
+
+if (missingAssets.length) {
+  console.error(missingAssets.slice(0, 20).join("\n"));
+}
+
+if (Object.values(checks).some((passed) => !passed)) {
+  process.exitCode = 1;
+}
