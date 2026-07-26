@@ -183,8 +183,17 @@ function replaceNavigationIcons(html) {
   );
 }
 
+function normalizeCategoryCards(html) {
+  if (!html.includes('class="category-list-content"')) return html;
+
+  return html.replace(
+    /(<a class="all-category-list-link" href="[^"]+">)([\s\S]*?)(<\/a>)(<span class="all-category-list-count">[\s\S]*?<\/span>)/g,
+    '$1<span class="all-category-list-label">$2</span>$4$3',
+  );
+}
+
 hexo.extend.filter.register("after_render:html", (html) => {
-  let output = replaceNavigationIcons(html);
+  let output = normalizeCategoryCards(replaceNavigationIcons(html));
 
   if (output.includes(HOME_MARKER)) {
     if (!output.includes('class="blog-sidebar-socials"')) {

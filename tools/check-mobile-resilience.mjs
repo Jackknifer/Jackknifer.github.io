@@ -3,9 +3,10 @@ import path from "node:path";
 
 const homePath = "public/index.html";
 const postPath = "public/2026/06/14/welcome/index.html";
+const categoriesPath = "public/categories/index.html";
 const bundlePath = "public/js/blog-experience.js";
 
-for (const filePath of [homePath, postPath, bundlePath]) {
+for (const filePath of [homePath, postPath, categoriesPath, bundlePath]) {
   if (!fs.existsSync(filePath)) {
     throw new Error(`missing generated file: ${filePath}`);
   }
@@ -13,11 +14,16 @@ for (const filePath of [homePath, postPath, bundlePath]) {
 
 const home = fs.readFileSync(homePath, "utf8");
 const post = fs.readFileSync(postPath, "utf8");
+const categories = fs.readFileSync(categoriesPath, "utf8");
 const bundle = fs.readFileSync(bundlePath, "utf8");
 const noScriptHome = home
   .replace(/<script\b[\s\S]*?<\/script>/gi, "")
   .replace(/<link[^>]+fontawesome[^>]*>/gi, "");
 const noScriptPost = post.replace(/<script\b[\s\S]*?<\/script>/gi, "");
+const categoryCardLinks =
+  categories.match(
+    /<a class="all-category-list-link" href="[^"]+"><span class="all-category-list-label">[\s\S]*?<\/span><span class="all-category-list-count">[\s\S]*?<\/span><\/a>/g,
+  ) || [];
 
 const checks = {
   "home page identity is static": /data-blog-page="home"/.test(home),
@@ -38,6 +44,7 @@ const checks = {
     /blog-post-player-section[\s\S]*?blog-player-native-fallback/.test(
       noScriptPost,
     ),
+  "category cards are complete native links": categoryCardLinks.length >= 3,
   "image retry and fallback are inline":
     home.includes("data-blog-retried") && home.includes("图片暂时无法加载"),
   "browser bundle excludes unsupported APIs":

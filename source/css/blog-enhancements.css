@@ -511,6 +511,7 @@ html
   .category-list-content
   .all-category-list
   > .all-category-list-item {
+  padding: 0 !important;
   border: 1px solid var(--taxonomy-border);
   border-radius: var(--blog-index-radius-card);
   outline: none;
@@ -528,9 +529,18 @@ html
   .all-category-list
   > .all-category-list-item
   > a.all-category-list-link {
-  border-color: var(--taxonomy-border);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 58px;
+  padding: 1rem 1.1rem;
+  border-bottom: 0;
   color: var(--taxonomy-accent);
   outline: none;
+  gap: 0.75rem;
+  text-decoration: none;
   transition:
     color var(--blog-index-motion),
     transform var(--blog-index-motion);
@@ -540,7 +550,10 @@ html
   .category-list-content
   .all-category-list
   > .all-category-list-item
+  > a.all-category-list-link
   > span.all-category-list-count {
+  flex: 0 0 auto;
+  margin-left: auto;
   color: var(--taxonomy-accent);
   background: var(--taxonomy-soft);
   transition:
