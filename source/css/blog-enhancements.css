@@ -1743,10 +1743,10 @@ html[data-blog-page="moments"] .main-content {
 
 .moment-body {
   grid-column: 1 / -1;
-  margin-top: 4px;
+  margin-top: 3px;
   color: var(--default-text-color);
   font-size: 1rem;
-  line-height: 1.8;
+  line-height: 1.72;
 }
 
 .moment-body > :first-child {
@@ -1778,8 +1778,9 @@ html[data-blog-page="moments"] .main-content {
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-top: 5px;
-  gap: 6px;
+  width: min(100%, 460px);
+  margin-top: 4px;
+  gap: 4px;
 }
 
 .moment-gallery[data-image-count="1"] {
@@ -1801,12 +1802,12 @@ html[data-blog-page="moments"] .main-content {
   padding: 0;
   border-radius: 12px;
   background: var(--third-background-color);
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1;
 }
 
 .moment-gallery[data-image-count="1"] .moment-photo {
   justify-content: flex-start;
-  width: min(100%, 620px);
+  width: 100%;
   max-height: none;
   background: transparent;
   aspect-ratio: auto;
@@ -1824,7 +1825,7 @@ html[data-blog-page="moments"] .main-content {
   width: auto;
   height: auto;
   max-width: 100%;
-  max-height: min(70vh, 680px);
+  max-height: min(62vh, 420px);
 }
 
 .moment-share-card,
@@ -2238,7 +2239,15 @@ html[data-blog-page="moments"] .main-content {
 
   .moment-body {
     font-size: 0.96rem;
-    line-height: 1.76;
+    line-height: 1.68;
+  }
+
+  .moment-gallery {
+    width: min(100%, 360px);
+  }
+
+  .moment-gallery[data-image-count="1"] .moment-photo img {
+    max-height: 380px;
   }
 
   .moment-share-card,
@@ -2317,7 +2326,12 @@ html[data-blog-page="moments"] .main-content {
   }
 
   .moment-gallery {
+    width: min(100%, 250px);
     gap: 4px;
+  }
+
+  .moment-gallery[data-image-count="1"] .moment-photo img {
+    max-height: 330px;
   }
 
   .moment-share-card,
