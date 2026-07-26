@@ -7,10 +7,26 @@ const HOME_MARKER = '<div class="home-content-container';
 const POST_MARKER = '<div class="post-page-container';
 
 const ICONS = {
+  arrowDown: '<path d="M12 4v16"></path><path d="m6 14 6 6 6-6"></path>',
+  arrowUp: '<path d="M12 20V4"></path><path d="m6 10 6-6 6 6"></path>',
   back:
     '<path d="M19 20 9 12l10-8v16Z"></path><path d="M5 19V5"></path>',
+  calendar:
+    '<rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path>',
+  chevronRight: '<path d="m9 5 7 7-7 7"></path>',
+  close: '<path d="m6 6 12 12M18 6 6 18"></path>',
   forward:
     '<path d="m5 4 10 8-10 8V4Z"></path><path d="M19 5v14"></path>',
+  gear:
+    '<circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.1A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3V9.6h.1A1.7 1.7 0 0 0 4.6 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.5 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.18.38.46.72.8 1 .3.25.68.39 1.1.4h.1v4h-.1A1.7 1.7 0 0 0 19.4 15Z"></path>',
+  heart:
+    '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"></path>',
+  keyboard:
+    '<rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M10 13h.01M14 13h.01M18 13h.01M8 16h8"></path>',
+  magnifyMinus:
+    '<circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m20 20-4.9-4.9M7.5 10.5h6"></path>',
+  magnifyPlus:
+    '<circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m20 20-4.9-4.9M7.5 10.5h6M10.5 7.5v6"></path>',
   play: '<path d="m8 5 11 7-11 7V5Z"></path>',
   repeat:
     '<path d="m17 1 4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="m7 23-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path>',
@@ -20,6 +36,10 @@ const ICONS = {
     '<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle>',
   refresh:
     '<path d="M20 7v5h-5"></path><path d="M4 17v-5h5"></path><path d="M6.1 8A7 7 0 0 1 19 12"></path><path d="M17.9 16A7 7 0 0 1 5 12"></path>',
+  search:
+    '<circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path>',
+  spinner:
+    '<circle cx="12" cy="12" r="9" opacity=".24"></circle><path d="M21 12a9 9 0 0 0-9-9"></path>',
 };
 
 const NAV_ICONS = {
@@ -183,6 +203,87 @@ function replaceNavigationIcons(html) {
   );
 }
 
+function replaceSearchIcons(html) {
+  return html.replace(
+    /<i class="fa-solid fa-magnifying-glass"><\/i>/g,
+    svgIcon(ICONS.search, "blog-inline-icon blog-search-icon"),
+  );
+}
+
+function replaceStaticUiIcons(html) {
+  const replacements = [
+    [
+      '<i class="fa-solid fa-arrow-down fa-fw fa-lg group-hover:translate-y-1 transition-transform"></i>',
+      svgIcon(ICONS.arrowDown, "blog-inline-icon blog-banner-arrow-icon"),
+    ],
+    [
+      '<i class="fa-solid fa-calendars"></i>',
+      svgIcon(ICONS.calendar, "blog-inline-icon blog-home-meta-icon"),
+    ],
+    [
+      '<i class="fa-solid fa-folders"></i>',
+      svgIcon(
+        NAV_ICONS["fa-folder"],
+        "blog-inline-icon blog-home-meta-icon",
+      ),
+    ],
+    [
+      '<i class="fa-solid fa-tags"></i>',
+      svgIcon(NAV_ICONS["fa-tags"], "blog-inline-icon blog-home-meta-icon"),
+    ],
+    [
+      '<i class="fa-solid fa-angle-right"></i>',
+      svgIcon(ICONS.chevronRight, "blog-inline-icon blog-read-more-icon"),
+    ],
+    [
+      '<i class="fa-regular fa-angle-right"></i>',
+      svgIcon(ICONS.chevronRight, "blog-inline-icon blog-pagination-icon"),
+    ],
+    [
+      '<i class="fa-regular fa-magnifying-glass-plus"></i>',
+      svgIcon(ICONS.magnifyPlus, "blog-inline-icon blog-side-tool-icon"),
+    ],
+    [
+      '<i class="fa-regular fa-magnifying-glass-minus"></i>',
+      svgIcon(ICONS.magnifyMinus, "blog-inline-icon blog-side-tool-icon"),
+    ],
+    [
+      '<i class="fa-regular fa-arrow-down"></i>',
+      svgIcon(ICONS.arrowDown, "blog-inline-icon blog-side-tool-icon"),
+    ],
+    [
+      '<i class="fa-regular fa-cog fa-spin"></i>',
+      svgIcon(ICONS.gear, "blog-inline-icon blog-side-tool-icon"),
+    ],
+    [
+      '<i class="arrow-up fas fa-arrow-up"></i>',
+      svgIcon(ICONS.arrowUp, "blog-inline-icon blog-side-tool-icon"),
+    ],
+    [
+      '<i class="fa-solid fa-keyboard"></i>',
+      svgIcon(ICONS.keyboard, "blog-inline-icon blog-search-field-icon"),
+    ],
+    [
+      '<i class="fa-solid fa-times"></i>',
+      svgIcon(ICONS.close, "blog-inline-icon blog-search-close-icon"),
+    ],
+    [
+      '<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>',
+      svgIcon(ICONS.spinner, "blog-inline-icon blog-search-loading-icon"),
+    ],
+  ];
+
+  let output = html;
+  for (const [source, replacement] of replacements) {
+    output = output.split(source).join(replacement);
+  }
+
+  return output.replace(
+    /<i class="fa-solid fa-heart fa-beat"[^>]*><\/i>/g,
+    svgIcon(ICONS.heart, "blog-inline-icon blog-footer-heart-icon"),
+  );
+}
+
 function normalizeCategoryCards(html) {
   if (!html.includes('class="category-list-content"')) return html;
 
@@ -219,7 +320,9 @@ function normalizeArticleIndexes(html) {
 
 hexo.extend.filter.register("after_render:html", (html) => {
   let output = normalizeArticleIndexes(
-    normalizeCategoryCards(replaceNavigationIcons(html)),
+    normalizeCategoryCards(
+      replaceNavigationIcons(replaceStaticUiIcons(replaceSearchIcons(html))),
+    ),
   );
 
   if (output.includes(HOME_MARKER)) {

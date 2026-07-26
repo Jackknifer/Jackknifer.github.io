@@ -41,6 +41,10 @@ const categoryCardLinks =
   categories.match(
     /<a class="all-category-list-link" href="[^"]+"><span class="all-category-list-label">[\s\S]*?<\/span><span class="all-category-list-count">[\s\S]*?<\/span><\/a>/g,
   ) || [];
+const staticSearchIcons =
+  noScriptHome.match(
+    /<svg class="blog-inline-icon blog-search-icon"[^>]*>[\s\S]*?<\/svg>/g,
+  ) || [];
 
 const checks = {
   "home page identity is static": /data-blog-page="home"/.test(home),
@@ -51,6 +55,33 @@ const checks = {
   "navigation icons do not need font files":
     (noScriptHome.match(/blog-inline-icon (?:fa-sm fa-fw|fa-fw|icon-space)/g) ||
       []).length >= 21,
+  "home search icons do not need font files":
+    staticSearchIcons.length >= 2 &&
+    !/search-popup-trigger">\s*<i class="fa-solid fa-magnifying-glass"/.test(
+      noScriptHome,
+    ),
+  "home core controls do not need font files":
+    /blog-banner-arrow-icon/.test(noScriptHome) &&
+    (noScriptHome.match(/blog-home-meta-icon/g) || []).length >= 3 &&
+    (noScriptHome.match(/blog-read-more-icon/g) || []).length >= 1 &&
+    /blog-side-tool-icon/.test(noScriptHome) &&
+    /blog-search-field-icon/.test(noScriptHome) &&
+    /blog-search-close-icon/.test(noScriptHome) &&
+    /blog-search-loading-icon/.test(noScriptHome) &&
+    !/<i class="fa-solid fa-(?:calendars|folders|tags|angle-right)"/.test(
+      noScriptHome,
+    ),
+  "profile typography uses the blog font":
+    styles.includes(
+      "html .home-sidebar-container .sidebar-content .statistics {",
+    ) && styles.includes("font-family: var(--blog-serif) !important;"),
+  "theme toggle has a local glyph fallback":
+    home.includes(
+      ".right-side-tools-container .tool-dark-light-toggle > i::before",
+    ) &&
+    home.includes(
+      "html.dark .right-side-tools-container .tool-dark-light-toggle > i::before",
+    ),
   "home player has native fallback":
     /data-player-surface="home"[\s\S]*?blog-player-native-fallback/.test(
       noScriptHome,

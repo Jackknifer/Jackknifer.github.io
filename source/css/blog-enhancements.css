@@ -204,6 +204,55 @@ html .navbar-list .blog-inline-icon {
   height: 1.05em;
 }
 
+html .search-popup-trigger .blog-search-icon {
+  width: 1em;
+  height: 1em;
+  color: var(--default-text-color);
+}
+
+html .home-banner-scroll-cue .blog-banner-arrow-icon {
+  width: 1.3em;
+  height: 1.3em;
+}
+
+html .home-article-meta-info-container .blog-home-meta-icon,
+html .home-article-meta-info-container .blog-read-more-icon,
+html .pagination-container .blog-pagination-icon {
+  width: 0.95em;
+  height: 0.95em;
+}
+
+html .right-side-tools-container .blog-side-tool-icon {
+  width: 1.12em;
+  height: 1.12em;
+}
+
+html .blog-footer-heart-icon {
+  width: 1em;
+  height: 1em;
+  color: #f54545;
+  fill: currentColor;
+  stroke-width: 1.4;
+}
+
+html .blog-search-field-icon,
+html .blog-search-close-icon {
+  width: 1em;
+  height: 1em;
+}
+
+html .blog-search-loading-icon {
+  width: 4rem;
+  height: 4rem;
+  animation: blog-icon-spin 1s linear infinite;
+}
+
+@keyframes blog-icon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 html .navbar-container .logo-title,
 html .navbar-container .navbar-list a,
 html .home-sidebar-container .sidebar-links .link-name,
@@ -213,6 +262,12 @@ html .home-article-title,
 html .page-title-header,
 html .page-template-content.markdown-body > h1:first-child,
 html .post-page-container .article-title h1 {
+  font-family: var(--blog-serif) !important;
+}
+
+html .home-sidebar-container .sidebar-content,
+html .home-sidebar-container .sidebar-content .author,
+html .home-sidebar-container .sidebar-content .statistics {
   font-family: var(--blog-serif) !important;
 }
 
@@ -1513,7 +1568,7 @@ html[data-blog-page="moments"] .main-content {
   transform: translateY(-2px);
 }
 
-.moments-search i {
+.moments-search .blog-search-icon {
   flex: 0 0 auto;
   color: var(--third-text-color);
   font-size: 1.1rem;
@@ -1522,7 +1577,7 @@ html[data-blog-page="moments"] .main-content {
     transform var(--blog-index-motion);
 }
 
-.moments-search:focus-within i {
+.moments-search:focus-within .blog-search-icon {
   color: var(--blog-index-interactive);
   transform: scale(1.06);
 }
