@@ -7,6 +7,7 @@ const categoriesPath = "public/categories/index.html";
 const archivePath = "public/archives/index.html";
 const tagDetailPath = "public/tags/求职/index.html";
 const categoryDetailPath = "public/categories/写作/index.html";
+const stylesPath = "public/css/blog-enhancements.css";
 const bundlePath = "public/js/blog-experience.js";
 
 for (const filePath of [
@@ -16,6 +17,7 @@ for (const filePath of [
   archivePath,
   tagDetailPath,
   categoryDetailPath,
+  stylesPath,
   bundlePath,
 ]) {
   if (!fs.existsSync(filePath)) {
@@ -29,6 +31,7 @@ const categories = fs.readFileSync(categoriesPath, "utf8");
 const archive = fs.readFileSync(archivePath, "utf8");
 const tagDetail = fs.readFileSync(tagDetailPath, "utf8");
 const categoryDetail = fs.readFileSync(categoryDetailPath, "utf8");
+const styles = fs.readFileSync(stylesPath, "utf8");
 const bundle = fs.readFileSync(bundlePath, "utf8");
 const noScriptHome = home
   .replace(/<script\b[\s\S]*?<\/script>/gi, "")
@@ -65,6 +68,9 @@ const checks = {
     /archive-container blog-index-list/.test(archive) &&
     /tag-post-list blog-index-list/.test(tagDetail) &&
     /category-post-list blog-index-list/.test(categoryDetail),
+  "title underline positioning does not depend on client JavaScript":
+    styles.includes(".page-template-container > .page-title-header,") &&
+    styles.includes(".archive-container > .archive-page-title {"),
   "image retry and fallback are inline":
     home.includes("data-blog-retried") && home.includes("图片暂时无法加载"),
   "browser bundle excludes unsupported APIs":

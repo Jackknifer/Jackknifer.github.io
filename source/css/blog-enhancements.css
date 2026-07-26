@@ -271,15 +271,11 @@ html[data-blog-section] .page-template-content.markdown-body {
   width: 100%;
 }
 
-html[data-blog-section] .page-template-container > .page-title-header,
-html[data-blog-section]
-  .page-template-content.markdown-body
-  > h1:first-child,
-html[data-blog-section="tags"] .page-template-container > .tag-name,
-html[data-blog-section="categories"]
-  .page-template-container
-  > .category-name,
-html[data-blog-section="archive"] .archive-page-title {
+.page-template-container > .page-title-header,
+.page-template-content.markdown-body > h1:first-child,
+.page-template-container > .tag-name,
+.page-template-container > .category-name,
+.archive-container > .archive-page-title {
   position: relative;
   width: fit-content;
   margin: 0 0 36px !important;
@@ -293,14 +289,10 @@ html[data-blog-section="archive"] .archive-page-title {
 }
 
 .page-template-container > .page-title-header::after,
-html[data-blog-section]
-  .page-template-content.markdown-body
-  > h1:first-child::after,
-html[data-blog-section="tags"] .page-template-container > .tag-name::after,
-html[data-blog-section="categories"]
-  .page-template-container
-  > .category-name::after,
-html[data-blog-section="archive"] .archive-page-title::after {
+.page-template-content.markdown-body > h1:first-child::after,
+.page-template-container > .tag-name::after,
+.page-template-container > .category-name::after,
+.archive-container > .archive-page-title::after {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -312,11 +304,8 @@ html[data-blog-section="archive"] .archive-page-title::after {
   content: "";
 }
 
-html[data-blog-section="tags"] .page-template-container > .tag-name > i,
-html[data-blog-section="categories"]
-  .page-template-container
-  > .category-name
-  > i {
+.page-template-container > .tag-name > i,
+.page-template-container > .category-name > i {
   display: none;
 }
 
@@ -2173,15 +2162,11 @@ html[data-blog-page="moments"] .main-content {
     padding: 0;
   }
 
-  html[data-blog-section] .page-template-container > .page-title-header,
-  html[data-blog-section]
-    .page-template-content.markdown-body
-    > h1:first-child,
-  html[data-blog-section="tags"] .page-template-container > .tag-name,
-  html[data-blog-section="categories"]
-    .page-template-container
-    > .category-name,
-  html[data-blog-section="archive"] .archive-page-title {
+  .page-template-container > .page-title-header,
+  .page-template-content.markdown-body > h1:first-child,
+  .page-template-container > .tag-name,
+  .page-template-container > .category-name,
+  .archive-container > .archive-page-title {
     margin: 0 0 28px !important;
     padding-bottom: 12px;
     font-size: 2.08rem;
