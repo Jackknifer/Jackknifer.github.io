@@ -71,10 +71,10 @@ function displayHost(url) {
 function normalizeImages(value) {
   const values = Array.isArray(value) ? value : value ? [value] : [];
   return values
-    .map((item, index) => {
+    .map((item) => {
       if (typeof item === "string") {
         const src = safeUrl(item);
-        return src ? { src, alt: `动态照片 ${index + 1}` } : null;
+        return src ? { src, alt: "" } : null;
       }
 
       const image = normalizeObject(item);
@@ -82,7 +82,7 @@ function normalizeImages(value) {
       if (!src) return null;
       return {
         src,
-        alt: String(image.alt || `动态照片 ${index + 1}`),
+        alt: String(image.alt || "").trim(),
       };
     })
     .filter(Boolean)
