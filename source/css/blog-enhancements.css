@@ -1778,12 +1778,13 @@ html[data-blog-page="moments"] .main-content {
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-top: 14px;
+  margin-top: 5px;
   gap: 6px;
 }
 
 .moment-gallery[data-image-count="1"] {
   grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
 }
 
 .moment-gallery[data-image-count="2"],
@@ -1792,24 +1793,38 @@ html[data-blog-page="moments"] .main-content {
 }
 
 .moment-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   margin: 0;
+  padding: 0;
   border-radius: 12px;
   background: var(--third-background-color);
   aspect-ratio: 4 / 3;
 }
 
 .moment-gallery[data-image-count="1"] .moment-photo {
-  max-height: 320px;
-  aspect-ratio: 4 / 3;
+  justify-content: flex-start;
+  width: min(100%, 620px);
+  max-height: none;
+  background: transparent;
+  aspect-ratio: auto;
 }
 
 .moment-photo img {
+  display: block;
   width: 100%;
   height: 100%;
   margin: 0 !important;
-  object-fit: cover;
-  transition: transform 0.35s ease;
+  object-fit: contain;
+}
+
+.moment-gallery[data-image-count="1"] .moment-photo img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: min(70vh, 680px);
 }
 
 .moment-share-card,
@@ -1817,7 +1832,7 @@ html[data-blog-page="moments"] .main-content {
   grid-column: 1 / -1;
   box-sizing: border-box;
   width: 100%;
-  margin-top: -4px;
+  margin-top: -6px;
   border: 1px solid var(--blog-index-border);
   border-radius: 14px;
   background: var(--third-background-color);
@@ -2055,10 +2070,6 @@ html[data-blog-page="moments"] .main-content {
   .moment-card:hover .moment-attachment-open,
   .moment-card:hover .moment-music-open {
     color: var(--blog-index-interactive);
-  }
-
-  .moment-photo:hover img {
-    transform: scale(1.025);
   }
 
   .moment-share-card:hover,
