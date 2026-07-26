@@ -5,7 +5,7 @@
     artist: "刘森",
     audio: "/media/rainy-night.mp3",
     lyrics: "/media/rainy-night.lrc",
-    cover: "/media/rainy-night-cover.png",
+    cover: "/media/rainy-night-cover.jpg",
   };
   const DEFAULT_VOLUME = 0.35;
 
@@ -212,7 +212,7 @@
     const root = document.createElement("div");
     root.id = "blog-global-player";
     root.innerHTML = `
-      <audio preload="auto" playsinline>
+      <audio preload="none" playsinline>
         <source src="${escapeAttribute(MUSIC.audio)}" type="audio/mpeg">
       </audio>
       ${playerSurfaceMarkup("floating")}

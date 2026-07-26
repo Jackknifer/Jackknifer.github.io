@@ -392,7 +392,7 @@ async function renderMomentsPage() {
   const momentsDirectory = path.join(hexo.source_dir, "_moments");
   const defaultAvatar =
     safeUrl(hexo.theme?.config?.defaults?.avatar) ||
-    "https://avatars.githubusercontent.com/u/130291261?v=4";
+    "/images/avatar.jpg";
   const files = fs.existsSync(momentsDirectory)
     ? fs
         .readdirSync(momentsDirectory, { withFileTypes: true })

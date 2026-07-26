@@ -29,7 +29,7 @@ defaults:
   # Site logo
   logo:
   # Site avatar
-  avatar: https://avatars.githubusercontent.com/u/130291261?v=4
+  avatar: /images/avatar.jpg
 # IMAGE CONFIGURATION <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 
 
@@ -88,7 +88,9 @@ global:
   single_page: true
   # Whether to enable Preloader.
   preloader:
-    enable: true
+    # Render the real page immediately. The animated preloader depended on
+    # anime.js and window.load, so one slow request could cover a usable page.
+    enable: false
     custom_message: Jackknifer # Custom message. If empty, the site title will be displayed
   # Side tools settings
   side_tools:
@@ -355,8 +357,9 @@ articles:
   copyright:
     enable: false # Whether to enable
     default: cc_by_nc_sa # Default license, can be cc_by_nc_sa, cc_by_nd, cc_by_nc, cc_by_sa, cc_by, all_rights_reserved, public_domain
-  # Whether to enable lazyload for images
-  lazyload: true
+  # Use native loading=lazy rather than a JS-only loading.svg placeholder.
+  # scripts/media-resilience.js adds native and responsive attributes.
+  lazyload: false
   # Pangu.js (automatically add space between Chinese and English). See https://github.com/vinta/pangu.js
   pangu_js: true
   # Article recommendation. Requires nodejieba (npm install nodejieba). Transplanted from hexo-theme-volantis.
@@ -463,7 +466,31 @@ inject:
   head: 
     - |
       <link rel="stylesheet" href="/css/blog-enhancements.css">
+      <link rel="preload" as="image" href="/images/responsive/hero-sea-level.jpg" media="(prefers-color-scheme: light)">
+      <link rel="preload" as="image" href="/images/responsive/hero-city.jpeg" media="(prefers-color-scheme: dark)">
       <style>
+        .home-banner-background {
+          background: #7f96aa;
+        }
+
+        html.dark .home-banner-background {
+          background: #252a31;
+        }
+
+        .home-banner-container .content > div.absolute > div[onclick="scrollToMain()"] > i::before {
+          content: "↓" !important;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+          font-size: 1.3rem;
+          font-weight: 700;
+        }
+
+        .right-side-tools-container .toggle-tools-list > i::before {
+          content: "⚙" !important;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Symbol", sans-serif !important;
+          font-size: 1.45rem;
+          font-weight: 400;
+        }
+
         @media (max-width: 768px) {
           .home-banner-container .content .description {
             font-size: 2.1rem;
@@ -487,6 +514,70 @@ inject:
           display: none !important;
         }
       </style>
+    - |
+      <script>
+        (() => {
+          const fallbackImage =
+            "data:image/svg+xml;charset=UTF-8," +
+            encodeURIComponent(
+              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540"><rect width="960" height="540" fill="#ece8e3"/><text x="480" y="280" text-anchor="middle" fill="#6f7479" font-family="sans-serif" font-size="30">图片暂时无法加载</text></svg>',
+            );
+
+          window.scrollToMain =
+            window.scrollToMain ||
+            (() => {
+              const target = document.querySelector(
+                ".main-content-container, .home-content-container, main",
+              );
+              target?.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+
+          document.addEventListener(
+            "error",
+            (event) => {
+              const image = event.target;
+              if (!(image instanceof HTMLImageElement)) return;
+              if (image.dataset.blogFallback === "true") return;
+
+              if (image.dataset.blogRetried !== "true") {
+                image.dataset.blogRetried = "true";
+                const failedUrl = image.currentSrc || image.src;
+                image.removeAttribute("srcset");
+                window.setTimeout(() => {
+                  const retryUrl = new URL(failedUrl, window.location.href);
+                  retryUrl.searchParams.set("_retry", Date.now().toString());
+                  image.src = retryUrl.href;
+                }, 650);
+                return;
+              }
+
+              image.dataset.blogFallback = "true";
+              image.classList.add("blog-image-failed");
+              if (image.alt === "home-banner-background") {
+                image.hidden = true;
+              } else {
+                image.removeAttribute("srcset");
+                image.src = fallbackImage;
+              }
+            },
+            true,
+          );
+
+          document.addEventListener("click", (event) => {
+            const button = event.target.closest(".toggle-tools-list");
+            if (!button) return;
+            const list = document.querySelector(".hidden-tools-list");
+            if (!list) return;
+            const wasOpen = list.classList.contains("show");
+            queueMicrotask(() => {
+              if (list.classList.contains("show") === wasOpen) {
+                list.classList.toggle("show");
+              }
+            });
+          }, true);
+        })();
+      </script>
+      <script defer src="/js/blog-experience.js"></script>
     -
   # Inject custom footer html code
   footer:
@@ -867,8 +958,6 @@ inject:
           }
         }
       </style>
-    - |
-      <script defer src="/js/blog-experience.js"></script>
     -
 # INJECT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< end
 

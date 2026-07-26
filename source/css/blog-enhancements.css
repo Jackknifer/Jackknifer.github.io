@@ -17,6 +17,25 @@ html.dark .preloader {
     #202124 !important;
 }
 
+.home-banner-background {
+  background: #7f96aa;
+}
+
+html.dark .home-banner-background {
+  background: #252a31;
+}
+
+.article-title {
+  background: var(--third-background-color);
+}
+
+img.blog-image-failed {
+  min-height: 180px;
+  border: 1px solid var(--border-color);
+  background: var(--third-background-color);
+  object-fit: cover;
+}
+
 html .preloader .ml13 {
   position: relative;
   margin: 0;
