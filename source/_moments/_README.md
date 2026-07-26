@@ -42,19 +42,12 @@ tags:
 
 ```markdown
 ---
-date: 2026-07-26 20:30:00
-# 可选：text、photo、link、music；不填会根据附件自动判断
-# type: text
-tags:
-  - 日常
-# author: Jackknifer
-# avatar: /images/avatar.jpg
-# location: 吉林
-# images:
-#   - src: /images/moments/动态文件名/照片.jpg
-#     alt: 照片说明
-# link: https://example.com
-# music: https://music.163.com/song?id=34723470
+date: 2026-07-26 
+images:
+  - src: /images/moments/动态文件名/照片.jpg
+    alt: 照片说明
+link: https://example.com
+music: https://music.163.com/song?id=34723470
 ---
 
 这里写动态正文，可以写多段，也可以使用基本的 Markdown 格式。
