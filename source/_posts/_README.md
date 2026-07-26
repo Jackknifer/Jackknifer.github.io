@@ -2,44 +2,35 @@
 
 本目录 `source/_posts/` 存放正式博文。本文档文件名以下划线开头，Hexo 会忽略它，不会把它当成文章发布。
 
-下面的命令都要在博客项目根目录执行：
+这份说明以 Finder 和 VS Code 图形界面为主。只有构建和预览需要使用 VS Code 终端。
 
-```bash
-cd "/Users/apple/Workspace/github/Jackknifer/Jackknifer.github.io"
-```
+## 一、发布一篇新文章
 
-## 一、最快发布流程
+### 第一步：在 VS Code 中创建文章文件
 
-### 0. 确认并同步仓库
+1. 用 VS Code 打开整个 `Jackknifer.github.io` 博客项目。
+2. 在左侧“资源管理器”中依次展开 `source`、`_posts`。
+3. 右键 `_posts` 文件夹，选择“新建文件”。
+4. 输入文件名，例如 `文章标题.md`。
+5. 打开新文件，粘贴后文的文章模板并填写内容。
 
-```bash
-git status --short
-git pull --ff-only origin main
-```
-
-只有在工作区没有未处理改动时再拉取；如果 `git status` 显示了其他工作，应先确认它们的用途，不要覆盖或误提交。
-
-### 1. 创建文章
-
-```bash
-npm run new:post -- "文章标题"
-```
-
-命令会创建：
+最终文件位置应为：
 
 ```text
 source/_posts/文章标题.md
 ```
 
-### 2. 创建图片文件夹
+不要在 `source/posts/` 或 `public/` 中创建文章。文件名可以使用中文，必须以 `.md` 结尾。
 
-文章没有图片时可以跳过。推荐让图片文件夹名与文章标题完全一致：
+### 第二步：用 Finder 或 VS Code 创建图片文件夹
 
-```bash
-mkdir -p "source/images/posts/文章标题"
-```
+文章没有图片时可以跳过。
 
-把封面和正文图片复制到这个文件夹，例如：
+1. 找到 `source/images/posts/`。
+2. 在 `posts` 中新建一个与文章标题完全相同的文件夹。
+3. 把封面和正文图片拖进这个文件夹。
+
+目录示例：
 
 ```text
 source/images/posts/文章标题/封面.jpg
@@ -49,7 +40,7 @@ source/images/posts/文章标题/示意图.png
 
 不要把图片放进 `public/`；该目录由构建命令自动生成。
 
-### 3. 填写文章
+### 第三步：填写文章
 
 可直接使用下面的完整模板：
 
@@ -90,7 +81,9 @@ Front Matter 字段说明：
 
 Front Matter 的开头和结尾必须是单独一行 `---`，缩进统一使用空格，不要使用 Tab。
 
-### 4. 构建和预览
+### 第四步：在终端构建和预览
+
+在 VS Code 顶部选择“终端 → 新建终端”。确认终端当前位于博客项目根目录，然后依次运行：
 
 ```bash
 npm run clean
@@ -108,32 +101,22 @@ npm run server
 
 预览结束后按 `Ctrl+C` 停止服务器。
 
-### 5. 提交并推送
+如果前三条命令出现红色错误，先不要提交。`npm run server` 会一直运行本地预览，检查完成后必须先按 `Ctrl+C`，再进行下一步。
 
-先检查将要提交的文件：
+### 第五步：使用 VS Code 提交并同步
 
-```bash
-git status --short
-git diff --check
-```
+1. 点击 VS Code 左侧的“源代码管理”图标。
+2. 展开“更改”，确认里面只有本次文章、图片以及你确实想发布的文件。
+3. 如果出现无关文件，先不要提交；不要直接选择“全部暂存”。
+4. 在截图所示的“消息”输入框填写提交说明，例如：`发布文章：文章标题`。
+5. 点击“提交”按钮。若 VS Code 询问是否暂存全部更改，只有在列表全部属于本次文章时才选择“是”。
+6. 提交完成后，点击“同步更改”；某些 VS Code 版本显示为“推送”或云朵箭头。
+7. 如果弹出 GitHub 登录或授权窗口，按提示登录自己的 GitHub 账号。
+8. 等待 VS Code 提示同步完成，左下角分支应继续显示 `main`。
 
-只添加本次文章和图片：
+建议在开始写作前也先点击一次“同步更改”，把 GitHub 上的最新代码同步到本地。
 
-```bash
-git add "source/_posts/文章标题.md" "source/images/posts/文章标题"
-git commit -m "content(post): 发布《文章标题》"
-git push origin main
-```
-
-如果文章没有图片，只添加 Markdown 文件：
-
-```bash
-git add "source/_posts/文章标题.md"
-```
-
-不要使用 `git add .`，以免把无关的本地修改一起提交。
-
-### 6. 确认上线
+### 第六步：确认上线
 
 推送 `main` 后，GitHub Actions 中的 `Pages` 工作流会自动执行：
 
@@ -141,12 +124,7 @@ git add "source/_posts/文章标题.md"
 2. 运行 `npm run build`；
 3. 发布 `public/` 到 GitHub Pages。
 
-可以在仓库的 **Actions → Pages** 页面等待绿色对勾，也可以使用：
-
-```bash
-gh run list --workflow Pages --branch main --limit 3
-gh run watch 运行编号 --exit-status
-```
+打开 GitHub 仓库网页，点击顶部 **Actions**，再打开最新的 **Pages** 记录。出现绿色对勾后才表示部署完成；黄色圆点表示仍在运行，红色叉号表示部署失败。
 
 文章地址通常是：
 
@@ -154,7 +132,7 @@ gh run watch 运行编号 --exit-status
 https://jackknifer.github.io/年/月/日/文章标题/
 ```
 
-部署成功后如仍看到旧页面，可等待一两分钟再刷新，或清除浏览器缓存后重试。这个项目由 GitHub Actions 部署，不需要运行 `hexo deploy`。
+部署成功后如仍看到旧页面，可等待一两分钟再刷新，或清除浏览器缓存后重试。整个部署由 GitHub Actions 自动完成，不需要再输入部署命令。
 
 ## 二、正文各种内容的写法
 
@@ -248,51 +226,20 @@ def hello():
 
 ## 三、先写草稿，之后再发布
 
-创建草稿：
-
-```bash
-npm run new:draft -- "文章标题"
-```
-
-草稿位于：
+1. 在 VS Code 左侧展开 `source/_drafts/`。
+2. 右键 `_drafts`，新建 `文章标题.md`。
+3. 按照正式文章模板写作。
+4. 草稿完成后，直接在 VS Code 左侧把文件从 `_drafts` 拖到 `_posts`。
+5. 再按照前面的四条命令进行构建和预览。
+6. 最后在“源代码管理”中提交并同步。
 
 ```text
 source/_drafts/文章标题.md
 ```
 
-预览草稿：
+`_drafts` 中的文件不会出现在正常构建的网站里；移动到 `_posts` 后才会作为正式文章发布。
 
-```bash
-npm run server:drafts
-```
-
-正式发布草稿：
-
-```bash
-npm run publish -- "文章标题"
-```
-
-发布后文件会移动到 `source/_posts/`。然后按照前面的构建、检查、提交和推送流程操作。
-
-## 四、导入已有文章和多张本地图片
-
-如果文章已经整理成一个 Markdown 文件夹，也可以先放到 `pending-posts/`，再使用项目的导入脚本。详细格式见 `pending-posts/README.md`。
-
-先预览，不改正式内容：
-
-```bash
-npm run import:pending:dry
-```
-
-确认无误后正式导入：
-
-```bash
-npm run import:pending
-```
-
-导入完成后仍要运行构建、检查、提交和推送。
-
-## 五、发布前检查清单
+## 四、发布前检查清单
 
 - [ ] 文件位于 `source/_posts/`，不是 `source/posts/` 或 `public/`。
 - [ ] `title`、`date`、`tags`、`categories` 和 `description` 已填写。
@@ -301,5 +248,6 @@ npm run import:pending
 - [ ] `npm run build` 成功。
 - [ ] `npm run check:mobile` 成功。
 - [ ] 本地预览正常。
-- [ ] 只暂存了本次文章相关文件。
-- [ ] 已推送到 `main`，Pages 工作流成功。
+- [ ] VS Code“更改”列表中没有无关文件。
+- [ ] 已在 VS Code 中提交并同步到 `main`。
+- [ ] GitHub Actions 中最新的 Pages 工作流显示绿色对勾。
