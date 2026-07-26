@@ -82,6 +82,11 @@ const checks = {
     home.includes(
       "html.dark .right-side-tools-container .tool-dark-light-toggle > i::before",
     ),
+  "image viewer controls have local glyph fallbacks":
+    styles.includes("html .image-viewer-close > i::before,") &&
+    styles.includes("html .image-viewer-prev > i::before {") &&
+    styles.includes("html .image-viewer-next > i::before {") &&
+    styles.includes("html .image-viewer-exif-card-icon::before {"),
   "home player has native fallback":
     /data-player-surface="home"[\s\S]*?blog-player-native-fallback/.test(
       noScriptHome,

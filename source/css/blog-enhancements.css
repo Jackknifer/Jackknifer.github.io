@@ -247,6 +247,35 @@ html .blog-search-loading-icon {
   animation: blog-icon-spin 1s linear infinite;
 }
 
+html .image-viewer-close > i::before,
+html .image-viewer-exif-close > i::before,
+html .image-viewer-prev > i::before,
+html .image-viewer-next > i::before,
+html .image-viewer-exif-toggle > i::before,
+html .image-viewer-exif-card-icon::before {
+  font-family: var(--blog-sans) !important;
+  font-style: normal;
+  font-weight: 700;
+}
+
+html .image-viewer-close > i::before,
+html .image-viewer-exif-close > i::before {
+  content: "×" !important;
+}
+
+html .image-viewer-prev > i::before {
+  content: "‹" !important;
+}
+
+html .image-viewer-next > i::before {
+  content: "›" !important;
+}
+
+html .image-viewer-exif-toggle > i::before,
+html .image-viewer-exif-card-icon::before {
+  content: "i" !important;
+}
+
 @keyframes blog-icon-spin {
   to {
     transform: rotate(360deg);
