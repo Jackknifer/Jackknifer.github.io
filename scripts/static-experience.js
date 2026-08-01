@@ -257,7 +257,10 @@ function replaceStaticUiIcons(html) {
     ],
     [
       '<i class="arrow-up fas fa-arrow-up"></i>',
-      svgIcon(ICONS.arrowUp, "blog-inline-icon blog-side-tool-icon"),
+      svgIcon(
+        ICONS.arrowUp,
+        "blog-inline-icon blog-side-tool-icon arrow-up",
+      ),
     ],
     [
       '<i class="fa-solid fa-keyboard"></i>',

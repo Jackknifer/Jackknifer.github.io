@@ -11,6 +11,7 @@ const archivePath = "public/archives/index.html";
 const tagDetailPath = "public/tags/求职/index.html";
 const categoryDetailPath = "public/categories/写作/index.html";
 const stylesPath = "public/css/blog-enhancements.css";
+const themeStylesPath = "public/css/style.css";
 const bundlePath = "public/js/blog-experience.js";
 const mediaResiliencePath = "scripts/media-resilience.js";
 const importerPath = "tools/import-pending-posts.mjs";
@@ -23,6 +24,7 @@ for (const filePath of [
   tagDetailPath,
   categoryDetailPath,
   stylesPath,
+  themeStylesPath,
   bundlePath,
   mediaResiliencePath,
   importerPath,
@@ -39,6 +41,7 @@ const archive = fs.readFileSync(archivePath, "utf8");
 const tagDetail = fs.readFileSync(tagDetailPath, "utf8");
 const categoryDetail = fs.readFileSync(categoryDetailPath, "utf8");
 const styles = fs.readFileSync(stylesPath, "utf8");
+const themeStyles = fs.readFileSync(themeStylesPath, "utf8");
 const bundle = fs.readFileSync(bundlePath, "utf8");
 const mediaResilience = fs.readFileSync(mediaResiliencePath, "utf8");
 const importer = fs.readFileSync(importerPath, "utf8");
@@ -79,6 +82,13 @@ const checks = {
     /blog-search-loading-icon/.test(noScriptHome) &&
     !/<i class="fa-solid fa-(?:calendars|folders|tags|angle-right)"/.test(
       noScriptHome,
+    ),
+  "scroll progress swaps cleanly with the return-to-top arrow":
+    /<svg class="blog-inline-icon blog-side-tool-icon arrow-up"/.test(
+      noScriptHome,
+    ) &&
+    /\.tool-scroll-to-top[^}]*[\s\S]*?\.arrow-up[^}]*display:\s*none/.test(
+      themeStyles,
     ),
   "profile typography uses the blog font":
     styles.includes(
