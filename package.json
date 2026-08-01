@@ -6,6 +6,7 @@
     "build": "npm run build:client && hexo generate",
     "build:client": "node tools/build-browser-js.mjs",
     "check:mobile": "node tools/check-mobile-resilience.mjs",
+    "check:security-import": "node tools/check-import-security.mjs",
     "clean": "hexo clean",
     "new": "hexo new post",
     "new:post": "hexo new post",
@@ -42,5 +43,10 @@
   },
   "devDependencies": {
     "esbuild": "^0.25.6"
+  },
+  "overrides": {
+    "glob": "13.0.6",
+    "jake": "12.10.1",
+    "stylus": "0.64.0"
   }
 }

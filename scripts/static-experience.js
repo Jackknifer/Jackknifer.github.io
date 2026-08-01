@@ -128,17 +128,17 @@ function weatherMarkup() {
       <div class="blog-weather-heading">
         <div class="blog-weather-location">
           ${svgIcon(ICONS.location)}
-          <strong data-weather-city>访客所在地</strong>
+          <strong data-weather-city>天气未启用</strong>
         </div>
-        <button type="button" class="blog-weather-mode" data-weather-action="retry" title="重新获取网络位置">
-          <span data-weather-mode>网络天气</span>
+        <button type="button" class="blog-weather-mode" data-weather-action="load" title="获取天气（将使用网络大致位置）">
+          <span data-weather-mode>获取天气</span>
           ${svgIcon(ICONS.refresh)}
         </button>
       </div>
       <div class="blog-weather-current">
         <div>
           <div class="blog-weather-temperature"><span data-weather-temperature>--</span><sup>°</sup></div>
-          <p data-weather-text>天气服务准备中</p>
+          <p data-weather-text>点击右上角获取当地天气</p>
           <small>最高 <span data-weather-high>--</span>° · 最低 <span data-weather-low>--</span>°</small>
         </div>
         <div class="blog-weather-main-icon" aria-hidden="true">
@@ -151,7 +151,7 @@ function weatherMarkup() {
         <div><span aria-hidden="true">湿度</span><strong><span data-weather-humidity>--</span>%</strong></div>
         <div><span aria-hidden="true">风速</span><strong><span data-weather-wind>--</span> km/h</strong></div>
       </div>
-      <p class="blog-weather-status" data-weather-status>若长时间没有更新，可点击右上角重试。</p>
+      <p class="blog-weather-status" data-weather-status>点击后会通过第三方服务使用网络大致位置，不调用设备定位。</p>
     </section>`;
 }
 
@@ -318,10 +318,31 @@ function normalizeArticleIndexes(html) {
   return output;
 }
 
+function addCommentFallback(html) {
+  if (
+    !html.includes('<div id="giscus-container"></div>') ||
+    html.includes('class="blog-comment-fallback"')
+  ) {
+    return html;
+  }
+
+  return html.replace(
+    '<div id="giscus-container"></div>',
+    `<div id="giscus-container"></div>
+    <p class="blog-comment-fallback">
+      评论由 GitHub Giscus 提供。若当前网络无法加载，可
+      <a href="https://github.com/Jackknifer/Jackknifer.github.io/discussions" target="_blank" rel="noopener noreferrer">前往 GitHub Discussions</a>
+      查看或参与讨论。
+    </p>`,
+  );
+}
+
 hexo.extend.filter.register("after_render:html", (html) => {
-  let output = normalizeArticleIndexes(
-    normalizeCategoryCards(
-      replaceNavigationIcons(replaceStaticUiIcons(replaceSearchIcons(html))),
+  let output = addCommentFallback(
+    normalizeArticleIndexes(
+      normalizeCategoryCards(
+        replaceNavigationIcons(replaceStaticUiIcons(replaceSearchIcons(html))),
+      ),
     ),
   );
 

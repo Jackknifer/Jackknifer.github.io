@@ -1,5 +1,13 @@
 #!/usr/bin/env node
-import { copyFile, mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
+import {
+  copyFile,
+  mkdir,
+  readdir,
+  readFile,
+  realpath,
+  stat,
+  writeFile,
+} from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 
@@ -108,7 +116,9 @@ function slugify(value) {
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
-  return slug || `post-${Date.now()}`;
+  return slug && slug !== "." && slug !== ".."
+    ? slug
+    : `post-${Date.now()}`;
 }
 
 function validDateParts(year, month, day) {
@@ -250,9 +260,86 @@ async function directoryExists(dirPath) {
   }
 }
 
-function ensureInsidePending(filePath) {
-  const relative = path.relative(pendingDir, filePath);
-  return Boolean(relative) && !relative.startsWith("..") && !path.isAbsolute(relative);
+function isInside(rootPath, candidatePath) {
+  const relative = path.relative(rootPath, candidatePath);
+  return (
+    Boolean(relative)
+    && !relative.startsWith(`..${path.sep}`)
+    && relative !== ".."
+    && !path.isAbsolute(relative)
+  );
+}
+
+function isInsideOrSame(rootPath, candidatePath) {
+  return path.resolve(rootPath) === path.resolve(candidatePath)
+    || isInside(rootPath, candidatePath);
+}
+
+async function resolveSafePendingFile(filePath) {
+  if (!isInside(pendingDir, filePath)) return "";
+
+  try {
+    const [resolvedPendingDir, resolvedFile] = await Promise.all([
+      realpath(pendingDir),
+      realpath(filePath),
+    ]);
+    if (!isInside(resolvedPendingDir, resolvedFile)) return "";
+
+    const stats = await stat(resolvedFile);
+    return stats.isFile() ? resolvedFile : "";
+  } catch {
+    return "";
+  }
+}
+
+async function nearestExistingRealpath(candidatePath) {
+  let current = path.resolve(candidatePath);
+
+  while (true) {
+    try {
+      return await realpath(current);
+    } catch {
+      const parent = path.dirname(current);
+      if (parent === current) return "";
+      current = parent;
+    }
+  }
+}
+
+async function prepareSafeDestination(rootPath, candidatePath) {
+  const lexicalRoot = path.resolve(rootPath);
+  const lexicalCandidate = path.resolve(candidatePath);
+  if (!isInside(lexicalRoot, lexicalCandidate)) return "";
+
+  try {
+    const canonicalRoot = await realpath(lexicalRoot);
+    const candidateParent = path.dirname(lexicalCandidate);
+    const existingAncestor = await nearestExistingRealpath(candidateParent);
+    if (!existingAncestor || !isInsideOrSame(canonicalRoot, existingAncestor)) {
+      return "";
+    }
+
+    await mkdir(candidateParent, { recursive: true });
+    const canonicalParent = await realpath(candidateParent);
+    if (!isInsideOrSame(canonicalRoot, canonicalParent)) return "";
+
+    const preparedDestination = path.join(
+      canonicalParent,
+      path.basename(lexicalCandidate),
+    );
+    try {
+      const existingDestination = await realpath(preparedDestination);
+      return isInside(canonicalRoot, existingDestination)
+        ? existingDestination
+        : "";
+    } catch {
+      return isInside(canonicalRoot, preparedDestination)
+        ? preparedDestination
+        : "";
+    }
+  } catch {
+    return "";
+  }
 }
 
 async function discoverCandidates() {
@@ -278,10 +365,11 @@ async function discoverCandidates() {
     if (!entry.isDirectory()) continue;
 
     const indexPath = path.join(entryPath, "index.md");
-    if (await fileExists(indexPath)) {
+    const safeIndexPath = await resolveSafePendingFile(indexPath);
+    if (safeIndexPath) {
       candidates.push({
         label: `pending-posts/${entry.name}/index.md`,
-        mdPath: indexPath,
+        mdPath: safeIndexPath,
         baseName: entry.name,
         category: entry.name,
       });
@@ -326,25 +414,23 @@ async function resolveAssetPath(target, markdownDir) {
 
   if (isLikelyLocalFilesystemPath(decodedTarget)) {
     const sameNameInMarkdownDir = path.join(markdownDir, path.basename(decodedTarget));
-    if (await fileExists(sameNameInMarkdownDir)) return sameNameInMarkdownDir;
+    const localSibling = await resolveSafePendingFile(sameNameInMarkdownDir);
+    if (localSibling) return localSibling;
 
     const sourcePath = path.resolve(decodedTarget);
-    if (ensureInsidePending(sourcePath) && await fileExists(sourcePath)) {
-      return sourcePath;
-    }
-
-    return "";
+    return resolveSafePendingFile(sourcePath);
   }
 
   if (!isLocalUrl(decodedTarget)) return "";
 
   const sourcePath = path.resolve(markdownDir, decodedTarget);
-  if (!ensureInsidePending(sourcePath)) {
+  const resolvedSourcePath = await resolveSafePendingFile(sourcePath);
+  if (!resolvedSourcePath) {
     console.warn(`[warn] skipped image outside pending-posts: ${target}`);
     return "";
   }
 
-  return await fileExists(sourcePath) ? sourcePath : "";
+  return resolvedSourcePath;
 }
 
 async function copyAsset(rawTarget, markdownDir, slug, copiedAssets, missingAssets) {
@@ -386,8 +472,11 @@ async function copyAsset(rawTarget, markdownDir, slug, copiedAssets, missingAsse
   if (!copiedAssets.has(selectedSourcePath)) {
     copiedAssets.set(selectedSourcePath, publicUrl);
     if (!dryRun) {
-      await mkdir(path.dirname(destPath), { recursive: true });
-      await copyFile(selectedSourcePath, destPath);
+      const safeDestination = await prepareSafeDestination(imageRoot, destPath);
+      if (!safeDestination) {
+        throw new Error(`blocked unsafe image destination: ${publicUrl}`);
+      }
+      await copyFile(selectedSourcePath, safeDestination);
     }
   }
 
@@ -422,8 +511,14 @@ async function findCover(markdownDir) {
 }
 
 async function importCandidate(candidate) {
-  const markdownDir = path.dirname(candidate.mdPath);
-  const rawMarkdown = await readFile(candidate.mdPath, "utf8");
+  const safeMarkdownPath = await resolveSafePendingFile(candidate.mdPath);
+  if (!safeMarkdownPath) {
+    console.warn(`[skip] ${candidate.label}: Markdown path leaves pending-posts.`);
+    return;
+  }
+
+  const markdownDir = path.dirname(safeMarkdownPath);
+  const rawMarkdown = await readFile(safeMarkdownPath, "utf8");
   let { frontMatter, body, hasFrontMatter } = parseFrontMatter(rawMarkdown);
 
   const initialTitle = getFrontMatterValue(frontMatter, "title") || inferTitle(body, candidate.baseName);

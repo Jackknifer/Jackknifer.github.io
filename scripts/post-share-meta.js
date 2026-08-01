@@ -81,8 +81,23 @@ function decodeHtmlAttribute(value) {
 function getLocalImageInfo(imageUrl) {
   try {
     const url = new URL(imageUrl, hexo.config.url);
+    const siteUrl = new URL(hexo.config.url);
+    if (url.origin !== siteUrl.origin) {
+      return {};
+    }
+
+    const sourceRoot = fs.realpathSync(hexo.source_dir);
     const relativePath = decodeURIComponent(url.pathname).replace(/^\/+/, "");
-    const imagePath = path.join(hexo.source_dir, relativePath);
+    const unresolvedImagePath = path.resolve(sourceRoot, relativePath);
+    if (!isInside(sourceRoot, unresolvedImagePath)) {
+      return {};
+    }
+
+    const imagePath = fs.realpathSync(unresolvedImagePath);
+    if (!isInside(sourceRoot, imagePath)) {
+      return {};
+    }
+
     const buffer = fs.readFileSync(imagePath);
     const dimensions = readImageDimensions(buffer);
 
@@ -93,6 +108,16 @@ function getLocalImageInfo(imageUrl) {
   } catch {
     return {};
   }
+}
+
+function isInside(rootPath, candidatePath) {
+  const relative = path.relative(rootPath, candidatePath);
+  return (
+    Boolean(relative)
+    && !relative.startsWith(`..${path.sep}`)
+    && relative !== ".."
+    && !path.isAbsolute(relative)
+  );
 }
 
 function getMimeType(imagePath) {

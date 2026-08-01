@@ -79,13 +79,17 @@ global:
     percentage: true # percentage
   # Website counter
   website_counter:
-    url: https://cn.vercount.one/js # counter API URL (no need to change)
-    enable: true # enable website counter or not
-    site_pv: true # site page view
-    site_uv: true # site unique visitor
-    post_pv: true # post page view
-  # Whether to enable single page experience (using swup). See https://swup.js.org/. similar to pjax
-  single_page: true
+    # Disabled: the mutable remote script could execute in the blog origin and
+    # regularly fails on restricted or unstable mainland-China networks.
+    url: ""
+    enable: false # enable website counter or not
+    site_pv: false # site page view
+    site_uv: false # site unique visitor
+    post_pv: false # post page view
+  # Use ordinary page navigation. This avoids a large Swup script chain whose
+  # modern syntax and lifecycle hooks fail on older Edge/Baidu browser engines
+  # and add latency on high-latency mainland-China connections.
+  single_page: false
   # Whether to enable Preloader.
   preloader:
     # Render the real page immediately. The animated preloader depended on
@@ -466,8 +470,6 @@ inject:
   head: 
     - |
       <link rel="stylesheet" href="/css/blog-enhancements.css">
-      <link rel="preload" as="image" href="/images/responsive/hero-sea-level.jpg" media="(prefers-color-scheme: light)">
-      <link rel="preload" as="image" href="/images/responsive/hero-city.jpeg" media="(prefers-color-scheme: dark)">
       <style>
         .home-banner-background {
           background: #7f96aa;

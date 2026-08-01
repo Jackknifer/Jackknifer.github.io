@@ -7,6 +7,18 @@ const IMAGE_TAG = /<img\b[^>]*\bsrc=(["'])(\/images\/[^"']+)\1[^>]*>/gi;
 const HOME_MARKER = 'class="home-content-container';
 const POST_MARKER = 'class="post-page-container';
 const RESPONSIVE_WIDTH = 960;
+const SOURCE_ROOT = fs.realpathSync(hexo.source_dir);
+const IMAGE_ROOT = fs.realpathSync(path.join(SOURCE_ROOT, "images"));
+
+function isInside(rootPath, candidatePath) {
+  const relative = path.relative(rootPath, candidatePath);
+  return (
+    Boolean(relative) &&
+    !relative.startsWith(`..${path.sep}`) &&
+    relative !== ".." &&
+    !path.isAbsolute(relative)
+  );
+}
 
 function imageWidth(filePath) {
   const buffer = fs.readFileSync(filePath);
@@ -61,7 +73,15 @@ function sourcePath(url) {
   } catch {
     decoded = url;
   }
-  return path.join(hexo.source_dir, decoded.replace(/^\//, ""));
+  const unresolvedPath = path.resolve(SOURCE_ROOT, decoded.replace(/^\/+/, ""));
+  if (!isInside(IMAGE_ROOT, unresolvedPath)) return "";
+
+  try {
+    const resolvedPath = fs.realpathSync(unresolvedPath);
+    return isInside(IMAGE_ROOT, resolvedPath) ? resolvedPath : "";
+  } catch {
+    return "";
+  }
 }
 
 function enhanceImage(tag, url) {
@@ -88,6 +108,15 @@ function enhanceImage(tag, url) {
 
   const width = imageWidth(originalPath);
   if (!width || width <= RESPONSIVE_WIDTH) return output;
+  // A responsive candidate only helps on slow or high-latency connections when
+  // it is actually smaller than the original. Some historical derivatives
+  // were encoded larger than their sources; advertising those in srcset made
+  // mobile browsers download more bytes.
+  if (
+    fs.statSync(responsivePath).size >= fs.statSync(originalPath).size
+  ) {
+    return output;
+  }
 
   output = addAttribute(
     output,
@@ -120,7 +149,7 @@ hexo.extend.filter.register("after_render:html", (html) => {
     // The profile is part of the first meaningful mobile screen. Embedding this
     // small local image removes an extra github.io request, so a transient
     // asset failure cannot leave the author card blank.
-    const avatarPath = path.join(hexo.source_dir, "images", "avatar.jpg");
+    const avatarPath = sourcePath("/images/avatar.jpg");
     if (fs.existsSync(avatarPath)) {
       const avatarData = fs.readFileSync(avatarPath).toString("base64");
       output = output.replace(

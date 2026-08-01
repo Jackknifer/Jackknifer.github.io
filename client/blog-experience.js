@@ -79,6 +79,13 @@
       data: null,
     },
   };
+  const legacyFallback = {
+    active: false,
+    searchEntries: null,
+    searchRequest: null,
+    images: [],
+    imageIndex: -1,
+  };
 
   function escapeAttribute(value) {
     return String(value)
@@ -208,17 +215,17 @@
         <div class="blog-weather-heading">
           <div class="blog-weather-location">
             <span class="blog-weather-symbol blog-weather-symbol-small" aria-hidden="true">⌖</span>
-            <strong data-weather-city>正在获取网络位置</strong>
+            <strong data-weather-city>天气未启用</strong>
           </div>
-          <button type="button" class="blog-weather-mode" data-weather-action="retry" title="重新获取网络位置">
-            <span data-weather-mode>网络定位</span>
+          <button type="button" class="blog-weather-mode" data-weather-action="load" title="获取天气（将使用网络大致位置）">
+            <span data-weather-mode>获取天气</span>
             <span class="blog-weather-symbol blog-weather-symbol-small" aria-hidden="true">↻</span>
           </button>
         </div>
         <div class="blog-weather-current">
           <div>
             <div class="blog-weather-temperature"><span data-weather-temperature>--</span><sup>°</sup></div>
-            <p data-weather-text>正在同步当地天气</p>
+            <p data-weather-text>点击右上角获取当地天气</p>
             <small>最高 <span data-weather-high>--</span>° · 最低 <span data-weather-low>--</span>°</small>
           </div>
           <div class="blog-weather-main-icon" aria-hidden="true">
@@ -254,7 +261,7 @@
           </div>
         </div>
         <p class="blog-weather-status" data-weather-status>
-          使用网络大致位置，不调用设备定位
+          点击后会通过第三方服务使用网络大致位置，不调用设备定位
         </p>
       </section>
     `;
@@ -334,7 +341,6 @@
 
       const overflow = Math.ceil(track.scrollWidth - viewport.clientWidth);
       const isOverflowing = overflow > 2;
-      viewport.toggleAttribute("title", isOverflowing);
       if (isOverflowing) {
         viewport.title = track.textContent;
         track.style.setProperty("--lyric-scroll-distance", `-${overflow}px`);
@@ -343,6 +349,8 @@
           `${Math.max(7, Math.min(14, overflow / 12 + 6))}s`,
         );
         viewport.classList.add("is-scrolling");
+      } else {
+        viewport.removeAttribute("title");
       }
     });
   }
@@ -472,10 +480,11 @@
         : null;
     let timer;
     try {
-      const request = fetch(url, {
-        ...(controller ? { signal: controller.signal } : {}),
+      const options = {
         headers: { Accept: "application/json" },
-      });
+      };
+      if (controller) options.signal = controller.signal;
+      const request = fetch(url, options);
       const timeoutRequest = new Promise((_resolve, reject) => {
         timer = window.setTimeout(() => {
           if (controller) controller.abort();
@@ -490,19 +499,29 @@
     }
   }
 
+  function queryString(values) {
+    return Object.keys(values)
+      .filter((key) => values[key] !== undefined && values[key] !== null)
+      .map(
+        (key) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(String(values[key]))}`,
+      )
+      .join("&");
+  }
+
   async function reverseGeocode(latitude, longitude) {
-    const params = new URLSearchParams({ localityLanguage: "zh" });
+    const params = { localityLanguage: "zh" };
     if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
-      params.set("latitude", String(latitude));
-      params.set("longitude", String(longitude));
+      params.latitude = latitude;
+      params.longitude = longitude;
     }
     return fetchJson(
-      `https://api.bigdatacloud.net/data/reverse-geocode-client?${params.toString()}`,
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?${queryString(params)}`,
     );
   }
 
   async function fetchWeather(latitude, longitude) {
-    const params = new URLSearchParams({
+    const params = {
       latitude: String(latitude),
       longitude: String(longitude),
       current:
@@ -512,8 +531,10 @@
       forecast_hours: "6",
       forecast_days: "1",
       timezone: "auto",
-    });
-    return fetchJson(`https://api.open-meteo.com/v1/forecast?${params.toString()}`);
+    };
+    return fetchJson(
+      `https://api.open-meteo.com/v1/forecast?${queryString(params)}`,
+    );
   }
 
   function locationName(location) {
@@ -568,8 +589,8 @@
     await loadWeatherForCoordinates(latitude, longitude, "网络位置");
   }
 
-  function requestWeather(force = false) {
-    if (!force && ["loading", "ready"].includes(state.weather.status)) {
+  function requestWeather() {
+    if (state.weather.status === "loading") {
       renderWeather();
       return;
     }
@@ -607,20 +628,27 @@
     widget.classList.toggle("has-error", weatherState.status === "error");
 
     if (weatherState.status !== "ready" || !weatherState.data) {
-      city.textContent =
-        weatherState.status === "error" ? "天气不可用" : "正在获取网络位置";
-      mode.textContent = weatherState.mode || "网络定位";
+      const isIdle = weatherState.status === "idle";
+      city.textContent = isIdle
+        ? "天气未启用"
+        : weatherState.status === "error"
+          ? "天气不可用"
+          : "正在获取网络位置";
+      mode.textContent = isIdle ? "获取天气" : weatherState.mode || "网络定位";
       widget.querySelector("[data-weather-text]").textContent =
-        weatherState.message || "正在同步当地天气";
+        isIdle
+          ? "点击右上角获取当地天气"
+          : weatherState.message || "正在同步当地天气";
       setWeatherIcon(
         widget.querySelector("[data-weather-icon]"),
         weatherState.status === "error" ? "↻" : "☁",
         weatherState.status === "loading" ? "is-pulsing" : "",
       );
-      status.textContent =
-        weatherState.status === "error"
+      status.textContent = isIdle
+        ? "点击后会通过第三方服务使用网络大致位置，不调用设备定位"
+        : weatherState.status === "error"
           ? "点击右上角重新获取网络位置与天气"
-          : "使用网络大致位置，不调用设备定位";
+          : "正在通过第三方服务获取网络大致位置";
       return;
     }
 
@@ -758,7 +786,7 @@
     }
 
     renderPlayer();
-    requestWeather();
+    renderWeather();
   }
 
   function mountPostPlayer() {
@@ -991,7 +1019,7 @@
     const title = document.createElement("h1");
     title.className = "page-title-header archive-page-title";
     title.textContent = "归档";
-    archive.prepend(title);
+    archive.insertBefore(title, archive.firstChild);
   }
 
   function classifyPage() {
@@ -1073,6 +1101,40 @@
     widgets.forEach((widget) => state.widgetAvoidanceObserver.observe(widget));
   }
 
+  function setSurfaceUsable(surface, isUsable) {
+    if ("inert" in surface) {
+      surface.inert = !isUsable;
+    } else {
+      const focusable = surface.querySelectorAll(
+        'a[href], button, input, select, textarea, [tabindex]',
+      );
+      focusable.forEach((element) => {
+        if (!isUsable) {
+          if (!element.hasAttribute("data-blog-previous-tabindex")) {
+            element.setAttribute(
+              "data-blog-previous-tabindex",
+              element.hasAttribute("tabindex")
+                ? element.getAttribute("tabindex")
+                : "",
+            );
+          }
+          element.setAttribute("tabindex", "-1");
+          return;
+        }
+
+        if (!element.hasAttribute("data-blog-previous-tabindex")) return;
+        const previous = element.getAttribute("data-blog-previous-tabindex");
+        element.removeAttribute("data-blog-previous-tabindex");
+        if (previous === "") {
+          element.removeAttribute("tabindex");
+        } else {
+          element.setAttribute("tabindex", previous);
+        }
+      });
+    }
+    surface.setAttribute("aria-hidden", String(!isUsable));
+  }
+
   function syncPlayerPresentation(pageType) {
     const isDesktopPost =
       pageType === "post" && window.matchMedia("(min-width: 769px)").matches;
@@ -1089,16 +1151,11 @@
       const isHiddenWithSideTools = floatingPlayer.classList.contains("hide");
       const isFloatingPlayerUsable =
         isDesktopPost && !isHiddenWithSideTools;
-      floatingPlayer.inert = !isFloatingPlayerUsable;
-      floatingPlayer.setAttribute(
-        "aria-hidden",
-        String(!isFloatingPlayerUsable),
-      );
+      setSurfaceUsable(floatingPlayer, isFloatingPlayerUsable);
     }
 
     if (postPlayer) {
-      postPlayer.inert = !isMobilePost;
-      postPlayer.setAttribute("aria-hidden", String(!isMobilePost));
+      setSurfaceUsable(postPlayer, isMobilePost);
     }
   }
 
@@ -1135,6 +1192,394 @@
     renderPlayer();
   }
 
+  function supportsThemeModuleSyntax() {
+    try {
+      const syntaxProbe = [
+        "return ({ value: 1 })",
+        String.fromCharCode(63, 46),
+        "value ",
+        String.fromCharCode(63, 63),
+        " 0;",
+      ].join("");
+      return new Function(syntaxProbe)() === 1;
+    } catch {
+      return false;
+    }
+  }
+
+  function activateLegacyThemeFallback(reason) {
+    if (legacyFallback.active) return;
+    legacyFallback.active = true;
+    document.documentElement.classList.add("blog-legacy-theme-fallback");
+    document.documentElement.setAttribute(
+      "data-blog-legacy-fallback-reason",
+      reason,
+    );
+  }
+
+  function deactivateLegacyThemeFallback() {
+    legacyFallback.active = false;
+    document.documentElement.classList.remove("blog-legacy-theme-fallback");
+    document.documentElement.removeAttribute(
+      "data-blog-legacy-fallback-reason",
+    );
+    document.body.classList.remove("navbar-drawer-show");
+  }
+
+  function isThemeMainScript(element) {
+    if (!element || element.tagName !== "SCRIPT") return false;
+    return /\/js\/build\/main\.js(?:[?#]|$)/.test(
+      element.getAttribute("src") || "",
+    );
+  }
+
+  function monitorThemeModule() {
+    if (!supportsThemeModuleSyntax()) {
+      activateLegacyThemeFallback("legacy-syntax");
+    }
+
+    document.addEventListener(
+      "load",
+      (event) => {
+        if (isThemeMainScript(event.target)) {
+          deactivateLegacyThemeFallback();
+        }
+      },
+      true,
+    );
+    document.addEventListener(
+      "error",
+      (event) => {
+        if (isThemeMainScript(event.target)) {
+          activateLegacyThemeFallback("theme-module-error");
+        }
+      },
+      true,
+    );
+
+    window.setTimeout(() => {
+      const themeModeReady =
+        document.body.classList.contains("light-mode") ||
+        document.body.classList.contains("dark-mode");
+      if (!themeModeReady) {
+        activateLegacyThemeFallback("theme-module-timeout");
+      }
+    }, 5000);
+  }
+
+  function setLegacySearchOpen(isOpen) {
+    const overlay = document.querySelector(".search-pop-overlay");
+    if (!overlay) return;
+    overlay.classList.toggle("active", isOpen);
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    if (!isOpen) return;
+
+    const input = overlay.querySelector(".search-input");
+    window.setTimeout(() => input && input.focus(), 0);
+    loadLegacySearch().then(() => {
+      renderLegacySearch(input ? input.value : "");
+    });
+  }
+
+  function normalizeLegacySearchUrl(value) {
+    try {
+      const parsed = new URL(value, window.location.href);
+      if (parsed.origin !== window.location.origin) return "/";
+      return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    } catch {
+      return "/";
+    }
+  }
+
+  function loadLegacySearch() {
+    if (legacyFallback.searchEntries) {
+      return Promise.resolve(legacyFallback.searchEntries);
+    }
+    if (legacyFallback.searchRequest) return legacyFallback.searchRequest;
+
+    legacyFallback.searchRequest = fetch("/search.json", {
+      headers: { Accept: "application/json" },
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("search index unavailable");
+        return response.json();
+      })
+      .then((entries) => {
+        if (!Array.isArray(entries)) throw new Error("invalid search index");
+        legacyFallback.searchEntries = entries
+          .slice(0, 2000)
+          .map((entry) => ({
+            title: String((entry && entry.title) || "")
+              .trim()
+              .slice(0, 300),
+            content: String((entry && entry.content) || "")
+              .slice(0, 200000)
+              .replace(/\s+/g, " ")
+              .trim(),
+            url: normalizeLegacySearchUrl(
+              String((entry && entry.url) || "").trim(),
+            ),
+          }))
+          .filter((entry) => entry.title);
+        return legacyFallback.searchEntries;
+      })
+      .catch(() => {
+        legacyFallback.searchEntries = [];
+        return legacyFallback.searchEntries;
+      });
+    return legacyFallback.searchRequest;
+  }
+
+  function appendLegacySearchStatus(container, message) {
+    const status = document.createElement("div");
+    status.id = "no-result";
+    status.className = "blog-legacy-search-status";
+    status.textContent = message;
+    container.appendChild(status);
+  }
+
+  function renderLegacySearch(rawQuery) {
+    const result = document.getElementById("search-result");
+    if (!result) return;
+    while (result.firstChild) result.removeChild(result.firstChild);
+
+    const query = String(rawQuery || "").trim().toLocaleLowerCase("zh-CN");
+    if (!legacyFallback.searchEntries) {
+      appendLegacySearchStatus(result, "正在加载本地搜索索引…");
+      return;
+    }
+    if (!query) {
+      appendLegacySearchStatus(result, "输入关键词即可搜索本站文章");
+      return;
+    }
+
+    const matches = legacyFallback.searchEntries
+      .filter(
+        (entry) =>
+          entry.title.toLocaleLowerCase("zh-CN").includes(query) ||
+          entry.content.toLocaleLowerCase("zh-CN").includes(query),
+      )
+      .slice(0, 20);
+    if (!matches.length) {
+      appendLegacySearchStatus(result, "没有找到匹配内容");
+      return;
+    }
+
+    const list = document.createElement("ul");
+    list.className = "search-result-list";
+    matches.forEach((entry) => {
+      const item = document.createElement("li");
+      const title = document.createElement("a");
+      title.className = "search-result-title";
+      title.href = entry.url;
+      title.textContent = entry.title;
+      item.appendChild(title);
+
+      if (entry.content) {
+        const summaryLink = document.createElement("a");
+        summaryLink.href = entry.url;
+        const summary = document.createElement("p");
+        summary.className = "search-result";
+        const lowerContent = entry.content.toLocaleLowerCase("zh-CN");
+        const matchIndex = lowerContent.indexOf(query);
+        const start = Math.max(0, matchIndex === -1 ? 0 : matchIndex - 32);
+        summary.textContent = `${entry.content.slice(start, start + 120)}…`;
+        summaryLink.appendChild(summary);
+        item.appendChild(summaryLink);
+      }
+      list.appendChild(item);
+    });
+    result.appendChild(list);
+  }
+
+  function setLegacyThemeMode(useDarkMode) {
+    const html = document.documentElement;
+    if (useDarkMode) {
+      html.classList.remove("light");
+      html.classList.add("dark");
+      document.body.classList.remove("light-mode");
+      document.body.classList.add("dark-mode");
+    } else {
+      html.classList.remove("dark");
+      html.classList.add("light");
+      document.body.classList.remove("dark-mode");
+      document.body.classList.add("light-mode");
+    }
+    try {
+      window.localStorage.setItem(
+        "redefine-color-scheme",
+        useDarkMode ? "dark" : "light",
+      );
+    } catch {
+      // Storage may be disabled; the in-page mode still works.
+    }
+  }
+
+  function legacyViewerImages() {
+    return Array.prototype.slice.call(
+      document.querySelectorAll(
+        ".markdown-body img, .masonry-item img, #shuoshuo-content img, .moment-photo img",
+      ),
+    );
+  }
+
+  function updateLegacyViewer(index) {
+    const viewer = document.querySelector(".image-viewer-container");
+    if (!viewer || !legacyFallback.images.length) return;
+    legacyFallback.imageIndex = Math.max(
+      0,
+      Math.min(index, legacyFallback.images.length - 1),
+    );
+    const source = legacyFallback.images[legacyFallback.imageIndex];
+    const target = viewer.querySelector(".image-viewer-frame img");
+    if (!source || !target) return;
+    target.src = source.currentSrc || source.src;
+    target.alt = source.alt || "";
+    target.style.transform = "";
+
+    const previous = viewer.querySelector(".image-viewer-prev");
+    const next = viewer.querySelector(".image-viewer-next");
+    if (previous) {
+      previous.classList.toggle(
+        "is-disabled",
+        legacyFallback.imageIndex === 0,
+      );
+    }
+    if (next) {
+      next.classList.toggle(
+        "is-disabled",
+        legacyFallback.imageIndex === legacyFallback.images.length - 1,
+      );
+    }
+  }
+
+  function openLegacyViewer(source) {
+    const viewer = document.querySelector(".image-viewer-container");
+    if (!viewer) return;
+    legacyFallback.images = legacyViewerImages();
+    const index = legacyFallback.images.indexOf(source);
+    viewer.classList.add("active");
+    document.body.style.overflow = "hidden";
+    updateLegacyViewer(index === -1 ? 0 : index);
+  }
+
+  function closeLegacyViewer() {
+    const viewer = document.querySelector(".image-viewer-container");
+    if (!viewer) return;
+    viewer.classList.remove("active");
+    document.body.style.overflow = "";
+    legacyFallback.imageIndex = -1;
+  }
+
+  function handleLegacyClick(event) {
+    if (!legacyFallback.active) return;
+    const target = event.target;
+
+    if (target.closest(".navbar-bar")) {
+      document.body.classList.toggle("navbar-drawer-show");
+      return;
+    }
+    if (
+      target.closest(".window-mask") ||
+      target.closest(".drawer-navbar-item a")
+    ) {
+      document.body.classList.remove("navbar-drawer-show");
+    }
+
+    if (target.closest(".search-popup-trigger")) {
+      event.preventDefault();
+      setLegacySearchOpen(true);
+      return;
+    }
+    const overlay = target.closest(".search-pop-overlay");
+    if (
+      target.closest(".popup-btn-close") ||
+      (overlay && target === overlay)
+    ) {
+      setLegacySearchOpen(false);
+      return;
+    }
+    if (target.closest(".search-input-field-pre")) {
+      const input = document.querySelector(".search-input");
+      if (input) {
+        input.value = "";
+        input.focus();
+        renderLegacySearch("");
+      }
+      return;
+    }
+
+    if (target.closest(".toggle-tools-list")) {
+      const tools = document.querySelector(".hidden-tools-list");
+      if (tools) tools.classList.toggle("show");
+      return;
+    }
+    if (target.closest(".tool-dark-light-toggle")) {
+      setLegacyThemeMode(
+        !document.documentElement.classList.contains("dark"),
+      );
+      return;
+    }
+    if (target.closest(".tool-scroll-to-top")) {
+      window.scrollTo(0, 0);
+      return;
+    }
+    if (target.closest(".tool-scroll-to-bottom")) {
+      window.scrollTo(0, document.documentElement.scrollHeight);
+      return;
+    }
+
+    const viewer = target.closest(".image-viewer-container");
+    if (target.closest(".image-viewer-close")) {
+      closeLegacyViewer();
+      return;
+    }
+    if (target.closest(".image-viewer-prev")) {
+      updateLegacyViewer(legacyFallback.imageIndex - 1);
+      return;
+    }
+    if (target.closest(".image-viewer-next")) {
+      updateLegacyViewer(legacyFallback.imageIndex + 1);
+      return;
+    }
+    if (
+      viewer &&
+      (target === viewer || target.closest(".image-viewer-frame") === target)
+    ) {
+      closeLegacyViewer();
+      return;
+    }
+
+    const sourceImage = target.closest(
+      ".markdown-body img, .masonry-item img, #shuoshuo-content img, .moment-photo img",
+    );
+    if (sourceImage && !sourceImage.closest(".image-viewer-container")) {
+      event.preventDefault();
+      openLegacyViewer(sourceImage);
+    }
+  }
+
+  function handleLegacyKeydown(event) {
+    if (!legacyFallback.active) return;
+    if (event.key === "Escape") {
+      setLegacySearchOpen(false);
+      closeLegacyViewer();
+      document.body.classList.remove("navbar-drawer-show");
+      return;
+    }
+
+    const viewer = document.querySelector(".image-viewer-container.active");
+    if (!viewer) return;
+    if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      event.preventDefault();
+      updateLegacyViewer(legacyFallback.imageIndex - 1);
+    }
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      event.preventDefault();
+      updateLegacyViewer(legacyFallback.imageIndex + 1);
+    }
+  }
+
   document.addEventListener("click", (event) => {
     const playerButton = event.target.closest("[data-player-action]");
     if (playerButton) {
@@ -1142,11 +1587,22 @@
       return;
     }
 
-    const weatherButton = event.target.closest('[data-weather-action="retry"]');
+    const weatherButton = event.target.closest('[data-weather-action="load"]');
     if (weatherButton) {
-      requestWeather(true);
+      requestWeather();
     }
   });
+
+  document.addEventListener("click", handleLegacyClick);
+  document.addEventListener("input", (event) => {
+    if (
+      legacyFallback.active &&
+      event.target.matches(".search-input")
+    ) {
+      renderLegacySearch(event.target.value);
+    }
+  });
+  document.addEventListener("keydown", handleLegacyKeydown);
 
   document.addEventListener("input", (event) => {
     const seek = event.target.closest("[data-player-seek]");
@@ -1171,6 +1627,7 @@
     }, 150);
   });
 
+  monitorThemeModule();
   createGlobalPlayer();
   syncPage();
   document.documentElement.classList.add("blog-experience-ready");

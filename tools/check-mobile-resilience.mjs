@@ -9,6 +9,8 @@ const tagDetailPath = "public/tags/求职/index.html";
 const categoryDetailPath = "public/categories/写作/index.html";
 const stylesPath = "public/css/blog-enhancements.css";
 const bundlePath = "public/js/blog-experience.js";
+const mediaResiliencePath = "scripts/media-resilience.js";
+const importerPath = "tools/import-pending-posts.mjs";
 
 for (const filePath of [
   homePath,
@@ -19,6 +21,8 @@ for (const filePath of [
   categoryDetailPath,
   stylesPath,
   bundlePath,
+  mediaResiliencePath,
+  importerPath,
 ]) {
   if (!fs.existsSync(filePath)) {
     throw new Error(`missing generated file: ${filePath}`);
@@ -33,6 +37,8 @@ const tagDetail = fs.readFileSync(tagDetailPath, "utf8");
 const categoryDetail = fs.readFileSync(categoryDetailPath, "utf8");
 const styles = fs.readFileSync(stylesPath, "utf8");
 const bundle = fs.readFileSync(bundlePath, "utf8");
+const mediaResilience = fs.readFileSync(mediaResiliencePath, "utf8");
+const importer = fs.readFileSync(importerPath, "utf8");
 const noScriptHome = home
   .replace(/<script\b[\s\S]*?<\/script>/gi, "")
   .replace(/<link[^>]+fontawesome[^>]*>/gi, "");
@@ -91,8 +97,10 @@ const checks = {
     /data-player-surface="home"[\s\S]*?blog-player-native-fallback/.test(
       noScriptHome,
     ),
-  "weather card has static status":
-    /data-weather-widget[\s\S]*?若长时间没有更新/.test(noScriptHome),
+  "weather card is explicit opt-in":
+    /data-weather-widget[\s\S]*?data-weather-action="load"[\s\S]*?点击后会通过第三方服务使用网络大致位置/.test(
+      noScriptHome,
+    ),
   "post player has native fallback":
     /blog-post-player-section[\s\S]*?blog-player-native-fallback/.test(
       noScriptPost,
@@ -110,9 +118,33 @@ const checks = {
   "image retry and fallback are inline":
     home.includes("data-blog-retried") && home.includes("图片暂时无法加载"),
   "browser bundle excludes unsupported APIs":
-    !/replaceAll|matchAll|Promise\.allSettled|queueMicrotask|\?\./.test(bundle),
-  "counter is not parser blocking":
-    !/<script[^>]+src="https:\/\/cn\.vercount\.one\/js/.test(home),
+    !/replaceAll|matchAll|Promise\.allSettled|queueMicrotask|URLSearchParams|toggleAttribute|\.prepend\(/.test(
+      bundle,
+    ),
+  "theme failure has local control fallbacks":
+    bundle.includes("blog-legacy-theme-fallback") &&
+    bundle.includes("theme-module-error") &&
+    bundle.includes("/search.json") &&
+    bundle.includes('Accept:"application/json"') &&
+    bundle.includes(".toggle-tools-list") &&
+    bundle.includes(".hidden-tools-list") &&
+    bundle.includes("navbar-drawer-show"),
+  "comments have a static fallback link":
+    /blog-comment-fallback[\s\S]*?github\.com\/Jackknifer\/Jackknifer\.github\.io\/discussions/.test(
+      noScriptPost,
+    ),
+  "single-page runtime is not loaded":
+    !/<script[^>]+src=["'][^"']*Swup/i.test(home),
+  "build-time image reads stay inside the canonical image root":
+    mediaResilience.includes("fs.realpathSync(unresolvedPath)") &&
+    mediaResilience.includes("isInside(IMAGE_ROOT, resolvedPath)"),
+  "pending post Markdown uses canonical inbox containment":
+    importer.includes(
+      "const safeMarkdownPath = await resolveSafePendingFile(candidate.mdPath)",
+    ) && importer.includes("mdPath: safeIndexPath"),
+  "pending post asset writes enforce destination containment":
+    importer.includes("slug !== \".\" && slug !== \"..\"") &&
+    importer.includes("prepareSafeDestination(imageRoot, destPath)"),
 };
 
 const missingAssets = [];
@@ -129,6 +161,8 @@ function collectHtml(directory) {
 
 collectHtml("public");
 
+const oversizedResponsiveAssets = [];
+
 for (const filePath of htmlFiles) {
   const html = fs.readFileSync(filePath, "utf8");
   const referencePattern =
@@ -143,9 +177,39 @@ for (const filePath of htmlFiles) {
       missingAssets.push(`${filePath}: ${match[1]}`);
     }
   }
+
+  const srcsetPattern = /\bsrcset=["']([^"']+)["']/g;
+  while ((match = srcsetPattern.exec(html))) {
+    for (const candidate of match[1].split(",")) {
+      const url = candidate.trim().split(/\s+/)[0];
+      if (!url.startsWith("/images/responsive/")) continue;
+      const responsivePath = path.join(
+        "public",
+        decodeURIComponent(url).replace(/^\//, ""),
+      );
+      const originalPath = responsivePath.replace(
+        `${path.sep}images${path.sep}responsive${path.sep}`,
+        `${path.sep}images${path.sep}`,
+      );
+      if (
+        fs.existsSync(responsivePath) &&
+        fs.existsSync(originalPath) &&
+        fs.statSync(responsivePath).size >= fs.statSync(originalPath).size
+      ) {
+        oversizedResponsiveAssets.push(
+          `${filePath}: ${url} is not smaller than its original`,
+        );
+      }
+    }
+  }
 }
 
 checks["all local asset references exist"] = missingAssets.length === 0;
+checks["advertised responsive images save bytes"] =
+  oversizedResponsiveAssets.length === 0;
+checks["counter dependency is removed"] = !htmlFiles.some((filePath) =>
+  fs.readFileSync(filePath, "utf8").includes("cn.vercount.one"),
+);
 
 for (const [name, passed] of Object.entries(checks)) {
   console.log(`${passed ? "PASS" : "FAIL"} ${name}`);
@@ -153,6 +217,9 @@ for (const [name, passed] of Object.entries(checks)) {
 
 if (missingAssets.length) {
   console.error(missingAssets.slice(0, 20).join("\n"));
+}
+if (oversizedResponsiveAssets.length) {
+  console.error(oversizedResponsiveAssets.slice(0, 20).join("\n"));
 }
 
 if (Object.values(checks).some((passed) => !passed)) {
