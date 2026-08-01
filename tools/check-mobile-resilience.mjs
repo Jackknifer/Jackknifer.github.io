@@ -13,6 +13,7 @@ const categoryDetailPath = "public/categories/写作/index.html";
 const stylesPath = "public/css/blog-enhancements.css";
 const themeStylesPath = "public/css/style.css";
 const bundlePath = "public/js/blog-experience.js";
+const clientExperiencePath = "client/blog-experience.js";
 const mediaResiliencePath = "scripts/media-resilience.js";
 const importerPath = "tools/import-pending-posts.mjs";
 
@@ -26,6 +27,7 @@ for (const filePath of [
   stylesPath,
   themeStylesPath,
   bundlePath,
+  clientExperiencePath,
   mediaResiliencePath,
   importerPath,
 ]) {
@@ -43,6 +45,7 @@ const categoryDetail = fs.readFileSync(categoryDetailPath, "utf8");
 const styles = fs.readFileSync(stylesPath, "utf8");
 const themeStyles = fs.readFileSync(themeStylesPath, "utf8");
 const bundle = fs.readFileSync(bundlePath, "utf8");
+const clientExperience = fs.readFileSync(clientExperiencePath, "utf8");
 const mediaResilience = fs.readFileSync(mediaResiliencePath, "utf8");
 const importer = fs.readFileSync(importerPath, "utf8");
 const noScriptHome = home
@@ -110,10 +113,11 @@ const checks = {
     /data-player-surface="home"[\s\S]*?blog-player-native-fallback/.test(
       noScriptHome,
     ),
-  "weather card is explicit opt-in":
-    /data-weather-widget[\s\S]*?data-weather-action="load"[\s\S]*?点击后会通过第三方服务使用网络大致位置/.test(
-      noScriptHome,
-    ),
+  "weather card loads automatically and keeps manual retry":
+    /if \(state\.weather\.status === "idle"\) requestWeather\(\);/.test(
+      clientExperience,
+    ) &&
+    /data-weather-widget[\s\S]*?data-weather-action="load"/.test(noScriptHome),
   "post player has native fallback":
     /blog-post-player-section[\s\S]*?blog-player-native-fallback/.test(
       noScriptPost,

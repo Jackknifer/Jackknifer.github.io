@@ -787,6 +787,7 @@
 
     renderPlayer();
     renderWeather();
+    if (state.weather.status === "idle") requestWeather();
   }
 
   function mountPostPlayer() {
