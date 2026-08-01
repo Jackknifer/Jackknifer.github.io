@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "npm run build:client && hexo generate",
+    "build": "npm run build:client && TZ=UTC hexo generate",
     "build:client": "node tools/build-browser-js.mjs",
     "check:mobile": "node tools/check-mobile-resilience.mjs",
     "check:security-import": "node tools/check-import-security.mjs",

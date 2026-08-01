@@ -2,7 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 
 const homePath = "public/index.html";
-const postPath = "public/2026/06/14/welcome/index.html";
+// Hexo derives permalink date components from the process timezone. Production
+// builds use UTC for deterministic paths while `_config.yml` keeps displayed
+// dates in Asia/Shanghai.
+const postPath = "public/2026/06/13/welcome/index.html";
 const categoriesPath = "public/categories/index.html";
 const archivePath = "public/archives/index.html";
 const tagDetailPath = "public/tags/求职/index.html";
